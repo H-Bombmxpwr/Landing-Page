@@ -17,14 +17,21 @@
             <ul>
                 <li><a href="#about">About Me</a></li>
                 <li><a href="#projects">Personal Projects</a></li>
-                <li><a href="#school-projects">School Projects</a></li>
+                <li><a href="#school-projects">Academic Projects</a></li>
             </ul>
         </nav>
 
         <!-- about section -->
         <section class="about">
-            <h2>About Me</h2>
-            <p>Electrical engineer and computer scientist who makes dumb programs</p>
+            <div class="about-content">
+                <div class="about-text">
+                    <h2>About Me</h2>
+                    <p>Electrical engineer and computer scientist who makes dumb programs</p>
+                </div>
+                <div class="about-image">
+                    <img src="{{ url_for('static', filename='images/bender.jpg') }}" alt="Your Image">
+                </div>
+            </div>
             <div class="social-links">
                 <a href="https://github.com/H-Bombmxpwr" target="_blank" class="icon-link">
                     <i class="fab fa-github"></i>
@@ -48,15 +55,15 @@
         <section id="projects">
             <h2>Personal Projects</h2>
             <ul id="project-tabs">
-                <li class="tab" onclick="showProject('project1')">Music Poster</li>
+                <li class="tab" onclick="showProject('project1')">Album Poster</li>
                 <li class="tab" onclick="showProject('project2')">Song Swears</li>
                 <li class="tab" onclick="showProject('project3')">Clarence</li>
                 <li class="tab" onclick="showProject('project4')">Personal Website</li>
             </ul>
 
             <div id="project1" class="project-content">
-                <h3>Music Poster Generator</h3>
-                <p>This is a website to generate a music poster. It interacts with the spotify API. It will take an artist or an album and generate a poster.</p>
+                <h3>Album Poster Generator</h3>
+                <p>This is a website to generate a cool album poster. It interacts with the spotify API. It will take an artist or an album and generate a poster.</p>
                 <a href="https://trevorg73.web.illinois.edu/musicposter/home" role="button" class="visit-button">Visit Website</a>
                 <figure>
                     <img src="{{ url_for('static', filename='images/khalid.png') }}" alt="American Teen Screenshot" style="max-width:100%; height:auto;">
@@ -100,7 +107,7 @@
 
             <div id="project4" class="project-content">
                 <h3>This Website</h3>
-                <p>Coded from scratch using html, css, and some python. The repository is linked below </p>
+                <p>Coded from scratch using HTML, CSS, JavaScript, and some Python. The repository is linked below </p>
     
                 <a href="https://github.com/H-Bombmxpwr/Landing-Page" role="button" class="visit-button">Site Repository</a>
                 <figure class="website-screenshot">
@@ -113,7 +120,7 @@
 
 
         <section id="school-projects">
-            <h2>School Projects</h2>
+            <h2>Academic Projects</h2>
             <ul id="project-tabs">
                 <li class="tab" onclick="showSchoolProject('school-project1')">Six Degrees of Wikipedia</li>
                 <li class="tab" onclick="showSchoolProject('school-project2')">FPGA Video Game</li>
