@@ -60,6 +60,19 @@ footer {
     bottom: 0;
 }
 
+.github-footer {
+    color: #fff; /* Color of the icon */
+    padding-right: 10px; /* Space between the icon and the text */
+    font-size: 1.5em; /* Size of the icon */
+    vertical-align: middle; /* Aligns icon with the text */
+    text-decoration: none; /* No underline on hover/focus */
+}
+
+/* Optional: Change the color of the icon on hover */
+.github-footer:hover {
+    color: #ccc;
+}
+
 #projects {
     padding: 20px;
     background-color: #f4f4f4;

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{{ url_for('static', filename='images/fry.svg') }}" type="image/svg">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <title>Hunter's Website</title>
@@ -15,10 +16,12 @@
         <nav class="navbar">
             <ul>
                 <li><a href="#about">About Me</a></li>
-                <li><a href="#projects">Projects</a></li>
+                <li><a href="#projects">Personal Projects</a></li>
+                <li><a href="#school-projects">School Projects</a></li>
             </ul>
         </nav>
 
+        <!-- about section -->
         <section class="about">
             <h2>About Me</h2>
             <p>Electrical engineer and computer scientist who makes dumb programs</p>
@@ -41,14 +44,16 @@
             </div>
         </section>
         
-        <!-- Projects Section -->
+        <!-- Personal Projects Section -->
         <section id="projects">
-            <h2>Projects</h2>
+            <h2>Personal Projects</h2>
             <ul id="project-tabs">
                 <li class="tab" onclick="showProject('project1')">Music Poster</li>
                 <li class="tab" onclick="showProject('project2')">Song Swears</li>
                 <li class="tab" onclick="showProject('project3')">Clarence</li>
+                <li class="tab" onclick="showProject('project4')">Personal Website</li>
             </ul>
+
             <div id="project1" class="project-content">
                 <h3>Music Poster Generator</h3>
                 <p>This is a website to generate a music poster. It interacts with the spotify API. It will take an artist or an album and generate a poster.</p>
@@ -93,14 +98,66 @@
                 </figure>
             </div>
 
+            <div id="project4" class="project-content">
+                <h3>This Website</h3>
+                <p>Coded from scratch using html, css, and some python. The repository is linked below </p>
+    
+                <a href="https://github.com/H-Bombmxpwr/Landing-Page" role="button" class="visit-button">Site Repository</a>
+                <figure class="website-screenshot">
+                    <img src="{{ url_for('static', filename='images/fry.svg') }}" alt="Fry Icon" class="round-icon">
+                    <figcaption>Fry from Futurama, this sites icon</figcaption>
+                </figure>
+            </div>
 
         </section>
 
-        
+
+        <section id="school-projects">
+            <h2>School Projects</h2>
+            <ul id="project-tabs">
+                <li class="tab" onclick="showSchoolProject('school-project1')">Six Degrees of Wikipedia</li>
+                <li class="tab" onclick="showSchoolProject('school-project2')">FPGA Video Game</li>
+                <!-- Add more tabs as needed -->
+            </ul>
+
+            <div id="school-project1" class="school-project-content">
+                <h3>Six Degrees of Wikipedia Solver</h3>
+                <p>A program to solve the six degrees of Wikipedia problem, which is described <a href="https://en.wikipedia.org/wiki/Wikipedia:Six_degrees_of_Wikipedia" target="_blank">here</a>. It was a final project, done in a group of 4. It also goes into the betweenness centrality of thousands of articles.</p>
+                <a href="https://github.com/JuanDiegoSanz7/225-Final-Project" role="button" class="visit-button">Repository</a>
+                <figure class="website-screenshot">
+                    <img src="{{ url_for('static', filename='images/graph.png') }}" alt="graph Images">
+                    <figcaption>Graph representing thousands of articles distance from "United States"</figcaption>
+                </figure>
+            </div>
+            
+            <div id="school-project2" class="school-project-content" style="display: none;">
+                <h3>Custom Video Game on FPGA</h3>
+                <p>A custom video game programmed onto an FPGA detailing the life of an ECE major @ U of I. Written in System Verilog it includes custom sprites and top down gameplay. The repository is currently private.</p>
+                <figure class="website-screenshot">
+                    <img src="{{ url_for('static', filename='images/fpga.png') }}" alt="graph Images">
+                    <figcaption> FPGA running the game real time</figcaption>
+                </figure>
+                <!-- Add more content as needed -->
+            </div>
+
+
+
+            <!-- Add more project-content divs as needed -->
+        </section>
+
+
+
+
         
         <footer class="footer">
-            <p>Copyright © 2023 Hunter Baisden</p>
+            <p>
+                <a href="https://github.com/H-Bombmxpwr/Landing-Page" target="_blank" class="github-footer">
+                    <i class="fab fa-github"></i>
+                </a>
+                2023 - Hunter Baisden
+            </p>
         </footer>
+        
     </div>
     <script src="{{ url_for('static', filename='js/project.js') }}"></script>
 </body>
