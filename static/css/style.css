@@ -1,0 +1,197 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    color: #333;
+    scroll-behavior: smooth; /* Enables smooth scrolling */
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 1rem 0;
+    text-align: center;
+}
+
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center; /* Center navbar items horizontally */
+    align-items: center; /* Center navbar items vertically */
+    background: #333; /* Background color */
+}
+
+nav ul li {
+    padding: 10px 20px; /* Spacing around navbar items */
+}
+
+nav ul li a {
+    color: #fff;
+    font-weight: bold; /* Make the text bold */
+    text-decoration: none; /* Remove underlines */
+    transition: color 0.3s ease; /* Smooth color transition for hover effect */
+}
+
+nav ul li a:hover, nav ul li a:focus {
+    color: #ddd; /* Lighter color on hover/focus */
+}
+
+/* Add some padding to the header for better spacing */
+header {
+    padding: 1rem;
+}
+
+
+section {
+    padding: 2rem;
+    text-align: center;
+}
+
+footer {
+    background: #333;
+    color: #fff;
+    text-align: center;
+    padding: 1rem 0;
+    position: sticky;
+    bottom: 0;
+}
+
+#projects {
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+#project-tabs {
+    list-style: none;
+    padding: 0;
+}
+
+#project-tabs .tab {
+    display: inline-block;
+    margin-right: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+
+#project-tabs .tab:hover {
+    background-color: #ddd;
+}
+
+/* Show the Music Poster project content by default */
+#project1 {
+    display: block;
+}
+.project-content {
+    display: none;
+    margin-top: 20px;
+}
+
+.project-content h3 {
+    margin-top: 0;
+}
+
+.visit-button {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 10px 0;
+    background-color: #000c49; /* Green background */
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.visit-button:hover, .visit-button:focus {
+    background-color: #0d6eb9; /* Darker green on hover/focus */
+    color: white;
+    text-decoration: none; /* No underline on hover/focus */
+}
+
+
+.social-links {
+    display: flex;
+    justify-content: center; /* This will center the icons horizontally */
+    align-items: center; /* This will center the icons vertically */
+    gap: 10px; /* Adjust the space between icons as needed */
+}
+
+.icon-link {
+    margin: 0 10px;
+    font-size: 24px; /* Size of the icons */
+    color: #333; /* Icon color */
+    text-decoration: none; /* Remove underlines from icons */
+}
+/* Hover effects */
+.icon-link:hover {
+    color: #555; /* Color when hovering, change as needed */
+    transform: scale(1.1); /* Slightly increase the size of the icon */
+}
+
+
+.icon-link:focus {
+    color: #666;
+    text-decoration: none; /* Icon color on hover/focus */
+}
+
+
+.social-icon {
+    
+    width: 24px; /* Set the width to 24 pixels */
+    height: 24px; /* Set the height to 24 pixels */
+    object-fit: contain; /* This ensures the image is resized within the container without being stretched or squished */
+    vertical-align: middle; /* Align with other inline or inline-block elements */
+}
+
+/* You may want to remove any default padding/margin for images inside the links */
+.icon-link img {
+    display: block; /* Remove any space below the image */
+    margin: 0;
+    padding: 0;
+    border: none; /* Remove border if there's any */
+}
+
+.website-screenshot img {
+    width: 100%; /* or any other size */
+    max-width: 400px; /* sets the maximum size of the image */
+    border: 2px solid #000; /* adds a black border */
+    display: block;
+    margin: 0 auto; /* centers the image in the figure element */
+}
+
+.feature-list {
+    list-style: none; /* Removes default list styling */
+    padding: 0; /* Removes default padding */
+    display: flex; /* Enables flexbox */
+    flex-wrap: wrap; /* Allows items to wrap into the next row */
+    justify-content: center; /* Centers the items horizontally */
+    max-width: 600px; /* Maximum width of the list */
+    margin: 0 auto; /* Centers the list in the container */
+}
+
+.feature-list li {
+    width: 50%; /* Each item takes up half the width of the list */
+    box-sizing: border-box; /* Makes sure padding and border are included in the width */
+    padding: 5px; /* Adds some padding around items */
+}
+
+/* Optional: Adds a bullet point before each item */
+.feature-list li::before {
+    content: '• '; /* Bullet point character */
+    color: #333; /* Bullet point color */
+    font-weight: bold; /* Makes the bullet point bold */
+}
+
+.round-icon {
+    display: block; /* Changes the display to block */
+    border: 3px solid #000; /* Optional: Adds a border around the image */
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 50%;
+}
