@@ -210,16 +210,14 @@ footer {
 }
 
 .about-content {
-    display: flex; /* Align items in a row */
-    align-items: center; /* Vertically center align items */
-    justify-content: flex-start; /* Align items to the start of the container */
-    padding: 20px; /* Add padding inside the container */
+    text-align: center; /* Center text elements */
+    display: flex; /* Use flexbox for layout */
+    flex-direction: column; /* Stack children vertically */
+    align-items: center; /* Center items horizontally */
+    justify-content: center; /* Center items vertically if there is extra space */
 }
 
-.about-text {
-    flex: 1; /* Flex-grow to fill available space */
-    padding-right: 20px; /* Add spacing between text and image */
-}
+
 
 .about-image {
     flex-shrink: 0; /* Don't allow the image to shrink */
@@ -229,6 +227,7 @@ footer {
     overflow: hidden; /* Hide any overflowing content */
     border: 2px solid #000; /* Added a black border */
     margin-left: 20px;
+    margin-bottom: 20px; /* Add some space below the image */
 }
 
 .about-image img {
