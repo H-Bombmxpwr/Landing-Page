@@ -125,6 +125,7 @@
             <ul id="project-tabs">
                 <li class="tab" onclick="showSchoolProject('school-project1')">Six Degrees of Wikipedia</li>
                 <li class="tab" onclick="showSchoolProject('school-project2')">FPGA Video Game</li>
+                <li class="tab" onclick="showSchoolProject('school-project3')">Controlled Boost Converter</li>
                 <!-- Add more tabs as needed -->
             </ul>
 
@@ -146,6 +147,16 @@
                     <figcaption> FPGA running the game real time</figcaption>
                 </figure>
                 <!-- Add more content as needed -->
+            </div>
+
+            <div id="school-project3" class="school-project-content" style="display: none;"">
+                <h3>Controlled Boost Converter</h3>
+                <p>A hand-controlled boost converter designed for a ranging 9-15V input, and a strict 24V&plusmn;3% output. A custom inductor was wound for the project. Arduino control was also built in for more precise control.</p>
+                
+                <figure class="website-screenshot">
+                    <img src="{{ url_for('static', filename='images/boost.jpg') }}" alt="graph Images">
+                    <figcaption>Photo of the converter including the power board, control board, and custom inductor.</figcaption>
+                </figure>
             </div>
 
 
