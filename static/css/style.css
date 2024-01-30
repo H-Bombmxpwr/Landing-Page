@@ -235,3 +235,9 @@ footer {
     height: 100%;
     object-fit: cover; /* Maintain image aspect ratio */
 }
+
+/* Active tab styling */
+.tab-active {
+    background-color: #000c49; /* Same as the visit button */
+    color: white; /* White text */
+}
