@@ -69,6 +69,7 @@
                 <li class="tab" onclick="showProject('project2')">Song Swears</li>
                 <li class="tab" onclick="showProject('project3')">Clarence</li>
                 <li class="tab" onclick="showProject('project4')">Personal Website</li>
+                <li class="tab" onclick="showProject('project5')">Mario Kart Tracker</li>
             </ul>
 
             <div id="project1" class="project-content">
@@ -123,6 +124,17 @@
                 <figure class="website-screenshot">
                     <img src="{{ url_for('static', filename='images/fry.svg') }}" alt="Fry Icon" class="round-icon">
                     <figcaption>Fry from Futurama, this sites icon</figcaption>
+                </figure>
+            </div>
+
+            <div id="project5" class="project-content">
+                <h3>Mario Kart Tracker</h3>
+                <p>Enter in a username and this site will track as many friends as you want, and all of their Mario Kart placements. They are saved under your username.</p>
+    
+                <a href="https://trevorg73.web.illinois.edu/kart/login" role="button" class="visit-button">Visit Site</a>
+                <figure class="website-screenshot">
+                    <img src="{{ url_for('static', filename='images/kart.png') }}" alt="Fry Icon" class="round-icon">
+                    <figcaption>Mario doing Mario things</figcaption>
                 </figure>
             </div>
 
