@@ -29,8 +29,17 @@
                 </div>
                 <div class="about-text">
                     <h2>About Me</h2>
-                    <p>Electrical engineer and computer scientist who makes fun programs.</p>
+                    <p>electrical engineer and computer scientist</p>
+                    <blockquote>
+                        Sometimes, just sometimes<br>
+                        Maybe more than some of the time<br>
+                        I'm on a false ego trip<br>
+                        Insecurity is rife<br>
+                        I'm not the ideal person<br>
+                        To be lecturing of life
+                    </blockquote>
                 </div>
+                
                 
             </div>
             <div class="social-links">
@@ -123,13 +132,26 @@
         <section id="school-projects">
             <h2>Academic Projects</h2>
             <ul id="project-tabs">
-                <li class="tab" onclick="showSchoolProject('school-project1')">Six Degrees of Wikipedia</li>
-                <li class="tab" onclick="showSchoolProject('school-project2')">FPGA Video Game</li>
-                <li class="tab" onclick="showSchoolProject('school-project3')">Controlled Boost Converter</li>
+                <li class="tab" onclick="showSchoolProject('school-project1')">First Person View Drone</li>
+                <li class="tab" onclick="showSchoolProject('school-project2')">Six Degrees of Wikipedia</li>
+                <li class="tab" onclick="showSchoolProject('school-project3')">FPGA Video Game</li>
+                <li class="tab" onclick="showSchoolProject('school-project4')">Controlled Boost Converter</li>
+                
                 <!-- Add more tabs as needed -->
             </ul>
 
             <div id="school-project1" class="school-project-content">
+                <h3>First Person View Drone</h3>
+                <p>Senior design project for ECE at Illinois. 3 custom designed PCBs used to implament live wireless camera transmission from a Crazyflie drone to a headset. Done in a group of 3. The final drone successfully streamed real time video to both a laptop and a headset.</p>
+                <a href="https://github.com/H-Bombmxpwr/FPV_Drone" role="button" class="visit-button">Repository</a>
+                <figure class="website-screenshot">
+                    <img src="{{ url_for('static', filename='images/Drone.png') }}" alt="graph Images">
+                    <figcaption>The final designed drone with the camera and IR LED boards attached (not pictured: the headset board)</figcaption>
+                </figure>
+            </div>
+
+
+            <div id="school-project2" class="school-project-content">
                 <h3>Six Degrees of Wikipedia Solver</h3>
                 <p>A program to solve the six degrees of Wikipedia problem, which is described <a href="https://en.wikipedia.org/wiki/Wikipedia:Six_degrees_of_Wikipedia" target="_blank">here</a>. It was a final project, done in a group of 4. It also goes into the betweenness centrality of thousands of articles.</p>
                 <a href="https://github.com/JuanDiegoSanz7/225-Final-Project" role="button" class="visit-button">Repository</a>
@@ -139,7 +161,7 @@
                 </figure>
             </div>
             
-            <div id="school-project2" class="school-project-content" style="display: none;">
+            <div id="school-project3" class="school-project-content" style="display: none;">
                 <h3>Custom Video Game on FPGA</h3>
                 <p>A custom video game programmed onto an FPGA detailing the life of an ECE major @ U of I. Written in System Verilog it includes custom sprites and top down gameplay. The repository is currently private.</p>
                 <figure class="website-screenshot">
@@ -149,7 +171,7 @@
                 <!-- Add more content as needed -->
             </div>
 
-            <div id="school-project3" class="school-project-content" style="display: none;"">
+            <div id="school-project4" class="school-project-content" style="display: none;"">
                 <h3>Controlled Boost Converter</h3>
                 <p>A hand-controlled boost converter designed for a ranging 9-15V input, and a strict 24V&plusmn;3% output. A custom inductor was wound for the project. Arduino control was also built in for more precise control.</p>
                 
@@ -158,7 +180,6 @@
                     <figcaption>Photo of the converter including the power board, control board, and custom inductor.</figcaption>
                 </figure>
             </div>
-
 
 
             <!-- Add more project-content divs as needed -->
@@ -175,7 +196,9 @@
                 </a>
                 2023 - Hunter Baisden
             </p>
+            <div id="funnyQuote">Loading a quote...</div>
         </footer>
+        
         
     </div>
     <script src="{{ url_for('static', filename='js/project.js') }}"></script>

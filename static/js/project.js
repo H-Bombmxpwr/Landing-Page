@@ -46,3 +46,11 @@ document.addEventListener('DOMContentLoaded', function() {
     var firstSchoolProjectId = firstSchoolProjectTab.getAttribute('onclick').split('\'')[1];
     showSchoolProject(firstSchoolProjectId);
 });
+
+fetch('https://api.quotable.io/random')
+  .then(response => response.json())
+  .then(data => {
+    console.log(data.content + " - " + data.author); // Logs the quote and the author to the console
+    document.getElementById('funnyQuote').innerHTML = `"${data.content}" - ${data.author}`;
+  })
+  .catch(error => console.error('Error fetching the quote:', error));
