@@ -30,15 +30,15 @@
                 <div class="about-text">
                     <h2>About Me</h2>
                     <p>electrical engineer and computer scientist</p>
-                    <blockquote>
-                        Sometimes, just sometimes<br>
-                        Maybe more than some of the time<br>
-                        I'm on a false ego trip<br>
-                        Insecurity is rife<br>
-                        I'm not the ideal person<br>
-                        To be lecturing of life
+                    <blockquote id="lyrics-block">
+                        <!-- This is where the random lyrics will be inserted -->
                     </blockquote>
+                    <p id="song-info">
+                        <!-- Song title and artist will be inserted here -->
+                    </p>
+                    <a href="#" role="button" class="visit-button" onclick="displayNextLyrics()">Change Lyrics</a>
                 </div>
+                
                 
                 
             </div>
@@ -203,10 +203,16 @@
                 <a href="https://github.com/H-Bombmxpwr/Landing-Page" target="_blank" class="github-footer">
                     <i class="fab fa-github"></i>
                 </a>
-                2023 - Hunter Baisden
+                <span id="year"></span> - Hunter Baisden
             </p>
             <div id="funnyQuote">Loading a quote...</div>
         </footer>
+        
+        <script>
+            // Get the current year and display it in the footer
+            document.getElementById('year').textContent = new Date().getFullYear();
+        </script>
+        
         
         
     </div>
