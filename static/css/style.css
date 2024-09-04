@@ -132,10 +132,15 @@ section {
     transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for background and text color */
 }
 
-.visit-button:hover, .visit-button:focus {
-    background-color: #0d6eb9; /* Lighter color on hover/focus */
+.visit-button:hover {
+    background-color: #0d6eb9; /* Lighter color on hover */
     color: white;
-    text-decoration: none; /* No underline on hover/focus */
+    text-decoration: none; /* No underline on hover */
+}
+
+/* Remove focus styles that keep the hover color after clicking */
+.visit-button:focus {
+    outline: none; /* Removes the focus outline, if any */
 }
 
 
