@@ -67,10 +67,11 @@
             <h2>Personal Projects</h2>
             <ul id="project-tabs">
                 <li class="tab" onclick="showProject('project1')">Album Poster</li>
-                <li class="tab" onclick="showProject('project2')">Song Swears</li>
-                <li class="tab" onclick="showProject('project3')">Clarence</li>
-                <li class="tab" onclick="showProject('project4')">Personal Website</li>
-                <li class="tab" onclick="showProject('project5')">Mario Kart Tracker</li>
+                <li class="tab" onclick="showProject('project2')">LiDAR Lense</li>
+                <li class="tab" onclick="showProject('project3')">Song Swears</li>
+                <li class="tab" onclick="showProject('project4')">Clarence</li>
+                <li class="tab" onclick="showProject('project5')">Personal Website</li>
+                <li class="tab" onclick="showProject('project6')">Mario Kart Tracker</li>
             </ul>
 
             <div id="project1" class="project-content">
@@ -84,7 +85,22 @@
                 
                 
             </div>
+
             <div id="project2" class="project-content">
+                <h3>LiDAR Lense</h3>
+                <p>My iPhone app that used the LiDAR on some iPhone Pro models to help map the room around you. It identifies potential obstacles and displays them on the screen for the user as they walk around real time. Written in Swift and Python, the repository is currently private.</p>
+                <figure class="website-screenshot">
+                    <img src="{{ url_for('static', filename='images/lidar.png') }}" alt="Screenshot of my kitchen through LiDAR Lense">
+                    <figcaption>Screenshot of my kitchen through LiDAR Lense</figcaption>
+                </figure>
+                <figure class="website-screenshot">
+                    <img src="{{ url_for('static', filename='images/lense.png') }}" alt="Screenshot of my kitchen through LiDAR Lense" class="round-icon">
+                    <figcaption>The apps icon</figcaption>
+                </figure>
+            </div>
+
+
+            <div id="project3" class="project-content">
                 <h3>Swears in Songs</h3>
                 <p>This is a website to return all of the swear words in a queried song. My first website so a little rough around the edges, still gets the job done though.</p>
                 <a href="https://trevorg73.web.illinois.edu/songswears" role="button" class="visit-button">Visit Website</a>
@@ -94,7 +110,7 @@
                 </figure>
             </div>
             
-            <div id="project3" class="project-content">
+            <div id="project4" class="project-content">
                 <h3>Clarence</h3>
                 <p>A discord bot with over 30 functions including but not limited too:</p>
                 <ul class="feature-list">
@@ -117,7 +133,7 @@
                 </figure>
             </div>
 
-            <div id="project4" class="project-content">
+            <div id="project5" class="project-content">
                 <h3>This Website</h3>
                 <p>Coded from scratch using HTML, CSS, JavaScript, and some Python. The repository is linked below </p>
     
@@ -128,7 +144,7 @@
                 </figure>
             </div>
 
-            <div id="project5" class="project-content">
+            <div id="project6" class="project-content">
                 <h3>Mario Kart Tracker</h3>
                 <p>Enter in a username and this site will track as many friends as you want, and all of their Mario Kart placements. They are saved under your username.</p>
     
