@@ -100,11 +100,31 @@ document.addEventListener('DOMContentLoaded', function() {
     showSchoolProject(firstSchoolProjectId);
 });
 
-// Fetch a random quote from the quotable API
-fetch('https://api.quotable.io/random')
-  .then(response => response.json())
-  .then(data => {
-    console.log(data.content + " - " + data.author); // Logs the quote and the author to the console
-    document.getElementById('funnyQuote').innerHTML = `"${data.content}" - ${data.author}`;
-  })
-  .catch(error => console.error('Error fetching the quote:', error));
+// Function to fetch and display a random quote from Flask
+async function fetchQuote() {
+    try {
+        const response = await fetch('/api/quote'); // Call local API
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Ensure valid response
+        if (data.quote && data.author) {
+            document.getElementById('funnyQuote').innerHTML = `"${data.quote}" — ${data.author}`;
+        } else {
+            throw new Error("Invalid response from Flask API.");
+        }
+    } catch (error) {
+        console.error("Error fetching the quote:", error);
+        document.getElementById('funnyQuote').innerHTML = "Couldn't load a quote.";
+    }
+}
+
+// Call the function when the page loads
+fetchQuote();
+
+
+

@@ -52,13 +52,14 @@ section {
 }
 
 .footer {
-    background: #333; /* Dark background for footer */
-    color: #fff; /* White text for visibility */
-    text-align: center; /* Centering the content */
-    padding: 1rem 0; /* Padding for space above and below the content */
-    position: sticky; /* Optional: to stick the footer at the bottom */
-    bottom: 0;
+    background: #333; /* Dark background */
+    color: white; /* Text color */
+    text-align: center; /* Center content */
+    padding: 1rem 0; /* Space above and below content */
+    width: 100%;
+    margin-top: 40px; /* Add spacing above footer */
 }
+
 
 .footer p, .footer div {
     margin: 10px 0; /* Space between elements */
