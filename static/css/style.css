@@ -8,11 +8,12 @@ body {
 }
 
 header {
-    background-color: #333;
+    background-color: #000c49; /* Change from #333 to your dark blue */
     color: #fff;
     padding: 1rem 0;
     text-align: center;
 }
+
 
 
 nav ul {
@@ -22,7 +23,7 @@ nav ul {
     display: flex;
     justify-content: center; /* Center navbar items horizontally */
     align-items: center; /* Center navbar items vertically */
-    background: #333; /* Background color */
+    background: #000c49;
 }
 
 nav ul li {

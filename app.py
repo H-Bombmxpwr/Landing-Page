@@ -1,6 +1,7 @@
 from flask import Flask, render_template, jsonify
 import requests
 import random
+import json
 
 app = Flask(__name__)
 
@@ -26,6 +27,12 @@ def get_quote():
 
     except requests.exceptions.RequestException as e:
         return jsonify({"error": str(e)}), 500
+    
+@app.route('/all-lyrics')
+def all_lyrics():
+    with open('static/lyrics.json', 'r') as f:
+        lyrics_data = json.load(f)
+    return render_template('all_lyrics.html', lyrics=lyrics_data)
 
 
 
