@@ -10,35 +10,38 @@
             color: white;
             margin-top: 1rem;
         }
-
+    
         .lyrics-page {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
             padding: 2rem;
-            text-align: center;
+            justify-items: center;
         }
-
+    
         .lyrics-block {
             background-color: #f9f9f9;
             color: #333;
             border-left: 4px solid #000c49;
-            margin: 2rem auto;
-            max-width: 700px;
+            max-width: 100%;
+            width: 100%;
             padding: 1.5rem;
             text-align: left;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
-
+    
         .lyrics-block blockquote {
             font-style: italic;
             color: #444;
             margin: 0 0 10px 0;
         }
-
+    
         .song-info {
             font-weight: bold;
             color: #000c49;
             margin-top: 0.5rem;
         }
-
+    
         .sticky-back-button {
             position: fixed;
             bottom: 20px;
@@ -46,7 +49,7 @@
             transform: translateX(-50%);
             z-index: 1000;
         }
-
+    
         .sticky-back-button a {
             display: inline-block;
             padding: 10px 20px;
@@ -57,16 +60,17 @@
             border-radius: 5px;
             transition: background-color 0.3s ease;
         }
-
+    
         .sticky-back-button a:hover {
             background-color: #0d6eb9;
         }
-
+    
         body {
-            background-color: white; /* Restores white background */
+            background-color: white;
             color: #333;
         }
     </style>
+    
 </head>
 <body>
     <header style="background-color: #000c49; padding: 1rem;">
