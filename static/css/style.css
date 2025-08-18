@@ -1,272 +1,276 @@
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.6;
-    margin: 0;
-    padding: 0;
-    color: #333;
-    scroll-behavior: smooth; /* Enables smooth scrolling */
+/* ===== Dark theme tokens ===== */
+:root{
+  --bg:#0b0f19;
+  --bg-2:#0e1526;
+  --surface:#11182a;
+  --surface-2:#0f1526;
+  --text:#e6edf3;
+  --muted:#9aa9b8;
+  --border:#1d2740;
+  --primary:#6d8dff;         /* Indigo-ish accent */
+  --primary-600:#5979ff;
+  --primary-700:#4366ff;
+  --ring:rgba(109,141,255,.45);
+  --aurora-1:#0ea5e9;  /* sky */
+  --aurora-2:#6366f1;  /* indigo */
+  --aurora-3:#a855f7;  /* violet */
+  --aurora-4:#22c55e;  /* green */
 }
 
-header {
-    background-color: #000c49; /* Change from #333 to your dark blue */
-    color: #fff;
-    padding: 1rem 0;
-    text-align: center;
+/* ===== Base ===== */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+  line-height:1.6;
+  color:var(--text);
+  background:
+    radial-gradient(1200px 600px at 70% -10%, #12203a 0%, rgba(18,32,58,0) 60%),
+    radial-gradient(1000px 500px at -10% 20%, #0c1730 0%, rgba(12,23,48,0) 55%),
+    var(--bg);
+  scroll-behavior:smooth;
+}
+
+/* ===== Header / Nav ===== */
+header{
+  position:sticky; top:0; z-index:50;
+  background:linear-gradient(180deg, rgba(10,15,24,.8), rgba(10,15,24,.6));
+  backdrop-filter: blur(10px);
+  border-bottom:1px solid var(--border);
+  color:var(--text);
+  padding:.75rem 0;
+}
+header .wrap{
+  max-width:1100px; margin:0 auto; padding:0 16px;
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+}
+.brand{
+  font-weight:800; letter-spacing:.3px; font-size:1.05rem;
+}
+.muted{ color:var(--muted); }
+
+/* Top navbar */
+nav ul{
+  list-style:none; margin:0; padding:0;
+  display:flex; gap:4px; align-items:center; justify-content:center;
+}
+nav ul li{ padding:0; }
+nav ul li a{
+  display:inline-flex; align-items:center; gap:8px;
+  height:36px; padding:0 12px;
+  color:var(--text); text-decoration:none; font-weight:600;
+  border:1px solid transparent; border-radius:10px;
+  transition: all .18s ease;
+}
+nav ul li a:hover, nav ul li a:focus{
+  color:#fff; background:rgba(109,141,255,.12); border-color:var(--border);
+  outline:none; box-shadow:0 0 0 4px var(--ring);
+}
+
+/* Right-aligned utility area (buttons/selects live here) */
+.actions{ display:flex; align-items:center; gap:8px; }
+.sep{ width:1px; height:26px; background:var(--border); margin:0 6px; }
+
+/* Buttons / inputs */
+button, .btn, .file-btn span, .visit-button, .ghost{
+  appearance:none; border:1px solid var(--border); background:var(--surface);
+  color:var(--text); padding:.55rem .8rem; border-radius:12px; cursor:pointer;
+  transition:transform .08s ease, background .18s ease, border-color .18s ease;
+}
+button:hover, .btn:hover, .visit-button:hover, .file-btn span:hover{
+  background:var(--surface-2); transform:translateY(-1px);
+}
+button:focus-visible, .btn:focus-visible, .visit-button:focus-visible{
+  outline:none; box-shadow:0 0 0 4px var(--ring);
+}
+.primary{
+  background: linear-gradient(180deg, var(--primary-600), var(--primary-700));
+  border-color:transparent; color:#fff; font-weight:700;
+}
+.ghost{ background:transparent; border-color:var(--border); opacity:.9; }
+
+.select, .num, input[type="number"], input[type="text"]{
+  background:var(--surface); border:1px solid var(--border); color:var(--text);
+  padding:.45rem .6rem; border-radius:10px; outline:none;
+}
+.select:focus, .num:focus{ box-shadow:0 0 0 4px var(--ring); }
+
+/* ===== Sections / cards ===== */
+section{ padding:2rem 1rem; text-align:center; }
+.card{
+  background: rgba(255,255,255,0.02);
+  border:1px solid var(--border);
+  border-radius:14px; padding:16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+}
+
+/* ===== Footer ===== */
+.footer{
+  background:linear-gradient(180deg, #0b1221, #0a0f1c);
+  color:var(--text); text-align:center; padding:1.25rem 0;
+  border-top:1px solid var(--border); width:100%; margin-top:40px;
+}
+.footer p, .footer div{ margin:10px 0; }
+#funnyQuote{ font-style:italic; opacity:.85; max-width:900px; margin:0 auto; }
+
+/* ===== Links / icons ===== */
+.github-footer{ color:var(--text); font-size:1.5em; padding-right:10px; text-decoration:none; }
+.github-footer:hover{ color:#cbd5e1; }
+
+.social-links{ display:flex; justify-content:center; align-items:center; gap:12px; }
+.icon-link{ color:var(--text); text-decoration:none; font-size:24px; transition:transform .12s ease, color .2s ease; }
+.icon-link:hover{ color:#cbd5e1; transform:translateY(-1px); }
+.icon-link:focus{ color:#dbeafe; outline:none; box-shadow:0 0 0 4px var(--ring); }
+
+.social-icon{ width:24px; height:24px; object-fit:contain; vertical-align:middle; }
+.icon-link img{ display:block; margin:0; padding:0; border:0; }
+
+/* ===== Projects / tabs ===== */
+#projects, #school-projects{ padding:20px; background:rgba(255,255,255,.02); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+#project-tabs{ list-style:none; padding:0; margin:0 0 12px; display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+
+.tab{
+  border:1px solid var(--border); background:var(--surface);
+  color:var(--text); padding:.5rem .8rem; border-radius:999px; cursor:pointer;
+  transition: all .18s ease;
+}
+.tab:hover{ background:var(--surface-2); transform:translateY(-1px); }
+.tab:focus-visible{ outline:none; box-shadow:0 0 0 4px var(--ring); }
+.tab-active{ background: linear-gradient(180deg, var(--primary-600), var(--primary-700)); color:#fff; border-color:transparent; }
+
+.project-content{ display:none; margin-top:16px; }
+#project1{ display:block; } /* default visible */
+
+.website-screenshot img{
+  width:100%; max-width:480px; border:1px solid var(--border);
+  border-radius:12px; display:block; margin:0 auto;
+}
+
+/* ===== Buttons: visit ===== */
+.visit-button{
+  font-weight:700;
+  background: linear-gradient(180deg, var(--primary-600), var(--primary-700));
+  color:#fff; border-color:transparent;
+}
+.visit-button:hover{ filter:brightness(1.06); color:#fff; }
+.visit-button:focus{ outline:none; }
+
+/* ===== Feature list ===== */
+.feature-list{
+  list-style:none; padding:0; display:flex; flex-wrap:wrap; justify-content:center;
+  gap:8px; max-width:700px; margin:0 auto;
+}
+.feature-list li{
+  width:calc(50% - 8px); padding:6px 8px; border-radius:10px;
+  border:1px solid var(--border); background:rgba(255,255,255,.02);
+}
+.feature-list li::before{ content:'• '; color:#a5b4fc; font-weight:900; }
+
+/* ===== About ===== */
+.about-content{ text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; }
+.round-icon{ display:block; border:3px solid #1f2a44; margin:0 auto; border-radius:50%; }
+.about-image{
+  width:150px; height:150px; border-radius:50%; overflow:hidden;
+  border:2px solid var(--border); margin-bottom:16px;
+}
+.about-image img{ width:100%; height:100%; object-fit:cover; }
+
+.about-text blockquote{
+  font-style:italic; margin:20px 0; padding-left:20px;
+  border-left:3px solid #334155; color:#cbd5e1;
+}
+
+/* ===== Utilities ===== */
+.container{ max-width:1100px; margin:0 auto; padding:0 16px; }
+
+/* ===== Responsive ===== */
+@media (max-width: 720px){
+  .feature-list li{ width:100%; }
+  nav ul{ flex-wrap:wrap; }
 }
 
 
-
-nav ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    justify-content: center; /* Center navbar items horizontally */
-    align-items: center; /* Center navbar items vertically */
-    background: #000c49;
+/* Card-like, centered header that doesn't span full width */
+.site-header{
+  position: static !important; /* override previous sticky/fixed */
+  top: auto;
+  z-index: auto;
 }
+.site-header .wrap{
+  max-width: 1100px;                 /* constrains width */
+  margin: 0 auto; padding: 0 16px;
 
-nav ul li {
-    padding: 10px 20px; /* Spacing around navbar items */
+  /* Make header itself look like a centered card */
+  background: linear-gradient(180deg, rgba(10,15,24,.85), rgba(10,15,24,.70));
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;           /* center the text/content */
+  gap: 12px;
+  min-height: 56px;
 }
-
-nav ul li a {
-    color: #fff;
-    font-weight: bold; /* Make the text bold */
-    text-decoration: none; /* Remove underlines */
-    transition: color 0.3s ease; /* Smooth color transition for hover effect */
-}
-
-nav ul li a:hover, nav ul li a:focus {
-    color: #ddd; /* Lighter color on hover/focus */
-}
-
-/* Add some padding to the header for better spacing */
-header {
-    padding: 1rem;
-}
-
-
-section {
-    padding: 2rem;
-    text-align: center;
-}
-
-.footer {
-    background: #333; /* Dark background */
-    color: white; /* Text color */
-    text-align: center; /* Center content */
-    padding: 1rem 0; /* Space above and below content */
-    width: 100%;
-    margin-top: 40px; /* Add spacing above footer */
-}
-
-
-.footer p, .footer div {
-    margin: 10px 0; /* Space between elements */
-}
-
-#funnyQuote {
-    font-style: italic; /* Styling for the quote */
-    opacity: 0.8; /* Slightly lighter than the main text for distinction */
-    max-width: 80%; /* Limiting width for better readability */
-    margin: 0 auto; /* Centering the quote */
-}
-
-.github-footer {
-    color: #fff; /* Color of the icon link */
-    font-size: 1.5em; /* Size of the GitHub icon */
-    padding-right: 10px; /* Space between the icon and text */
-    vertical-align: middle; /* Aligns icon with the text */
-    text-decoration: none; /* No underline on hover/focus */
-}
-
-.github-footer:hover {
-    color: #ccc; /* Lighter color on hover for the icon */
-}
-
-
-#projects {
-    padding: 20px;
-    background-color: #f4f4f4;
-}
-
-#project-tabs {
-    list-style: none;
-    padding: 0;
-}
-
-#project-tabs .tab {
-    display: inline-block;
-    margin-right: 10px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    cursor: pointer;
-}
-
-#project-tabs .tab:hover {
-    background-color: #ddd;
-}
-
-/* Show the Music Poster project content by default */
-#project1 {
-    display: block;
-}
-.project-content {
-    display: none;
-    margin-top: 20px;
-}
-
-.project-content h3 {
-    margin-top: 0;
-}
-
-.visit-button {
-    display: inline-block;
-    padding: 10px 20px;
-    margin: 10px 0;
-    background-color: #000c49; /* Initial dark background */
-    color: white;
-    text-align: center;
-    text-decoration: none;
-    font-weight: bold;
-    border-radius: 5px;
-    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for background and text color */
-}
-
-.visit-button:hover {
-    background-color: #0d6eb9; /* Lighter color on hover */
-    color: white;
-    text-decoration: none; /* No underline on hover */
-}
-
-/* Remove focus styles that keep the hover color after clicking */
-.visit-button:focus {
-    outline: none; /* Removes the focus outline, if any */
-}
-
-
-
-.social-links {
-    display: flex;
-    justify-content: center; /* This will center the icons horizontally */
-    align-items: center; /* This will center the icons vertically */
-    gap: 10px; /* Adjust the space between icons as needed */
-}
-
-.icon-link {
-    margin: 0 10px;
-    font-size: 24px; /* Size of the icons */
-    color: #333; /* Icon color */
-    text-decoration: none; /* Remove underlines from icons */
-}
-/* Hover effects */
-.icon-link:hover {
-    color: #555; /* Color when hovering, change as needed */
-    transform: scale(1.1); /* Slightly increase the size of the icon */
-}
-
-
-.icon-link:focus {
-    color: #666;
-    text-decoration: none; /* Icon color on hover/focus */
-}
-
-
-.social-icon {
-    
-    width: 24px; /* Set the width to 24 pixels */
-    height: 24px; /* Set the height to 24 pixels */
-    object-fit: contain; /* This ensures the image is resized within the container without being stretched or squished */
-    vertical-align: middle; /* Align with other inline or inline-block elements */
-}
-
-/* You may want to remove any default padding/margin for images inside the links */
-.icon-link img {
-    display: block; /* Remove any space below the image */
-    margin: 0;
-    padding: 0;
-    border: none; /* Remove border if there's any */
-}
-
-.website-screenshot img {
-    width: 100%; /* or any other size */
-    max-width: 400px; /* sets the maximum size of the image */
-    border: 2px solid #000; /* adds a black border */
-    display: block;
-    margin: 0 auto; /* centers the image in the figure element */
-}
-
-.feature-list {
-    list-style: none; /* Removes default list styling */
-    padding: 0; /* Removes default padding */
-    display: flex; /* Enables flexbox */
-    flex-wrap: wrap; /* Allows items to wrap into the next row */
-    justify-content: center; /* Centers the items horizontally */
-    max-width: 600px; /* Maximum width of the list */
-    margin: 0 auto; /* Centers the list in the container */
-}
-
-.feature-list li {
-    width: 50%; /* Each item takes up half the width of the list */
-    box-sizing: border-box; /* Makes sure padding and border are included in the width */
-    padding: 5px; /* Adds some padding around items */
-}
-
-/* Optional: Adds a bullet point before each item */
-.feature-list li::before {
-    content: '• '; /* Bullet point character */
-    color: #333; /* Bullet point color */
-    font-weight: bold; /* Makes the bullet point bold */
-}
-
-.round-icon {
-    display: block; /* Changes the display to block */
-    border: 3px solid #000; /* Optional: Adds a border around the image */
-    margin-left: auto;
-    margin-right: auto;
-    border-radius: 50%;
-}
-
-.about-content {
-    text-align: center; /* Center text elements */
-    display: flex; /* Use flexbox for layout */
-    flex-direction: column; /* Stack children vertically */
-    align-items: center; /* Center items horizontally */
-    justify-content: center; /* Center items vertically if there is extra space */
+.site-header .brand { 
+  color: var(--text);
+  font-weight: 800; 
+  letter-spacing: .3px; 
+  margin: 0;
+  text-align: center;
 }
 
 
 
-.about-image {
-    flex-shrink: 0; /* Don't allow the image to shrink */
-    width: 150px; /* Adjusted the width as needed */
-    height: 150px; /* Adjusted the height as needed */
-    border-radius: 50%; /* Create a circular shape */
-    overflow: hidden; /* Hide any overflowing content */
-    border: 2px solid #000; /* Added a black border */
-    margin-left: 20px;
-    margin-bottom: 20px; /* Add some space below the image */
+/* Give controls a bit more breathing room */
+.actions{
+  gap: 10px;            /* was 8px */
+  flex-wrap: wrap;      /* prevents overlap on narrow widths */
 }
 
-.about-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Maintain image aspect ratio */
+/* Slightly smaller, tidier buttons/inputs */
+button, .btn, .file-btn span, .visit-button, .ghost{
+  padding: .45rem .70rem;   /* was .55rem .8rem */
+  border-radius: 10px;      /* slightly less pill-y so they don't “stick out” */
+  line-height: 1.05;        /* prevents tall “overflowing” look */
+}
+.select, .num, input[type="number"], input[type="text"]{
+  padding: .40rem .55rem;   /* match the tighter button size */
+  border-radius: 10px;
 }
 
-/* Active tab styling */
-.tab-active {
-    background-color: #000c49; /* Same as the visit button */
-    color: white; /* White text */
+/* Subtle gap tweaks so borders don’t butt up against each other */
+nav ul{ gap: 8px; }                       /* more room between nav pills */
+nav ul li a{ height: 34px; padding: 0 10px; }
+.sep{ height: 22px; margin: 0 6px; }      /* slightly shorter separator */
+.card{ margin-bottom: 14px; }             /* space between adjacent cards */
+
+/* Generic vertical stacking helper inside cards/panels */
+.card > * + *{ margin-top: 10px; }
+
+/* Project tabs: a hair more space so rounded borders don’t collide */
+#project-tabs{ gap: 10px; }
+
+/* Container/section breathing room */
+section{ padding: 2rem 1rem; }
+.container{ padding-left: 16px; padding-right:16px; }
+
+/* Header “card” gets a touch more room so content isn’t cramped */
+.site-header .wrap{
+  padding: 8px 14px;      /* was 0 16px */
+  gap: 14px;              /* space between brand and nav */
 }
 
-.about-text blockquote {
-    font-style: italic;
-    margin: 20px 0;
-    padding-left: 20px;
-    border-left: 3px solid #ccc;
-    color: #666;
+/* Mobile: prevent cramping / overlapped borders */
+@media (max-width: 720px){
+  .actions{ gap: 8px; }
+  button, .btn, .file-btn span, .visit-button, .ghost{
+    padding: .42rem .60rem;
+  }
+  .select, .num, input[type="number"], input[type="text"]{
+    padding: .38rem .50rem;
+  }
 }
 
 
