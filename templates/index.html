@@ -70,12 +70,13 @@
             <ul id="project-tabs">
                 <li class="tab" onclick="showProject('project1')">Album Poster</li>
                 <li class="tab" onclick="showProject('project2')">LiDAR Lense</li>
-                <li class="tab" onclick="showProject('project3')">Song Swears</li>
-                <li class="tab" onclick="showProject('project4')">DJ Music Aggregator</li>
-                <li class="tab" onclick="showProject('project5')">Clarence</li>
-                <li class="tab" onclick="showProject('project6')">TI Programs</li>
-                <li class="tab" onclick="showProject('project7')">Portfolio Website</li>
-                <li class="tab" onclick="showProject('project8')">Mario Kart Tracker</li>
+                <li class="tab" onclick="showProject('project3')">Image Lab</li>
+                <li class="tab" onclick="showProject('project4')">Song Swears</li>
+                <li class="tab" onclick="showProject('project5')">DJ Music Aggregator</li>
+                <li class="tab" onclick="showProject('project6')">Clarence</li>
+                <li class="tab" onclick="showProject('project7')">TI Programs</li>
+                <li class="tab" onclick="showProject('project8')">Portfolio Website</li>
+                <li class="tab" onclick="showProject('project9')">Mario Kart Tracker</li>
             </ul>
 
             <div id="project1" class="project-content">
@@ -103,8 +104,18 @@
                 </figure>
             </div>
 
-
             <div id="project3" class="project-content">
+                <h3>Image Lab</h3>
+                <p>Image Lab is a fast, browser-based image editor with a Python (Flask) backend. It supports cropping, resizing, color adjustments, filters, background removal, histogram equalization, and content-aware seam carving. </p>
+                <a href="https://image.hxr.life" role="button" class="visit-button">Visit Website</a>
+                <figure class="website-screenshot">
+                    <img src="{{ url_for('static', filename='images/il.png') }}" alt="Image Lab Dashboard">
+                    <figcaption>Image Lab Dashboard featuring George Michael</figcaption>
+                </figure>
+            </div>
+
+
+            <div id="project4" class="project-content">
                 <h3>Swears in Songs</h3>
                 <p>This is a website to return all of the swear words in a queried song. My first website so a little rough around the edges, still gets the job done though.</p>
                 <a href="https://trevorg73.web.illinois.edu/songswears" role="button" class="visit-button">Visit Website</a>
@@ -114,7 +125,7 @@
                 </figure>
             </div>
 
-            <div id="project4" class="project-content">
+            <div id="project5" class="project-content">
                 <h3>Music Aggregator for DJing</h3>
                 <p>This is a GUI I wrote that will take in a spotify playlist and download that playlist as a series of MP3s, all tagged with standard ID3 tags. This makes importing into DJ software, such as Serato, trivial. It is highly parallelized, being able to support downloading 6 playlists at a time.</p>
                 <a href="https://github.com/H-Bombmxpwr/dj-library" role="button" class="visit-button">Repository</a>
@@ -124,7 +135,7 @@
                 </figure>
             </div>
             
-            <div id="project5" class="project-content">
+            <div id="project6" class="project-content">
                 <h3>Clarence</h3>
                 <p>A discord bot with over 30 functions including but not limited too:</p>
                 <ul class="feature-list">
@@ -148,7 +159,7 @@
             </div>
 
 
-            <div id="project6" class="project-content">
+            <div id="project7" class="project-content">
                 <h3>TI Programs</h3>
                 <p>I made hundreds of programs for the TI-84 series of calcualtors throughout my high school and college days, below linked are some of the best, most useful (and brainrot) ones. </p>
     
@@ -160,7 +171,7 @@
             </div>
 
 
-            <div id="project7" class="project-content">
+            <div id="project8" class="project-content">
                 <h3>This Website you are Looking at Right Now</h3>
                 <p>Coded from scratch using HTML, CSS, JavaScript, and some Python. The repository is linked below </p>
     
@@ -171,7 +182,7 @@
                 </figure>
             </div>
 
-            <div id="project8" class="project-content">
+            <div id="project9" class="project-content">
                 <h3>Mario Kart Tracker</h3>
                 <p>Enter in a username and this site will track as many friends as you want, and all of their Mario Kart placements. They are saved under your username.</p>
     
