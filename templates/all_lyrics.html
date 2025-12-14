@@ -2,12 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <header class="site-header slim">
-        <div class="wrap">
-            <h1>All Lyrics</h1>
-        </div>
-    </header>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Lyrics</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <style>
@@ -30,10 +26,10 @@
         .lyrics-block{
             width: 100%;
             max-width: 700px;
-            background: rgba(17,20,26,.45);         /* glassy black */
+            background: rgba(17,20,26,.45);
             color: var(--text);
             border: 1px solid var(--border);
-            border-left: 4px solid var(--primary);  /* Orioles orange accent */
+            border-left: 4px solid var(--primary);
             border-radius: 12px;
             padding: 1.25rem 1.5rem;
             text-align: left;
@@ -74,25 +70,65 @@
         .sticky-back-button a:focus-visible{ outline: none; box-shadow: 0 0 0 4px var(--ring); }
 
         /* Lyrics page header variant */
-            header.site-header.slim{
-                background: linear-gradient(180deg, rgba(12,12,12,.72), rgba(12,12,12,.54));
-                backdrop-filter: blur(10px) saturate(120%);
-                -webkit-backdrop-filter: blur(10px) saturate(120%);
-                border-bottom: 1px solid rgba(255,106,0,.28);   /* Orioles orange */
-            }
-            header.site-header.slim h1{
-                color: var(--primary);
-                text-shadow: 0 0 10px rgba(255,106,0,.35);
-                margin: 0;
-            }
-
+        header.site-header.slim{
+            background: linear-gradient(180deg, rgba(12,12,12,.72), rgba(12,12,12,.54));
+            backdrop-filter: blur(10px) saturate(120%);
+            -webkit-backdrop-filter: blur(10px) saturate(120%);
+            border-bottom: 1px solid rgba(255,106,0,.28);
+        }
+        header.site-header.slim h1{
+            color: var(--primary);
+            text-shadow: 0 0 10px rgba(255,106,0,.35);
+            margin: 0;
+        }
     </style>
-
-    
 </head>
-<body>
-    <header style="background-color: #000c49; padding: 1rem;">
-        <h1>All Lyrics</h1>
+<body data-city="baltimore">
+    <!-- Apply saved city theme on this page too -->
+    <script>
+        (function() {
+            try {
+                const saved = localStorage.getItem('selectedCity') || 'baltimore';
+                document.body.dataset.city = saved;
+                
+                // Apply theme colors
+                const themes = {
+                    baltimore: {
+                        primary: '#ff6a00',
+                        primary600: '#ff5c00',
+                        primary700: '#ef4b00',
+                        ring: 'rgba(255,106,0,.35)'
+                    },
+                    dc: {
+                        primary: '#c41e3a',
+                        primary600: '#b01830',
+                        primary700: '#9a1528',
+                        ring: 'rgba(196,30,58,.35)'
+                    },
+                    chicago: {
+                        primary: '#41b6e6',
+                        primary600: '#35a5d4',
+                        primary700: '#2994c2',
+                        ring: 'rgba(65,182,230,.35)'
+                    }
+                };
+                
+                const theme = themes[saved];
+                if (theme) {
+                    const r = document.documentElement;
+                    r.style.setProperty('--primary', theme.primary);
+                    r.style.setProperty('--primary-600', theme.primary600);
+                    r.style.setProperty('--primary-700', theme.primary700);
+                    r.style.setProperty('--ring', theme.ring);
+                }
+            } catch(e) {}
+        })();
+    </script>
+
+    <header class="site-header slim">
+        <div class="wrap">
+            <h1>All Lyrics</h1>
+        </div>
     </header>
 
     <section class="lyrics-page">
@@ -141,8 +177,6 @@
         }
 
         fetchQuote();
-
-        
     </script>
 </body>
 </html>

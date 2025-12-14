@@ -8,13 +8,44 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <title>Hunter</title>
 </head>
-<body id="index-page">
+<body id="index-page" data-city="baltimore">
     <div class="container">
         <header class="site-header">
             <div class="wrap">
                 <h1 class="brand">Hunter</h1>
             </div>
         </header>
+        
+        <!-- City Switcher Slider -->
+        <div class="city-switcher">
+            <div class="city-options">
+                <div class="city-option" data-city="baltimore" onclick="CityCollage.switchCity('baltimore')">
+                    <img src="{{ url_for('static', filename='images/flags/baltimore_flag.png') }}" alt="Baltimore Flag" class="city-flag">
+                    <span class="city-label">Baltimore</span>
+                </div>
+                <div class="city-option" data-city="dc" onclick="CityCollage.switchCity('dc')">
+                    <img src="{{ url_for('static', filename='images/flags/dc_flag.png') }}" alt="DC Flag" class="city-flag">
+                    <span class="city-label">DC</span>
+                </div>
+                <div class="city-option" data-city="chicago" onclick="CityCollage.switchCity('chicago')">
+                    <img src="{{ url_for('static', filename='images/flags/chicago_flag.png') }}" alt="Chicago Flag" class="city-flag">
+                    <span class="city-label">Chicago</span>
+                </div>
+            </div>
+            <div class="slider-container">
+                <input 
+                    type="range" 
+                    id="city-slider" 
+                    class="city-slider-input" 
+                    min="0" 
+                    max="2" 
+                    value="0" 
+                    step="1"
+                    aria-label="Select city theme"
+                >
+            </div>
+        </div>
+
         <nav class="navbar">
             <ul>
                 <li><a href="#about">About Me</a></li>
@@ -131,54 +162,37 @@
             <div id="project5" class="project-content">
                 <h3>Music Aggregator for DJing</h3>
                 <p>This is a GUI I wrote that will take in a spotify playlist and download that playlist as a series of MP3s, all tagged with standard ID3 tags. This makes importing into DJ software, such as Serato, trivial. It is highly parallelized, being able to support downloading 6 playlists at a time.</p>
-                <a href="https://github.com/H-Bombmxpwr/dj-library" role="button" class="visit-button">Repository</a>
+                <a href="https://github.com/H-Bombmxpwr/Music_DJ_Downloader" role="button" class="visit-button">Repository</a>
                 <figure class="website-screenshot">
-                    <img src="{{ url_for('static', filename='images/GUI_Ex.png') }}" alt="Screenshot of the GUI downloading 2 playlists at once.">
-                    <figcaption>Screenshot of the GUI downloading 2 playlists at once.</figcaption>
+                    <img src="{{ url_for('static', filename='images/dj.png') }}" alt="DJ Music Aggregator Screenshot">
+                    <figcaption>The Music Aggregator GUI</figcaption>
                 </figure>
             </div>
-            
+
             <div id="project6" class="project-content">
                 <h3>Clarence</h3>
-                <p>A discord bot with over 30 functions including but not limited too:</p>
-                <ul class="feature-list">
-                    <li>Music Playing</li>
-                    <li>Trivia</li>
-                    <li>Bitwise Math</li>
-                    <li>Latex Rendering</li>
-                    <li>Play Poker</li>
-                    <li>GIF Generation</li>
-                    <li>AI Image Generation</li>
-                    <li>Cute Animal Photos</li>
-                    <li>Fetch Wikipedia Articles</li>
-                    <li>Numerous Moderation Functions</li>
-                    <!-- Add other functions here -->
-                </ul>
-                <a href="https://discord.com/api/oauth2/authorize?client_id=877014219499925515&permissions=8&scope=bot" role="button" class="visit-button">Add Clarence</a>
+                <p>My first ever Discord bot! Built using Discord.py, it was an incredibly janky but a good learning experience. It had a range of features including music playback, trivia games, image manipulation, and more.</p>
+                <a href="https://github.com/H-Bombmxpwr/Clarence" role="button" class="visit-button">Repository</a>
                 <figure class="website-screenshot">
-                    <img src="{{ url_for('static', filename='images/clarence.png') }}" alt="Clarence Icon" class="round-icon">
-                    <figcaption>Clarence's Beautiful Icon</figcaption>
+                    <img src="{{ url_for('static', filename='images/clarence.png') }}" alt="Clarence">
+                    <figcaption>Clarence from The Big Lez Show</figcaption>
                 </figure>
             </div>
-
 
             <div id="project7" class="project-content">
-                <h3>TI Programs</h3>
-                <p>I made hundreds of programs for the TI-84 series of calcualtors throughout my high school and college days, below linked are some of the best, most useful (and brainrot) ones. </p>
-    
+                <h3>TI Calculator Programs</h3>
+                <p>I am a huge proponent of learning to code as early as possible, and I think the best and most accessible way to start is through a calculator! These are all of the programs I wrote on my TI-84 over the years</p>
                 <a href="https://github.com/H-Bombmxpwr/TI-Programs" role="button" class="visit-button">Repository</a>
                 <figure class="website-screenshot">
-                    <img src="{{ url_for('static', filename='images/ti.png') }}" alt="Liam">
-                    <figcaption>Liam waving at you from prgmLIAM</figcaption>
+                    <img src="{{ url_for('static', filename='images/ti.png') }}" alt="TI-84 Plus CE" class="round-icon">
+                    <figcaption>TI-84 Plus CE</figcaption>
                 </figure>
             </div>
 
-
             <div id="project8" class="project-content">
-                <h3>This Website you are Looking at Right Now</h3>
-                <p>Coded from scratch using HTML, CSS, JavaScript, and some Python. The repository is linked below </p>
-    
-                <a href="https://github.com/H-Bombmxpwr/Landing-Page" role="button" class="visit-button">Site Repository</a>
+                <h3>This Website!</h3>
+                <p>A website to show off all of my projects and introduce myself. It is written with Flask and is hosted on Railway.</p>
+                <a href="https://github.com/H-Bombmxpwr/Landing-Page" role="button" class="visit-button">Repository</a>
                 <figure class="website-screenshot">
                     <img src="{{ url_for('static', filename='images/fry.svg') }}" alt="Fry Icon" class="round-icon">
                     <figcaption>Phillip J Fry</figcaption>
@@ -285,10 +299,12 @@
         
         
     </div>
-    <script src="{{ url_for('static', filename='js/project.js') }}"></script>
-    scottkey, camden, powerplant, Pickles, mchenry, homewood, charles
+    
+    <!-- City Image Arrays - Easy to add more images! -->
     <script>
-    window.BMORE_IMAGES = [
+    // BALTIMORE IMAGES
+    // Add more images by adding paths to this array
+    window.BALTIMORE_IMAGES = [
         "{{ url_for('static', filename='images/baltimore/harbor.jpg') }}",
         "{{ url_for('static', filename='images/baltimore/skyline.jpg') }}",
         "{{ url_for('static', filename='images/baltimore/rowhouses.jpg') }}",
@@ -305,9 +321,83 @@
         "{{ url_for('static', filename='images/baltimore/charles.jpg') }}",
         "{{ url_for('static', filename='images/baltimore/canon_gate.jpg') }}",
         "{{ url_for('static', filename='images/baltimore/red.jpg') }}"
+        // Add more Baltimore images here:
+        // "{{ url_for('static', filename='images/baltimore/newimage.jpg') }}",
+    ];
+
+    // DC IMAGES
+    // Add more images by adding paths to this array
+    window.DC_IMAGES = [
+        "{{ url_for('static', filename='images/dc/capitol.jpg') }}",
+        "{{ url_for('static', filename='images/dc/george_mason.jpg') }}",
+        "{{ url_for('static', filename='images/dc/lincoln.jpg') }}",
+        "{{ url_for('static', filename='images/dc/lafayette.jpg') }}",
+        "{{ url_for('static', filename='images/dc/noma.jpg') }}",
+        "{{ url_for('static', filename='images/dc/jefferson.jpg') }}",
+        "{{ url_for('static', filename='images/dc/market.jpg') }}",
+        "{{ url_for('static', filename='images/dc/dupont.jpg') }}",
+        "{{ url_for('static', filename='images/dc/georgetown.jpg') }}",
+        "{{ url_for('static', filename='images/dc/cherryblossoms.jpg') }}",
+        "{{ url_for('static', filename='images/dc/union.jpg') }}",
+        "{{ url_for('static', filename='images/dc/nationals.jpg') }}"
+        // Add more DC images here:
+        // "{{ url_for('static', filename='images/dc/newimage.jpg') }}",
+    ];
+
+    // CHICAGO IMAGES
+    // Add more images by adding paths to this array
+    window.CHICAGO_IMAGES = [
+        "{{ url_for('static', filename='images/chicago/bean.jpg') }}",
+        "{{ url_for('static', filename='images/chicago/skyline.jpg') }}",
+        "{{ url_for('static', filename='images/chicago/wrigley.jpg') }}",
+        "{{ url_for('static', filename='images/chicago/wicker.jpg') }}",
+        "{{ url_for('static', filename='images/chicago/river.jpg') }}",
+        "{{ url_for('static', filename='images/chicago/pequods.jpg') }}",
+        "{{ url_for('static', filename='images/chicago/lincoln_park.jpg') }}",
+        "{{ url_for('static', filename='images/chicago/dawes.jpg') }}",
+        "{{ url_for('static', filename='images/chicago/crib.jpg') }}",
+        "{{ url_for('static', filename='images/chicago/logan.jpeg') }}",
+        "{{ url_for('static', filename='images/chicago/loop.jpg') }}",
+        "{{ url_for('static', filename='images/chicago/hancock.jpg') }}",
+        "{{ url_for('static', filename='images/chicago/daley.jpg') }}"
+        // Add more Chicago images here:
+        // "{{ url_for('static', filename='images/chicago/newimage.jpg') }}",
     ];
     </script>
-    <script src="{{ url_for('static', filename='js/baltimore.js') }}"></script>
+
+    <!-- Core Scripts -->
+    <script src="{{ url_for('static', filename='js/project.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/collage.js') }}"></script>
+    
+    <!-- City Slider Logic -->
+    <script>
+    (function() {
+        const slider = document.getElementById('city-slider');
+        const cities = ['baltimore', 'dc', 'chicago'];
+        
+        if (slider) {
+            // Handle slider input
+            slider.addEventListener('input', function() {
+                const cityIndex = parseInt(this.value, 10);
+                const city = cities[cityIndex];
+                if (city && window.CityCollage) {
+                    window.CityCollage.switchCity(city);
+                }
+            });
+            
+            // Initialize slider position from saved preference
+            document.addEventListener('DOMContentLoaded', function() {
+                try {
+                    const saved = localStorage.getItem('selectedCity') || 'baltimore';
+                    const idx = cities.indexOf(saved);
+                    if (idx !== -1) {
+                        slider.value = idx;
+                    }
+                } catch(e) {}
+            });
+        }
+    })();
+    </script>
 
 </body>
 </html>
