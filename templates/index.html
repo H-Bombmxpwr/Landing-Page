@@ -6,13 +6,13 @@
     <link rel="icon" href="{{ url_for('static', filename='images/fry.svg') }}" type="image/svg">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-    <title>H</title>
+    <title>Hunter</title>
 </head>
-<body>
+<body id="index-page">
     <div class="container">
         <header class="site-header">
             <div class="wrap">
-                <h1 class="brand">Hunter</h1
+                <h1 class="brand">Hunter</h1>
             </div>
         </header>
         <nav class="navbar">
@@ -206,6 +206,7 @@
                 <li class="tab" onclick="showSchoolProject('school-project2')">Six Degrees of Wikipedia</li>
                 <li class="tab" onclick="showSchoolProject('school-project3')">FPGA Video Game</li>
                 <li class="tab" onclick="showSchoolProject('school-project4')">Controlled Boost Converter</li>
+                <li class="tab" onclick="showSchoolProject('school-project5')">Manim Seam Carving Demo</li>
                 
                 <!-- Add more tabs as needed -->
             </ul>
@@ -251,6 +252,16 @@
                 </figure>
             </div>
 
+            <div id="school-project5" class="school-project-content" style="display: none;"">
+                <h3>Demonstration of Seam Carving using Manim</h3>
+                <p>A final project in my Image Engineering class where I use the community version of Manim to explain in detail how seam carving works. I didn't have a good microphone so the audio is not great. </p>
+                <a href="https://www.youtube.com/watch?v=1EKT18cBecc" role="button" class="visit-button">Video</a>
+                <figure class="website-screenshot">
+                    <img src="{{ url_for('static', filename='images/seam.png') }}" alt="graph Images">
+                    <figcaption>Screen capture of the video, showing the original image, an "edginess" image, and a "minimum energy to the bottom" image.</figcaption>
+                </figure>
+            </div>
+
 
             <!-- Add more project-content divs as needed -->
         </section>
@@ -275,5 +286,28 @@
         
     </div>
     <script src="{{ url_for('static', filename='js/project.js') }}"></script>
+    scottkey, camden, powerplant, Pickles, mchenry, homewood, charles
+    <script>
+    window.BMORE_IMAGES = [
+        "{{ url_for('static', filename='images/baltimore/harbor.jpg') }}",
+        "{{ url_for('static', filename='images/baltimore/skyline.jpg') }}",
+        "{{ url_for('static', filename='images/baltimore/rowhouses.jpg') }}",
+        "{{ url_for('static', filename='images/baltimore/domino.jpg') }}",
+        "{{ url_for('static', filename='images/baltimore/boh.jpg') }}",
+        "{{ url_for('static', filename='images/baltimore/observe.jpg') }}",
+        "{{ url_for('static', filename='images/baltimore/fedhill.jpg') }}",
+        "{{ url_for('static', filename='images/baltimore/scottkey.jpg') }}",
+        "{{ url_for('static', filename='images/baltimore/camden.jpg') }}",
+        "{{ url_for('static', filename='images/baltimore/powerplant.jpg') }}",
+        "{{ url_for('static', filename='images/baltimore/pickles.jpg') }}",
+        "{{ url_for('static', filename='images/baltimore/mchenry.jpg') }}",
+        "{{ url_for('static', filename='images/baltimore/homewood.jpg') }}",
+        "{{ url_for('static', filename='images/baltimore/charles.jpg') }}",
+        "{{ url_for('static', filename='images/baltimore/canon_gate.jpg') }}",
+        "{{ url_for('static', filename='images/baltimore/red.jpg') }}"
+    ];
+    </script>
+    <script src="{{ url_for('static', filename='js/baltimore.js') }}"></script>
+
 </body>
 </html>

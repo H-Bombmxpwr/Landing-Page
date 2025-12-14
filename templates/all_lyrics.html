@@ -2,70 +2,92 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>All Lyrics</title>
+    <header class="site-header slim">
+        <div class="wrap">
+            <h1>All Lyrics</h1>
+        </div>
+    </header>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <style>
         header.site-header h1{
-        color: var(--text);
-        margin: 1rem 0 0;
-        text-align: center;
+            color: var(--text);
+            margin: 1rem 0 0;
+            text-align: center;
         }
 
         /* Responsive grid for lyrics tiles */
         .lyrics-page{
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 2rem;
-        padding: 2rem;
-        justify-items: center;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+            justify-items: center;
         }
 
         /* Dark card for each lyrics block */
         .lyrics-block{
-        width: 100%;
-        max-width: 700px;
-        background: var(--surface);
-        color: var(--text);
-        border: 1px solid var(--border);
-        border-left: 4px solid var(--primary);
-        border-radius: 12px;
-        padding: 1.25rem 1.5rem;
-        text-align: left;
-        box-shadow: 0 10px 26px rgba(0,0,0,.25);
+            width: 100%;
+            max-width: 700px;
+            background: rgba(17,20,26,.45);         /* glassy black */
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--primary);  /* Orioles orange accent */
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            text-align: left;
+            box-shadow: 0 10px 26px rgba(0,0,0,.25);
+            backdrop-filter: blur(6px) saturate(110%);
         }
 
         /* Quote text */
         .lyrics-block blockquote{
-        margin: 0 0 10px 0;
-        font-style: italic;
-        color: #cbd5e1;            /* slightly lighter than body text */
+            margin: 0 0 10px 0;
+            font-style: italic;
+            color: #e2e8f0;
         }
 
         /* Song/artist label */
         .song-info{
-        margin-top: .5rem;
-        font-weight: 700;
-        color: var(--primary);
+            margin-top: .5rem;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: .2px;
         }
 
         /* Centered sticky back button (matches theme) */
         .sticky-back-button{
-        position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%);
-        z-index: 1000;
+            position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%);
+            z-index: 1000;
         }
         .sticky-back-button a{
-        display: inline-block;
-        padding: 10px 20px;
-        background: linear-gradient(180deg, var(--primary-600), var(--primary-700));
-        color: #fff; font-weight: 700; text-decoration: none;
-        border-radius: 10px;
-        border: 1px solid transparent;
-        transition: filter .18s ease, transform .08s ease;
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(180deg, var(--primary-600), var(--primary-700));
+            color: #fff; font-weight: 800; text-decoration: none;
+            border-radius: 10px;
+            border: 1px solid transparent;
+            transition: filter .18s ease, transform .08s ease;
         }
         .sticky-back-button a:hover{ filter: brightness(1.06); transform: translateY(-1px); }
         .sticky-back-button a:focus-visible{ outline: none; box-shadow: 0 0 0 4px var(--ring); }
+
+        /* Lyrics page header variant */
+            header.site-header.slim{
+                background: linear-gradient(180deg, rgba(12,12,12,.72), rgba(12,12,12,.54));
+                backdrop-filter: blur(10px) saturate(120%);
+                -webkit-backdrop-filter: blur(10px) saturate(120%);
+                border-bottom: 1px solid rgba(255,106,0,.28);   /* Orioles orange */
+            }
+            header.site-header.slim h1{
+                color: var(--primary);
+                text-shadow: 0 0 10px rgba(255,106,0,.35);
+                margin: 0;
+            }
+
     </style>
+
     
 </head>
 <body>
