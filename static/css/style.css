@@ -2071,8 +2071,12 @@ nav ul li a.nav-active {
 }
 
 .social-card:hover i {
-  color: var(--primary);
+  /* keep hover effects elsewhere; do not override icon color */
 }
+
+.social-card.github-card i { color: #fff; }        /* keep GitHub white */
+.social-card.linkedin-card i { color: #0077b5; }   /* LinkedIn blue */
+.social-card.spotify-card i { color: #1db954; }    /* Spotify green */
 
 .social-name {
   font-weight: 700;
@@ -2087,10 +2091,11 @@ nav ul li a.nav-active {
 }
 
 /* Platform-specific hover colors */
-.github-card:hover i { color: #fff; }
-.linkedin-card:hover i { color: #0077b5; }
 .instagram-card:hover i { color: #e4405f; }
-.spotify-card:hover i { color: #1db954; }
+
+
+
+
 
 /* =========================
    Lyrics Page

@@ -54,7 +54,8 @@
       "description": [
         "Image Lab is a fast, browser-based image editor with a Python (Flask) backend.",
         "It supports cropping, resizing, color adjustments, filters, background removal, histogram equalization, and content-aware seam carving.",
-        "The seam carving feature allows for intelligent resizing that preserves important content in images."
+        "The seam carving feature allows for intelligent resizing that preserves important content in images.",
+        "Used to be on a website, currently being worked on so not actively deployed to production."
       ],
       "iconImage": "il.png",
       "tags": ["Python", "Flask", "Image Processing", "Web"],
@@ -105,7 +106,7 @@
         "The original website may still be at: https://trevorg73.web.illinois.edu/songswears"
       ],
       "iconImage": "new.png",
-      "tags": ["Web", "API"],
+      "tags": ["Web", "API", "Spotify"],
       "hasGithub": true,
       "githubLink": "https://github.com/H-Bombmxpwr/song-swears",
       "hasLive": true,
