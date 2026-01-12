@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.title }} - Hunter{% endblock %}
+
+{% block content %}
+<section class="project-detail">
+    <div class="detail-header">
+        <a href="{{ url_for('personal_projects') if project.category == 'personal' else url_for('academic_projects') }}" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            Back to {{ 'Personal' if project.category == 'personal' else 'Academic' }} Projects
+        </a>
+    </div>
+
+    <div class="detail-layout">
+        <div class="detail-image-side">
+            <div class="detail-image-container" onclick="openLightbox(0)">
+                <img src="{{ url_for('static', filename=project.iconImagePath) }}" alt="{{ project.title }}" class="detail-main-image">
+                <div class="image-zoom-hint"><i class="fas fa-expand"></i></div>
+            </div>
+        </div>
+
+        <div class="detail-content-side">
+            <h1 class="detail-title">{{ project.title }}</h1>
+
+            <div class="detail-tags">
+                {% for tag in project.tags %}
+                <span class="tag">{{ tag }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="detail-description">
+                {% for paragraph in project.description %}
+                <p>{{ paragraph }}</p>
+                {% endfor %}
+            </div>
+
+            <div class="detail-links">
+                {% if project.hasLive and project.liveLink %}
+                <a href="{{ project.liveLink }}" target="_blank" class="detail-link-btn primary">
+                    <i class="fas fa-external-link-alt"></i>
+                    Visit Site
+                </a>
+                {% endif %}
+                {% if project.hasGithub and project.githubLink %}
+                <a href="{{ project.githubLink }}" target="_blank" class="detail-link-btn github">
+                    <i class="fab fa-github"></i>
+                    View Code
+                </a>
+                {% endif %}
+                {% if project.hasVideo and project.videoLink %}
+                <a href="{{ project.videoLink }}" target="_blank" class="detail-link-btn video">
+                    <i class="fas fa-play-circle"></i>
+                    Watch Video
+                </a>
+                {% endif %}
+                {% if project.hasDownload and project.downloadLink %}
+                <a href="{{ project.downloadLink }}" target="_blank" class="detail-link-btn download">
+                    <i class="fas fa-download"></i>
+                    Download
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if project.galleryImages and project.galleryImages|length > 0 %}
+    <div class="detail-gallery-section">
+        <h2 class="gallery-header"><i class="fas fa-images"></i> Gallery</h2>
+        <div class="gallery-grid">
+            {% for image in project.galleryImages %}
+            <div class="gallery-item" onclick="openLightbox({{ loop.index }})">
+                <img src="{{ url_for('static', filename=image) }}" alt="{{ project.title }} screenshot {{ loop.index }}" loading="lazy">
+                <div class="gallery-overlay"><i class="fas fa-expand"></i></div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</section>
+
+<!-- Lightbox Modal with Navigation -->
+<div id="lightbox" class="lightbox">
+    <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+    <button class="lightbox-nav lightbox-prev" onclick="navigateLightbox(-1)"><i class="fas fa-chevron-left"></i></button>
+    <img class="lightbox-content" id="lightbox-img" onclick="event.stopPropagation()">
+    <button class="lightbox-nav lightbox-next" onclick="navigateLightbox(1)"><i class="fas fa-chevron-right"></i></button>
+    <div class="lightbox-counter" id="lightbox-counter"></div>
+    <div class="lightbox-backdrop" onclick="closeLightbox()"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Gallery images array (main image + gallery images)
+const galleryImages = [
+    "{{ url_for('static', filename=project.iconImagePath) }}"
+    {% if project.galleryImages %}
+    {% for image in project.galleryImages %}
+    , "{{ url_for('static', filename=image) }}"
+    {% endfor %}
+    {% endif %}
+];
+
+let currentImageIndex = 0;
+
+function openLightbox(index) {
+    currentImageIndex = index;
+    updateLightboxImage();
+    document.getElementById('lightbox').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+function navigateLightbox(direction) {
+    event.stopPropagation();
+    currentImageIndex += direction;
+    if (currentImageIndex < 0) currentImageIndex = galleryImages.length - 1;
+    if (currentImageIndex >= galleryImages.length) currentImageIndex = 0;
+    updateLightboxImage();
+}
+
+function updateLightboxImage() {
+    const img = document.getElementById('lightbox-img');
+    const counter = document.getElementById('lightbox-counter');
+    img.src = galleryImages[currentImageIndex];
+    counter.textContent = `${currentImageIndex + 1} / ${galleryImages.length}`;
+
+    // Hide nav buttons if only one image
+    const prevBtn = document.querySelector('.lightbox-prev');
+    const nextBtn = document.querySelector('.lightbox-next');
+    if (galleryImages.length <= 1) {
+        prevBtn.style.display = 'none';
+        nextBtn.style.display = 'none';
+        counter.style.display = 'none';
+    } else {
+        prevBtn.style.display = 'flex';
+        nextBtn.style.display = 'flex';
+        counter.style.display = 'block';
+    }
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', function(e) {
+    const lightbox = document.getElementById('lightbox');
+    if (!lightbox.classList.contains('active')) return;
+
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') navigateLightbox(-1);
+    if (e.key === 'ArrowRight') navigateLightbox(1);
+});
+</script>
+{% endblock %}

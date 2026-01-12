@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Hunter - About Me{% endblock %}
+
+{% block content %}
+<section class="about-page animate-on-scroll">
+    <div class="about-hero">
+        <div class="about-image-large">
+            <img src="{{ url_for('static', filename='images/icon2.png') }}" alt="Hunter">
+        </div>
+        <div class="about-intro">
+            <h1 class="about-title slide-in-left">About Me</h1>
+            <h2 class="about-role slide-in-left">Electrical Engineer & Computer Scientist</h2>
+            <p class="about-bio slide-in-left">
+                I’m Hunter—an Electrical Engineer and Computer Scientist based in Baltimore, MD. 
+                I mostly build things I find interesting, with the (healthy) suspicion that they 
+                might end up helping someone along the way.
+            </p>
+            <p class="about-bio slide-in-left">
+                When I’m not coding or designing circuits, you can find me DJing, playing chess, hitting the ice for hockey, playing the hot corner in softball, getting a round of disc golf in, watching movies, and reviewing restaurants..
+            </p>
+        </div>
+    </div>
+
+    <div class="about-details animate-on-scroll">
+        <div class="detail-section">
+            <h3><i class="fas fa-graduation-cap"></i> Undergraduate</h3>
+            <p>University of Illinois at Urbana-Champaign</p>
+            <p class="detail-sub">B.S. Electrical Engineering</p>
+        </div>
+        <div class="detail-section">
+            <h3><i class="fas fa-graduation-cap"></i> Graduate</h3>
+            <p>Johns Hopkins University</p>
+            <p class="detail-sub">M.S. Electrical & Computer Engineering</p>
+        </div>
+        <div class="detail-section">
+            <h3><i class="fas fa-map-marker-alt"></i> Location</h3>
+            <p>Baltimore, MD</p>
+            <p class="detail-sub">Originally from Chicago</p>
+        </div>
+        <div class="detail-section">
+            <h3><i class="fas fa-heart"></i> Interests</h3>
+            <p>DJing, Chess, Music, Movies</p>
+            <p class="detail-sub"> and so much more, always learning something new</p>
+        </div>
+    </div>
+
+    <div class="social-section animate-on-scroll">
+        <h2 class="section-title">
+            <span class="title-accent"><i class="fas fa-link"></i></span>
+            Connect With Me
+        </h2>
+        <div class="social-grid">
+            <a href="https://github.com/H-Bombmxpwr" target="_blank" class="social-card github-card">
+                <i class="fab fa-github"></i>
+                <span class="social-name">GitHub</span>
+                <span class="social-handle">Way too many projects</span>
+            </a>
+            <a href="https://www.linkedin.com/in/hunter-baisden/" target="_blank" class="social-card linkedin-card">
+                <i class="fab fa-linkedin"></i>
+                <span class="social-name">LinkedIn</span>
+                <span class="social-handle">Connect with Peyton Baisden for a good laugh</span>
+            </a>
+            <a href="https://lichess.org/@/H-Bombmxpwr" target="_blank" class="social-card lichess-card">
+                <img src="{{ url_for('static', filename='images/lichess_icon.png') }}" alt="Lichess" class="social-icon-img">
+                <span class="social-name">Lichess</span>
+                <span class="social-handle">Can you beat me?</span>
+            </a>
+            <a href="https://www.instagram.com/hbombmxpwr" target="_blank" class="social-card instagram-card">
+                <i class="fab fa-instagram"></i>
+                <span class="social-name">Instagram</span>
+                <span class="social-handle">Haven't used it in years, but its here</span>
+            </a>
+            <a href="https://open.spotify.com/user/awesome7335" target="_blank" class="social-card spotify-card">
+                <i class="fab fa-spotify"></i>
+                <span class="social-name">Spotify</span>
+                <span class="social-handle">Curated playlists</span>
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Slide-in animations
+    const slideElements = document.querySelectorAll('.slide-in-left');
+    slideElements.forEach((el, index) => {
+        el.style.animationDelay = `${index * 0.1}s`;
+    });
+
+    // Magnetic effect on social cards
+    const socialCards = document.querySelectorAll('.social-card');
+    socialCards.forEach(card => {
+        card.addEventListener('mousemove', function(e) {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left - rect.width / 2;
+            const y = e.clientY - rect.top - rect.height / 2;
+            card.style.transform = `translate(${x * 0.1}px, ${y * 0.1}px) scale(1.02)`;
+        });
+
+        card.addEventListener('mouseleave', function() {
+            card.style.transform = 'translate(0, 0) scale(1)';
+        });
+    });
+
+    // Scroll animations
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate-in');
+            }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+    document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+});
+</script>
+{% endblock %}

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{{ url_for('static', filename='images/icon.png') }}" type="image/png">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <title>{% block title %}Hunter{% endblock %}</title>
+    {% block head %}{% endblock %}
+</head>
+<body id="{{ page_id|default('index-page') }}" data-city="baltimore" data-collage-density="{{ collage_density|default('medium') }}">
+    <div class="container">
+        <header class="site-header">
+            <div class="wrap">
+                <a href="{{ url_for('index') }}" class="brand-link">
+                    <h1 class="brand">Hunter</h1>
+                </a>
+            </div>
+        </header>
+
+        <!-- City Switcher Slider -->
+        <div class="city-switcher">
+            <div class="city-options">
+                <div class="city-option" data-city="baltimore" onclick="CityCollage.switchCity('baltimore')">
+                    <img src="{{ url_for('static', filename='images/flags/baltimore_flag.png') }}" alt="Baltimore Flag" class="city-flag">
+                    <span class="city-label">Baltimore</span>
+                </div>
+                <div class="city-option" data-city="dc" onclick="CityCollage.switchCity('dc')">
+                    <img src="{{ url_for('static', filename='images/flags/dc_flag.png') }}" alt="DC Flag" class="city-flag">
+                    <span class="city-label">DC</span>
+                </div>
+                <div class="city-option" data-city="chicago" onclick="CityCollage.switchCity('chicago')">
+                    <img src="{{ url_for('static', filename='images/flags/chicago_flag.png') }}" alt="Chicago Flag" class="city-flag">
+                    <span class="city-label">Chicago</span>
+                </div>
+            </div>
+            <div class="slider-container">
+                <input
+                    type="range"
+                    id="city-slider"
+                    class="city-slider-input"
+                    min="0"
+                    max="2"
+                    value="0"
+                    step="1"
+                    aria-label="Select city theme"
+                >
+            </div>
+        </div>
+
+        <nav class="navbar">
+            <ul>
+                <li><a href="{{ url_for('index') }}" class="{% if active_page == 'home' %}nav-active{% endif %}">Home</a></li>
+                <li><a href="{{ url_for('personal_projects') }}" class="{% if active_page == 'personal' %}nav-active{% endif %}">Personal</a></li>
+                <li><a href="{{ url_for('academic_projects') }}" class="{% if active_page == 'academic' %}nav-active{% endif %}">Academic</a></li>
+                <li><a href="{{ url_for('about') }}" class="{% if active_page == 'about' %}nav-active{% endif %}">About</a></li>
+            </ul>
+        </nav>
+
+        {% block content %}{% endblock %}
+
+        <!-- Lyrics Footer -->
+        <footer class="footer lyrics-footer">
+            <div class="lyrics-footer-content">
+                <blockquote id="footer-lyrics" class="footer-lyrics-text">
+                    <!-- Lyrics will be inserted here -->
+                </blockquote>
+                <p id="footer-song-info" class="footer-song-info">
+                    <!-- Song info will be inserted here -->
+                </p>
+                <div class="footer-lyrics-controls">
+                    <button onclick="changeFooterLyric()" class="lyrics-btn ghost" aria-label="Change lyrics">
+                        <i class="fas fa-random"></i>
+                    </button>
+                    <a href="{{ url_for('all_lyrics') }}" class="lyrics-btn ghost" aria-label="View all lyrics">
+                        <i class="fas fa-music"></i> All Lyrics
+                    </a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <a href="https://github.com/H-Bombmxpwr/Landing-Page" target="_blank" class="github-footer">
+                    <i class="fab fa-github"></i>
+                </a>
+                <span id="year"></span> - Hunter Baisden
+            </div>
+        </footer>
+
+        <script>
+            document.getElementById('year').textContent = new Date().getFullYear();
+        </script>
+    </div>
+
+    <!-- City Image Arrays -->
+    <script>
+    window.BALTIMORE_IMAGES = [
+        "{{ url_for('static', filename='images/baltimore/harbor.jpg') }}",
+        "{{ url_for('static', filename='images/baltimore/skyline.jpg') }}",
+        "{{ url_for('static', filename='images/baltimore/rowhouses.jpg') }}",
+        "{{ url_for('static', filename='images/baltimore/domino.jpg') }}",
+        "{{ url_for('static', filename='images/baltimore/boh.jpg') }}",
+        "{{ url_for('static', filename='images/baltimore/observe.jpg') }}",
+        "{{ url_for('static', filename='images/baltimore/fedhill.jpg') }}",
+        "{{ url_for('static', filename='images/baltimore/scottkey.jpg') }}",
+        "{{ url_for('static', filename='images/baltimore/camden.jpg') }}",
+        "{{ url_for('static', filename='images/baltimore/powerplant.jpg') }}",
+        "{{ url_for('static', filename='images/baltimore/pickles.jpg') }}",
+        "{{ url_for('static', filename='images/baltimore/mchenry.jpg') }}",
+        "{{ url_for('static', filename='images/baltimore/homewood.jpg') }}",
+        "{{ url_for('static', filename='images/baltimore/charles.jpg') }}",
+        "{{ url_for('static', filename='images/baltimore/canton_gate.jpg') }}",
+        "{{ url_for('static', filename='images/baltimore/red.jpg') }}"
+    ];
+
+    window.DC_IMAGES = [
+        "{{ url_for('static', filename='images/dc/capitol.jpg') }}",
+        "{{ url_for('static', filename='images/dc/george_mason.jpg') }}",
+        "{{ url_for('static', filename='images/dc/lincoln.jpeg') }}",
+        "{{ url_for('static', filename='images/dc/lafayette.jpg') }}",
+        "{{ url_for('static', filename='images/dc/noma.jpg') }}",
+        "{{ url_for('static', filename='images/dc/jefferson.jpg') }}",
+        "{{ url_for('static', filename='images/dc/market.jpg') }}",
+        "{{ url_for('static', filename='images/dc/dupont.jpg') }}",
+        "{{ url_for('static', filename='images/dc/georgetown.jpg') }}",
+        "{{ url_for('static', filename='images/dc/cherryblossoms.jpg') }}",
+        "{{ url_for('static', filename='images/dc/union.jpg') }}",
+        "{{ url_for('static', filename='images/dc/nationals.jpg') }}"
+    ];
+
+    window.CHICAGO_IMAGES = [
+        "{{ url_for('static', filename='images/chicago/bean.jpg') }}",
+        "{{ url_for('static', filename='images/chicago/skyline.jpg') }}",
+        "{{ url_for('static', filename='images/chicago/wrigley.jpg') }}",
+        "{{ url_for('static', filename='images/chicago/wicker.jpg') }}",
+        "{{ url_for('static', filename='images/chicago/river.jpg') }}",
+        "{{ url_for('static', filename='images/chicago/pequods.jpg') }}",
+        "{{ url_for('static', filename='images/chicago/lincoln_park.jpg') }}",
+        "{{ url_for('static', filename='images/chicago/dawes.jpg') }}",
+        "{{ url_for('static', filename='images/chicago/crib.jpg') }}",
+        "{{ url_for('static', filename='images/chicago/logan.jpeg') }}",
+        "{{ url_for('static', filename='images/chicago/loop.jpg') }}",
+        "{{ url_for('static', filename='images/chicago/hancock.jpg') }}",
+        "{{ url_for('static', filename='images/chicago/daley.jpg') }}"
+    ];
+    </script>
+
+    <!-- Core Scripts -->
+    <script src="{{ url_for('static', filename='js/collage.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/lyrics-footer.js') }}"></script>
+
+    <!-- City Slider Logic -->
+    <script>
+    (function() {
+        const slider = document.getElementById('city-slider');
+        const cities = ['baltimore', 'dc', 'chicago'];
+
+        if (slider) {
+            slider.addEventListener('input', function() {
+                const cityIndex = parseInt(this.value, 10);
+                const city = cities[cityIndex];
+                if (city && window.CityCollage) {
+                    window.CityCollage.switchCity(city);
+                }
+            });
+
+            document.addEventListener('DOMContentLoaded', function() {
+                try {
+                    const saved = localStorage.getItem('selectedCity') || 'baltimore';
+                    const idx = cities.indexOf(saved);
+                    if (idx !== -1) {
+                        slider.value = idx;
+                    }
+                } catch(e) {}
+            });
+        }
+    })();
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

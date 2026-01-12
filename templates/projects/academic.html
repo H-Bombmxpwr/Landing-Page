@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Hunter - Academic Projects{% endblock %}
+
+{% block content %}
+<section class="projects-page academic-projects">
+    <div class="page-header animate-on-scroll">
+        <h1 class="page-title">
+            <i class="fas fa-graduation-cap"></i>
+            Academic Projects
+        </h1>
+        <p class="page-subtitle">School Projects</p>
+    </div>
+
+    {% for university, projects in grouped_projects %}
+    <div class="project-group animate-on-scroll">
+        <h2 class="group-title">
+            <i class="fas fa-university"></i>
+            {{ university }}
+        </h2>
+        <div class="projects-grid stagger-children">
+            {% for project in projects %}
+            <a href="{{ url_for('project_detail', project_id=project.id) }}" class="project-card academic-card" data-index="{{ loop.index }}">
+                <div class="project-card-image">
+                    <img src="{{ url_for('static', filename=project.iconImagePath) }}" alt="{{ project.title }}" loading="lazy">
+                    <div class="project-card-overlay">
+                        <span class="view-btn">View Details <i class="fas fa-arrow-right"></i></span>
+                    </div>
+                </div>
+                <div class="project-card-content">
+                    <h3 class="project-card-title">{{ project.title }}</h3>
+                    <p class="project-card-desc">{{ project.shortDescription }}</p>
+                    <div class="project-card-tags">
+                        {% for tag in project.tags[:3] %}
+                        <span class="tag">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="project-card-links">
+                        {% if project.hasLive %}
+                        <span class="link-indicator" title="Live Site"><i class="fas fa-external-link-alt"></i></span>
+                        {% endif %}
+                        {% if project.hasGithub %}
+                        <span class="link-indicator" title="GitHub"><i class="fab fa-github"></i></span>
+                        {% endif %}
+                        {% if project.hasVideo %}
+                        <span class="link-indicator" title="Video"><i class="fas fa-video"></i></span>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Flip/reveal animation on scroll
+    const cards = document.querySelectorAll('.project-card');
+
+    const cardObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+                setTimeout(() => {
+                    entry.target.classList.add('revealed');
+                }, index * 100);
+            }
+        });
+    }, { threshold: 0.2 });
+
+    cards.forEach(card => cardObserver.observe(card));
+
+    // Scroll animations
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate-in');
+            }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+    document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+
+    // Card hover effect
+    cards.forEach(card => {
+        card.addEventListener('mousemove', function(e) {
+            const rect = card.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width - 0.5;
+            const y = (e.clientY - rect.top) / rect.height - 0.5;
+            card.style.transform = `perspective(1000px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg) translateY(-8px)`;
+        });
+
+        card.addEventListener('mouseleave', function() {
+            card.style.transform = 'perspective(1000px) rotateY(0) rotateX(0) translateY(0)';
+        });
+    });
+});
+</script>
+{% endblock %}

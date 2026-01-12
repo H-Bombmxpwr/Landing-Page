@@ -1,403 +1,102 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="{{ url_for('static', filename='images/fry.svg') }}" type="image/svg">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-    <title>Hunter</title>
-</head>
-<body id="index-page" data-city="baltimore">
-    <div class="container">
-        <header class="site-header">
-            <div class="wrap">
-                <h1 class="brand">Hunter</h1>
-            </div>
-        </header>
-        
-        <!-- City Switcher Slider -->
-        <div class="city-switcher">
-            <div class="city-options">
-                <div class="city-option" data-city="baltimore" onclick="CityCollage.switchCity('baltimore')">
-                    <img src="{{ url_for('static', filename='images/flags/baltimore_flag.png') }}" alt="Baltimore Flag" class="city-flag">
-                    <span class="city-label">Baltimore</span>
-                </div>
-                <div class="city-option" data-city="dc" onclick="CityCollage.switchCity('dc')">
-                    <img src="{{ url_for('static', filename='images/flags/dc_flag.png') }}" alt="DC Flag" class="city-flag">
-                    <span class="city-label">DC</span>
-                </div>
-                <div class="city-option" data-city="chicago" onclick="CityCollage.switchCity('chicago')">
-                    <img src="{{ url_for('static', filename='images/flags/chicago_flag.png') }}" alt="Chicago Flag" class="city-flag">
-                    <span class="city-label">Chicago</span>
-                </div>
-            </div>
-            <div class="slider-container">
-                <input 
-                    type="range" 
-                    id="city-slider" 
-                    class="city-slider-input" 
-                    min="0" 
-                    max="2" 
-                    value="0" 
-                    step="1"
-                    aria-label="Select city theme"
-                >
+{% extends "base.html" %}
+
+{% block title %}Hunter - Home{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <div class="hero-text">
+            <h1 class="hero-title">
+                <span class="hero-greeting">Hello, I'm</span>
+                <span class="hero-name">Hunter</span>
+            </h1>
+            <p class="hero-subtitle">Electrical Engineer & Computer Scientist</p>
+            <p class="hero-location"><i class="fas fa-map-marker-alt"></i> Baltimore, MD</p>
+            <div class="hero-cta">
+                <a href="{{ url_for('personal_projects') }}" class="btn primary hero-btn">
+                    <i class="fas fa-code"></i> View Projects
+                </a>
+                <a href="{{ url_for('about') }}" class="btn ghost hero-btn">
+                    <i class="fas fa-user"></i> About Me
+                </a>
             </div>
         </div>
-
-        <nav class="navbar">
-            <ul>
-                <li><a href="#about">About Me</a></li>
-                <li><a href="#projects">Personal Projects</a></li>
-                <li><a href="#school-projects">Academic Projects</a></li>
-            </ul>
-        </nav>
-
-        <!-- about section -->
-        <section class="about">
-            <div class="about-content">
-                <div class="about-image">
-                    <img src="{{ url_for('static', filename='images/icon2.png') }}" alt="Your Image">
-                </div>
-                <div class="about-text">
-                    <h2>About Me</h2>
-                    <p>Electrical Engineer and Computer Scientist</p>
-                    <p>Baltimore, MD </p>
-                    <blockquote id="lyrics-block">
-                        <!-- This is where the random lyrics will be inserted -->
-                    </blockquote>
-                    <p id="song-info">
-                        <!-- Song title and artist will be inserted here -->
-                    </p>
-                    <a href="javascript:void(0);" role="button" class="visit-button" onclick="displayNextLyrics()">Change Lyrics</a>
-                    <a href="/all-lyrics" role="button" class="visit-button">View All Lyrics</a>
-
-                </div>
-                
-                
-                
-                
+        <div class="hero-image-wrapper">
+            <div class="hero-image">
+                <img src="{{ url_for('static', filename='images/icon2.png') }}" alt="Hunter">
             </div>
-            <div class="social-links">
-                <a href="https://github.com/H-Bombmxpwr" target="_blank" class="icon-link">
-                    <i class="fab fa-github"></i>
-                </a>
-                <a href="https://www.linkedin.com/in/hunter-baisden/" target="_blank" class="icon-link">
-                    <i class="fab fa-linkedin"></i>
-                </a>
-                <a href="https://lichess.org/@/H-Bombmxpwr" target="_blank" class="icon-link">
-                    <img src="{{ url_for('static', filename='images/lichess_icon.png') }}" alt="Lichess" class="social-icon">
-                </a>
-                <a href="https://www.instagram.com/hbombmxpwr" target="_blank" class="icon-link">
-                    <i class="fab fa-instagram"></i>
-                </a>
-                <a href="https://open.spotify.com/user/awesome7335" target="_blank" class="icon-link">
-                    <i class="fab fa-spotify"></i>
-                </a>
-            </div>
-        </section>
-        
-        <!-- Personal Projects Section -->
-        <section id="projects">
-            <h2>Personal Projects</h2>
-            <ul id="project-tabs">
-                <li class="tab" onclick="showProject('project1')">Album Poster</li>
-                <li class="tab" onclick="showProject('project2')">LiDAR Lense</li>
-                <li class="tab" onclick="showProject('project3')">Image Lab</li>
-                <li class="tab" onclick="showProject('project4')">Song Swears</li>
-                <li class="tab" onclick="showProject('project5')">DJ Music Aggregator</li>
-                <li class="tab" onclick="showProject('project6')">Clarence</li>
-                <li class="tab" onclick="showProject('project7')">TI Programs</li>
-                <li class="tab" onclick="showProject('project8')">Portfolio Website</li>
-                <li class="tab" onclick="showProject('project9')">Mario Kart Tracker</li>
-            </ul>
-
-            <div id="project1" class="project-content">
-                <h3>Album Poster Generator</h3>
-                <p>This is a website to generate a cool album poster. It interacts with the Spotify API for all of the album data. It will take an artist, an album, or both and generate a poster.</p>
-                <a href="https://album.hxr.life" role="button" class="visit-button">Visit Website</a>
-                <figure>
-                    <img src="{{ url_for('static', filename='images/khalid.png') }}" alt="American Teen Screenshot" style="max-width:100%; height:auto;">
-                    <figcaption>Example of a Poster, American Teen by Khalid</figcaption>
-                </figure>
-                
-                
-            </div>
-
-            <div id="project2" class="project-content">
-                <h3>LiDAR Lense</h3>
-                <p>My iPhone app that used the LiDAR on some iPhone Pro models to help map the room around you. It identifies potential obstacles and displays them on the screen for the user as they walk around real time. Written in Swift and Python, the repository is currently private.</p>
-                <figure class="website-screenshot">
-                    <img src="{{ url_for('static', filename='images/lidar.png') }}" alt="Screenshot of my kitchen through LiDAR Lense">
-                    <figcaption>Screenshot of my kitchen through LiDAR Lense</figcaption>
-                </figure>
-                <figure class="website-screenshot">
-                    <img src="{{ url_for('static', filename='images/lense.png') }}" alt="Screenshot of my kitchen through LiDAR Lense" class="round-icon">
-                    <figcaption>The apps icon</figcaption>
-                </figure>
-            </div>
-
-            <div id="project3" class="project-content">
-                <h3>Image Lab</h3>
-                <p>Image Lab is a fast, browser-based image editor with a Python (Flask) backend. It supports cropping, resizing, color adjustments, filters, background removal, histogram equalization, and content-aware seam carving. </p>
-                <a href="https://image.hxr.life" role="button" class="visit-button">Visit Website</a>
-                <figure class="website-screenshot">
-                    <img src="{{ url_for('static', filename='images/il.png') }}" alt="Image Lab Dashboard">
-                    <figcaption>Image Lab Dashboard, featuring Bender</figcaption>
-                </figure>
-            </div>
-
-
-            <div id="project4" class="project-content">
-                <h3>Swears in Songs</h3>
-                <p>This is a website to return all of the swear words in a queried song. My first website so a little rough around the edges, still gets the job done though.</p>
-                <a href="https://trevorg73.web.illinois.edu/songswears" role="button" class="visit-button">Visit Website</a>
-                <figure class="website-screenshot">
-                    <img src="{{ url_for('static', filename='images/swears.png') }}" alt="Screenshot of Song Swears website">
-                    <figcaption>All the swears in 8TEEN, from American Teen</figcaption>
-                </figure>
-            </div>
-
-            <div id="project5" class="project-content">
-                <h3>Music Aggregator for DJing</h3>
-                <p>This is a GUI I wrote that will take in a spotify playlist and download that playlist as a series of MP3s, all tagged with standard ID3 tags. This makes importing into DJ software, such as Serato, trivial. It is highly parallelized, being able to support downloading 6 playlists at a time.</p>
-                <a href="https://github.com/H-Bombmxpwr/Music_DJ_Downloader" role="button" class="visit-button">Repository</a>
-                <figure class="website-screenshot">
-                    <img src="{{ url_for('static', filename='images/GUI_Ex.png') }}" alt="DJ Music Aggregator Screenshot">
-                    <figcaption>The Music Aggregator GUI</figcaption>
-                </figure>
-            </div>
-
-            <div id="project6" class="project-content">
-                <h3>Clarence</h3>
-                <p>My first ever Discord bot! Built using Discord.py, it was an incredibly janky but a good learning experience. It had a range of features including music playback, trivia games, image manipulation, and more.</p>
-                <a href="https://discord.com/api/oauth2/authorize?client_id=877014219499925515&permissions=8&scope=bot" role="button" class="visit-button">Invite</a>
-                <figure class="website-screenshot">
-                    <img src="{{ url_for('static', filename='images/clarence.png') }}" alt="Clarence">
-                    <figcaption>Clarence's Icon made by Ryan</figcaption>
-                </figure>
-            </div>
-
-            <div id="project7" class="project-content">
-                <h3>TI Calculator Programs</h3>
-                <p>I am a huge proponent of learning to code as early as possible, and I think the best and most accessible way to start is through a calculator! These are all of the programs I wrote on my TI-84 over the years</p>
-                <a href="https://github.com/H-Bombmxpwr/TI-Programs" role="button" class="visit-button">Repository</a>
-                <figure class="website-screenshot">
-                    <img src="{{ url_for('static', filename='images/ti.png') }}" alt="TI-84 Plus CE" class="round-icon">
-                    <figcaption>TI-84 Plus CE</figcaption>
-                </figure>
-            </div>
-
-            <div id="project8" class="project-content">
-                <h3>This Website!</h3>
-                <p>A website to show off all of my projects and introduce myself. It is written with Flask and is hosted on Railway.</p>
-                <a href="https://github.com/H-Bombmxpwr/Landing-Page" role="button" class="visit-button">Repository</a>
-                <figure class="website-screenshot">
-                    <img src="{{ url_for('static', filename='images/fry.svg') }}" alt="Fry Icon" class="round-icon">
-                    <figcaption>Phillip J Fry</figcaption>
-                </figure>
-            </div>
-
-            <div id="project9" class="project-content">
-                <h3>Mario Kart Tracker</h3>
-                <p>Enter in a username and this site will track as many friends as you want, and all of their Mario Kart placements. They are saved under your username.</p>
-    
-                <a href="https://trevorg73.web.illinois.edu/kart/login" role="button" class="visit-button">Visit Site</a>
-                <figure class="website-screenshot">
-                    <img src="{{ url_for('static', filename='images/kart.png') }}" alt="Fry Icon" class="round-icon">
-                    <figcaption>Mario doing Mario things</figcaption>
-                </figure>
-            </div>
-
-        </section>
-
-
-        <section id="school-projects">
-            <h2>Academic Projects</h2>
-            <ul id="project-tabs">
-                <li class="tab" onclick="showSchoolProject('school-project1')">First Person View Drone</li>
-                <li class="tab" onclick="showSchoolProject('school-project2')">Six Degrees of Wikipedia</li>
-                <li class="tab" onclick="showSchoolProject('school-project3')">FPGA Video Game</li>
-                <li class="tab" onclick="showSchoolProject('school-project4')">Controlled Boost Converter</li>
-                <li class="tab" onclick="showSchoolProject('school-project5')">Manim Seam Carving Demo</li>
-                
-                <!-- Add more tabs as needed -->
-            </ul>
-
-            <div id="school-project1" class="school-project-content">
-                <h3>First Person View Drone</h3>
-                <p>Senior design project for ECE at Illinois. 3 custom designed PCBs used to implament live wireless camera transmission from a Crazyflie drone to a headset. Done in a group of 3. The final drone successfully streamed real time video to both a laptop and a headset.</p>
-                <a href="https://github.com/H-Bombmxpwr/FPV_Drone" role="button" class="visit-button">Repository</a>
-                <figure class="website-screenshot">
-                    <img src="{{ url_for('static', filename='images/Drone.png') }}" alt="graph Images">
-                    <figcaption>The final designed drone with the camera and IR LED boards attached (not pictured: the headset board)</figcaption>
-                </figure>
-            </div>
-
-
-            <div id="school-project2" class="school-project-content">
-                <h3>Six Degrees of Wikipedia Solver</h3>
-                <p>A program to solve the six degrees of Wikipedia problem, which is described <a href="https://en.wikipedia.org/wiki/Wikipedia:Six_degrees_of_Wikipedia" target="_blank">here</a>. It was a final project, done in a group of 4. It also goes into the betweenness centrality of thousands of articles.</p>
-                <a href="https://github.com/JuanDiegoSanz7/225-Final-Project" role="button" class="visit-button">Repository</a>
-                <figure class="website-screenshot">
-                    <img src="{{ url_for('static', filename='images/graph.png') }}" alt="graph Images">
-                    <figcaption>Graph representing thousands of articles distance from "United States"</figcaption>
-                </figure>
-            </div>
-            
-            <div id="school-project3" class="school-project-content" style="display: none;">
-                <h3>Custom Video Game on FPGA</h3>
-                <p>A custom video game programmed onto an FPGA detailing the life of an ECE major @ U of I. Written in System Verilog it includes custom sprites and top down gameplay. The repository is currently private.</p>
-                <figure class="website-screenshot">
-                    <img src="{{ url_for('static', filename='images/fpga.png') }}" alt="graph Images">
-                    <figcaption> FPGA running the game real time</figcaption>
-                </figure>
-                <!-- Add more content as needed -->
-            </div>
-
-            <div id="school-project4" class="school-project-content" style="display: none;"">
-                <h3>Controlled Boost Converter</h3>
-                <p>A hand-controlled boost converter designed for a ranging 9-15V input, and a strict 24V&plusmn;3% output. A custom inductor was wound for the project. Arduino control was also built in for more precise control.</p>
-                
-                <figure class="website-screenshot">
-                    <img src="{{ url_for('static', filename='images/boost.jpg') }}" alt="graph Images">
-                    <figcaption>Photo of the converter including the power board, control board, and custom inductor.</figcaption>
-                </figure>
-            </div>
-
-            <div id="school-project5" class="school-project-content" style="display: none;"">
-                <h3>Demonstration of Seam Carving using Manim</h3>
-                <p>A final project in my Image Engineering class where I use the community version of Manim to explain in detail how seam carving works. I didn't have a good microphone so the audio is not great. </p>
-                <a href="https://www.youtube.com/watch?v=1EKT18cBecc" role="button" class="visit-button">Video</a>
-                <figure class="website-screenshot">
-                    <img src="{{ url_for('static', filename='images/seam.png') }}" alt="graph Images">
-                    <figcaption>Screen capture of the video, showing the original image, an "edginess" image, and a "minimum energy to the bottom" image.</figcaption>
-                </figure>
-            </div>
-
-
-            <!-- Add more project-content divs as needed -->
-        </section>
-
-        
-        <footer class="footer">
-            <p>
-                <a href="https://github.com/H-Bombmxpwr/Landing-Page" target="_blank" class="github-footer">
-                    <i class="fab fa-github"></i>
-                </a>
-                <span id="year"></span> - Hunter Baisden
-            </p>
-            <div id="funnyQuote">Loading a quote...</div>
-        </footer>
-        
-        <script>
-            // Get the current year and display it in the footer
-            document.getElementById('year').textContent = new Date().getFullYear();
-        </script>
-        
-        
-        
+        </div>
     </div>
-    
-    <!-- City Image Arrays - Easy to add more images! -->
-    <script>
-    // BALTIMORE IMAGES
-    // Add more images by adding paths to this array
-    window.BALTIMORE_IMAGES = [
-        "{{ url_for('static', filename='images/baltimore/harbor.jpg') }}",
-        "{{ url_for('static', filename='images/baltimore/skyline.jpg') }}",
-        "{{ url_for('static', filename='images/baltimore/rowhouses.jpg') }}",
-        "{{ url_for('static', filename='images/baltimore/domino.jpg') }}",
-        "{{ url_for('static', filename='images/baltimore/boh.jpg') }}",
-        "{{ url_for('static', filename='images/baltimore/observe.jpg') }}",
-        "{{ url_for('static', filename='images/baltimore/fedhill.jpg') }}",
-        "{{ url_for('static', filename='images/baltimore/scottkey.jpg') }}",
-        "{{ url_for('static', filename='images/baltimore/camden.jpg') }}",
-        "{{ url_for('static', filename='images/baltimore/powerplant.jpg') }}",
-        "{{ url_for('static', filename='images/baltimore/pickles.jpg') }}",
-        "{{ url_for('static', filename='images/baltimore/mchenry.jpg') }}",
-        "{{ url_for('static', filename='images/baltimore/homewood.jpg') }}",
-        "{{ url_for('static', filename='images/baltimore/charles.jpg') }}",
-        "{{ url_for('static', filename='images/baltimore/canton_gate.jpg') }}",
-        "{{ url_for('static', filename='images/baltimore/red.jpg') }}"
-        // Add more Baltimore images here:
-        // "{{ url_for('static', filename='images/baltimore/newimage.jpg') }}",
-    ];
+</section>
 
-    // DC IMAGES
-    // Add more images by adding paths to this array
-    window.DC_IMAGES = [
-        "{{ url_for('static', filename='images/dc/capitol.jpg') }}",
-        "{{ url_for('static', filename='images/dc/george_mason.jpg') }}",
-        "{{ url_for('static', filename='images/dc/lincoln.jpeg') }}",
-        "{{ url_for('static', filename='images/dc/lafayette.jpg') }}",
-        "{{ url_for('static', filename='images/dc/noma.jpg') }}",
-        "{{ url_for('static', filename='images/dc/jefferson.jpg') }}",
-        "{{ url_for('static', filename='images/dc/market.jpg') }}",
-        "{{ url_for('static', filename='images/dc/dupont.jpg') }}",
-        "{{ url_for('static', filename='images/dc/georgetown.jpg') }}",
-        "{{ url_for('static', filename='images/dc/cherryblossoms.jpg') }}",
-        "{{ url_for('static', filename='images/dc/union.jpg') }}",
-        "{{ url_for('static', filename='images/dc/nationals.jpg') }}"
-        // Add more DC images here:
-        // "{{ url_for('static', filename='images/dc/newimage.jpg') }}",
-    ];
+{% if featured_project %}
+<section class="featured-section animate-on-scroll">
+    <h2 class="section-title">
+        <span class="title-accent"><i class="fas fa-star"></i></span>
+        Featured Project
+    </h2>
+    <a href="{{ url_for('project_detail', project_id=featured_project.id) }}" class="featured-card">
+        <div class="featured-image">
+            <img src="{{ url_for('static', filename=featured_project.iconImagePath) }}" alt="{{ featured_project.title }}">
+            <div class="featured-overlay">
+                <span class="view-project">View Project <i class="fas fa-arrow-right"></i></span>
+            </div>
+        </div>
+        <div class="featured-info">
+            <h3 class="featured-title">{{ featured_project.title }}</h3>
+            <p class="featured-description">{{ featured_project.shortDescription }}</p>
+            <div class="featured-tags">
+                {% for tag in featured_project.tags[:4] %}
+                <span class="tag">{{ tag }}</span>
+                {% endfor %}
+            </div>
+        </div>
+    </a>
+</section>
+{% endif %}
 
-    // CHICAGO IMAGES
-    // Add more images by adding paths to this array
-    window.CHICAGO_IMAGES = [
-        "{{ url_for('static', filename='images/chicago/bean.jpg') }}",
-        "{{ url_for('static', filename='images/chicago/skyline.jpg') }}",
-        "{{ url_for('static', filename='images/chicago/wrigley.jpg') }}",
-        "{{ url_for('static', filename='images/chicago/wicker.jpg') }}",
-        "{{ url_for('static', filename='images/chicago/river.jpg') }}",
-        "{{ url_for('static', filename='images/chicago/pequods.jpg') }}",
-        "{{ url_for('static', filename='images/chicago/lincoln_park.jpg') }}",
-        "{{ url_for('static', filename='images/chicago/dawes.jpg') }}",
-        "{{ url_for('static', filename='images/chicago/crib.jpg') }}",
-        "{{ url_for('static', filename='images/chicago/logan.jpeg') }}",
-        "{{ url_for('static', filename='images/chicago/loop.jpg') }}",
-        "{{ url_for('static', filename='images/chicago/hancock.jpg') }}",
-        "{{ url_for('static', filename='images/chicago/daley.jpg') }}"
-        // Add more Chicago images here:
-        // "{{ url_for('static', filename='images/chicago/newimage.jpg') }}",
-    ];
-    </script>
+<section class="quick-links animate-on-scroll">
+    <div class="quick-links-grid">
+        <a href="{{ url_for('personal_projects') }}" class="quick-link-card personal-card">
+            <div class="quick-link-icon">
+                <i class="fas fa-rocket"></i>
+            </div>
+            <h3>Personal Projects</h3>
+            <p>Side projects, experiments, and passion work</p>
+            <span class="quick-link-arrow"><i class="fas fa-arrow-right"></i></span>
+        </a>
+        <a href="{{ url_for('academic_projects') }}" class="quick-link-card academic-card">
+            <div class="quick-link-icon">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <h3>Academic Projects</h3>
+            <p>University coursework and research</p>
+            <span class="quick-link-arrow"><i class="fas fa-arrow-right"></i></span>
+        </a>
+    </div>
+</section>
+{% endblock %}
 
-    <!-- Core Scripts -->
-    <script src="{{ url_for('static', filename='js/project.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/collage.js') }}"></script>
-    
-    <!-- City Slider Logic -->
-    <script>
-    (function() {
-        const slider = document.getElementById('city-slider');
-        const cities = ['baltimore', 'dc', 'chicago'];
-        
-        if (slider) {
-            // Handle slider input
-            slider.addEventListener('input', function() {
-                const cityIndex = parseInt(this.value, 10);
-                const city = cities[cityIndex];
-                if (city && window.CityCollage) {
-                    window.CityCollage.switchCity(city);
-                }
-            });
-            
-            // Initialize slider position from saved preference
-            document.addEventListener('DOMContentLoaded', function() {
-                try {
-                    const saved = localStorage.getItem('selectedCity') || 'baltimore';
-                    const idx = cities.indexOf(saved);
-                    if (idx !== -1) {
-                        slider.value = idx;
-                    }
-                } catch(e) {}
-            });
-        }
-    })();
-    </script>
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize scroll animations
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
 
-</body>
-</html>
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate-in');
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.animate-on-scroll').forEach(el => {
+        observer.observe(el);
+    });
+});
+</script>
+{% endblock %}

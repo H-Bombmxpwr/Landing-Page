@@ -43,10 +43,44 @@
   // ============================================
   // COLLAGE SETTINGS
   // ============================================
-  const TILE_COUNT = 20;
+  const DENSITY_LEVELS = {
+    minimal: 6,
+    low: 10,
+    medium: 15,
+    high: 22
+  };
+  let TILE_COUNT = 20;
   const SPAN_CLASSES = ['', 'w2', 'w3', 'h2'];
   const SHUFFLE_INTERVAL = 45000; // ms between random tile swaps
   const STORAGE_KEY = 'selectedCity';
+
+  /**
+   * Set collage density based on page configuration
+   */
+  function setDensity(level) {
+    const density = DENSITY_LEVELS[level] || DENSITY_LEVELS.medium;
+    TILE_COUNT = density;
+
+    // Adjust opacity based on density
+    const opacityMap = {
+      minimal: 0.15,
+      low: 0.18,
+      medium: 0.22,
+      high: 0.25
+    };
+    document.documentElement.style.setProperty('--collage-opacity', opacityMap[level] || 0.22);
+
+    return density;
+  }
+
+  /**
+   * Initialize density from body data attribute
+   */
+  function initDensity() {
+    const body = document.body;
+    const densityAttr = body.dataset.collageDensity || 'medium';
+    setDensity(densityAttr);
+  }
 
   // ============================================
   // STATE
@@ -243,6 +277,9 @@
   // INITIALIZATION
   // ============================================
   function init() {
+    // Initialize density from page data attribute
+    initDensity();
+
     // Create or get collage root
     root = document.getElementById('bmore-collage');
     if (!root) {
@@ -285,7 +322,9 @@
     switchCity,
     getCurrentCity: () => currentCity,
     getCityConfig: () => CITY_CONFIG,
-    rebuild: buildTiles
+    rebuild: buildTiles,
+    setDensity,
+    getDensityLevels: () => DENSITY_LEVELS
   };
 
   // Initialize when DOM ready
