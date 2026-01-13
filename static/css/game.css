@@ -1,0 +1,1033 @@
+/* =========================
+   Space Docking Game Styles
+   ========================= */
+
+.game-page {
+    min-height: calc(100vh - 200px);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* =========================
+   Game Screens
+   ========================= */
+.game-screen {
+    display: none;
+    width: 100%;
+    max-width: 1200px;
+}
+
+.game-screen.active {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.game-screen.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-width: none;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+/* =========================
+   Level Select
+   ========================= */
+.game-title {
+    font-size: 3rem;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+}
+
+.game-subtitle {
+    color: var(--muted);
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+}
+
+.level-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;
+    margin-bottom: 2rem;
+    width: 100%;
+    max-width: 600px;
+}
+
+.level-btn {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s var(--ease-out-expo);
+    position: relative;
+    overflow: hidden;
+}
+
+.level-btn:hover:not(.locked) {
+    border-color: var(--primary);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px var(--ring);
+}
+
+.level-btn.locked {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.level-btn.locked::after {
+    content: '\f023';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    font-size: 1.2rem;
+    color: var(--muted);
+}
+
+.level-btn .level-num {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.level-btn.locked .level-num {
+    display: none;
+}
+
+.level-btn.completed {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, var(--surface) 0%, rgba(var(--primary), 0.1) 100%);
+}
+
+.level-btn.completed::before {
+    content: '\f00c';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 0.8rem;
+    color: var(--primary);
+}
+
+.level-stars {
+    display: flex;
+    gap: 2px;
+    margin-top: 5px;
+}
+
+.level-stars i {
+    font-size: 0.7rem;
+    color: var(--muted);
+}
+
+.level-stars i.filled {
+    color: gold;
+}
+
+/* =========================
+   Mode Buttons (Freeroam & Settings)
+   ========================= */
+.mode-buttons {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 2rem;
+    width: 100%;
+    max-width: 600px;
+}
+
+.mode-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s var(--ease-out-expo);
+    text-align: center;
+}
+
+.mode-btn:hover {
+    border-color: var(--primary);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px var(--ring);
+}
+
+.mode-btn i {
+    font-size: 2rem;
+    color: var(--primary);
+    margin-bottom: 10px;
+}
+
+.mode-btn span {
+    font-weight: 600;
+    color: var(--text);
+    font-size: 1.1rem;
+}
+
+.mode-btn small {
+    display: block;
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-top: 5px;
+}
+
+.mode-btn.freeroam {
+    background: linear-gradient(135deg, var(--surface) 0%, rgba(var(--primary-rgb, 255, 106, 0), 0.1) 100%);
+}
+
+.mode-btn.settings {
+    max-width: 150px;
+    flex: 0 0 auto;
+}
+
+/* =========================
+   Instructions
+   ========================= */
+.game-instructions {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+    width: 100%;
+    max-width: 600px;
+}
+
+.game-instructions h3 {
+    color: var(--primary);
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.controls-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.control-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.control-item .key {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-family: monospace;
+    font-weight: bold;
+    color: var(--primary);
+    margin-bottom: 5px;
+}
+
+.control-item .action {
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+
+/* =========================
+   Game Container
+   ========================= */
+#game-container {
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    aspect-ratio: 16/9;
+    background: #000;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 2px solid var(--border);
+}
+
+#game-container.fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-width: none;
+    aspect-ratio: auto;
+    border-radius: 0;
+    z-index: 9999;
+}
+
+#game-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    outline: none;
+}
+
+/* =========================
+   HUD
+   ========================= */
+.game-hud {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    padding: 15px;
+}
+
+.game-hud > * {
+    pointer-events: auto;
+}
+
+.hud-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.hud-level, .hud-timer {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+.hud-level span {
+    color: var(--primary);
+}
+
+.hud-timer i {
+    color: var(--primary);
+    margin-right: 5px;
+}
+
+.hud-left {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.hud-fuel {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    min-width: 120px;
+}
+
+.fuel-label, .proximity-label, .alignment-label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 8px;
+}
+
+.fuel-label i, .proximity-label i, .alignment-label i {
+    color: var(--primary);
+    margin-right: 5px;
+}
+
+.fuel-bar-container {
+    height: 8px;
+    background: var(--bg);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.fuel-bar {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, var(--primary-700), var(--primary));
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.fuel-bar.low {
+    background: linear-gradient(90deg, #ff4444, #ff6666);
+    animation: pulse-glow 1s infinite;
+}
+
+.fuel-percent {
+    text-align: center;
+    font-weight: 600;
+    margin-top: 5px;
+    font-size: 0.9rem;
+}
+
+.hud-right {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.hud-proximity, .hud-alignment {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    min-width: 120px;
+}
+
+.proximity-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    text-align: center;
+}
+
+.proximity-value.close {
+    color: var(--primary);
+}
+
+.alignment-meter {
+    height: 8px;
+    background: var(--bg);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.alignment-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--primary-700), var(--primary));
+    border-radius: 4px;
+    transition: width 0.1s ease;
+}
+
+.alignment-bar.aligned {
+    background: #44ff44;
+}
+
+.hud-bottom {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.hud-btn {
+    width: 45px;
+    height: 45px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    border: 1px solid var(--border);
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+
+.hud-btn:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+/* =========================
+   Touch Controls
+   ========================= */
+.touch-controls {
+    display: none;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px;
+    pointer-events: none;
+}
+
+@media (pointer: coarse) {
+    .touch-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+    }
+}
+
+.joystick {
+    width: 120px;
+    height: 120px;
+    position: relative;
+    pointer-events: auto;
+}
+
+.joystick-base {
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+}
+
+.joystick-stick {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background: var(--primary);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: transform 0.05s ease;
+}
+
+.touch-btn {
+    pointer-events: auto;
+    padding: 15px 25px;
+    background: var(--primary);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.boost-btn {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* =========================
+   Docking Indicator
+   ========================= */
+.docking-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    color: var(--primary);
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+
+.docking-indicator.hidden {
+    display: none;
+}
+
+.docking-ring {
+    width: 100px;
+    height: 100px;
+    border: 4px solid var(--primary);
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* =========================
+   Menu Panels
+   ========================= */
+.menu-panel {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 20px;
+    padding: 2rem 3rem;
+    text-align: center;
+    min-width: 320px;
+}
+
+.menu-panel h2 {
+    color: var(--text);
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+}
+
+.menu-panel h2 i {
+    margin-right: 10px;
+}
+
+.success-panel h2 i {
+    color: #44ff44;
+}
+
+.failure-panel h2 i {
+    color: #ff4444;
+}
+
+.menu-btn {
+    display: block;
+    width: 100%;
+    padding: 14px 24px;
+    margin-bottom: 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.menu-btn:last-child {
+    margin-bottom: 0;
+}
+
+.menu-btn:hover {
+    background: var(--border);
+}
+
+.menu-btn.primary {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+    font-weight: 600;
+}
+
+.menu-btn.primary:hover {
+    background: var(--primary-600);
+}
+
+/* =========================
+   Stats Grid
+   ========================= */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 1.5rem;
+}
+
+.stat {
+    background: var(--bg);
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.new-best {
+    background: linear-gradient(90deg, var(--primary), var(--primary-600));
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: inline-block;
+}
+
+.new-best.hidden {
+    display: none;
+}
+
+.failure-reason {
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+}
+
+/* =========================
+   Settings Panel
+   ========================= */
+.settings-panel {
+    min-width: 380px;
+}
+
+.settings-group {
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 15px 20px;
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+.settings-group h4 {
+    color: var(--primary);
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.setting-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.setting-item:last-child {
+    border-bottom: none;
+}
+
+.setting-item label {
+    color: var(--text);
+    font-size: 0.95rem;
+}
+
+.setting-toggle {
+    width: 50px;
+    height: 26px;
+    appearance: none;
+    background: var(--border);
+    border-radius: 13px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.setting-toggle::before {
+    content: '';
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    background: white;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.3s ease;
+}
+
+.setting-toggle:checked {
+    background: var(--primary);
+}
+
+.setting-toggle:checked::before {
+    transform: translateX(24px);
+}
+
+.setting-slider {
+    width: 120px;
+    height: 6px;
+    appearance: none;
+    background: var(--border);
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.setting-slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background: var(--primary);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.setting-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: var(--primary);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+}
+
+.slider-value {
+    color: var(--primary);
+    font-weight: 600;
+    margin-left: 10px;
+    min-width: 30px;
+}
+
+.menu-btn.danger {
+    background: #ff4444;
+    border-color: #ff4444;
+    color: white;
+}
+
+.menu-btn.danger:hover {
+    background: #cc3333;
+}
+
+/* =========================
+   Hint Button
+   ========================= */
+.hint-btn {
+    background: rgba(0, 0, 0, 0.7) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.hint-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--primary), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.hint-btn:hover::after {
+    opacity: 0.3;
+}
+
+.hint-btn i {
+    position: relative;
+    z-index: 1;
+}
+
+/* =========================
+   Customization Panel
+   ========================= */
+.customization-panel {
+    min-width: 400px;
+    max-width: 500px;
+}
+
+.customization-group {
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 15px 20px;
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+.customization-group h4 {
+    color: var(--primary);
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.ship-select {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+}
+
+.ship-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 8px;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ship-btn:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.ship-btn.selected {
+    border-color: var(--primary);
+    background: rgba(var(--primary-rgb, 255, 106, 0), 0.15);
+}
+
+.ship-btn i {
+    font-size: 1.5rem;
+    color: var(--text);
+    margin-bottom: 6px;
+}
+
+.ship-btn.selected i {
+    color: var(--primary);
+}
+
+.ship-btn span {
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-align: center;
+}
+
+.ship-btn.selected span {
+    color: var(--primary);
+}
+
+.color-select {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.ship-color-btn,
+.thruster-color-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    border: 3px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.ship-color-btn:hover,
+.thruster-color-btn:hover {
+    transform: scale(1.1);
+}
+
+.ship-color-btn.selected,
+.thruster-color-btn.selected {
+    border-color: var(--primary);
+    box-shadow: 0 0 15px var(--primary);
+}
+
+.ship-color-btn.selected::after,
+.thruster-color-btn.selected::after {
+    content: '\f00c';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1rem;
+    color: white;
+    text-shadow: 0 0 3px rgba(0,0,0,0.8);
+}
+
+/* Ship color swatches */
+.ship-color-btn[data-color="0.9,0.9,0.95"] { background: linear-gradient(135deg, #e6e6f2, #ccccdd); }
+.ship-color-btn[data-color="0.2,0.2,0.25"] { background: linear-gradient(135deg, #333340, #1a1a22); }
+.ship-color-btn[data-color="0.8,0.2,0.2"] { background: linear-gradient(135deg, #cc3333, #991a1a); }
+.ship-color-btn[data-color="0.2,0.4,0.8"] { background: linear-gradient(135deg, #3366cc, #1a3399); }
+.ship-color-btn[data-color="0.2,0.7,0.3"] { background: linear-gradient(135deg, #33b34d, #1a8033); }
+.ship-color-btn[data-color="0.9,0.7,0.2"] { background: linear-gradient(135deg, #e6b333, #cc8c1a); }
+.ship-color-btn[data-color="0.6,0.2,0.8"] { background: linear-gradient(135deg, #9933cc, #661a99); }
+.ship-color-btn[data-color="0.1,0.1,0.1"] { background: linear-gradient(135deg, #1a1a1a, #0d0d0d); }
+
+/* Thruster color swatches */
+.thruster-color-btn[data-color="1,0.4,0"] { background: linear-gradient(135deg, #ff6600, #cc5200); }
+.thruster-color-btn[data-color="0,0.8,1"] { background: linear-gradient(135deg, #00ccff, #0099cc); }
+.thruster-color-btn[data-color="0.5,1,0.5"] { background: linear-gradient(135deg, #80ff80, #4dcc4d); }
+.thruster-color-btn[data-color="1,0.2,0.5"] { background: linear-gradient(135deg, #ff3380, #cc1a66); }
+.thruster-color-btn[data-color="1,1,0.3"] { background: linear-gradient(135deg, #ffff4d, #cccc26); }
+.thruster-color-btn[data-color="1,1,1"] { background: linear-gradient(135deg, #ffffff, #e6e6e6); }
+.thruster-color-btn[data-color="0.8,0.4,1"] { background: linear-gradient(135deg, #cc66ff, #9933cc); }
+.thruster-color-btn[data-color="1,0,0"] { background: linear-gradient(135deg, #ff0000, #cc0000); }
+
+/* =========================
+   Responsive
+   ========================= */
+@media (max-width: 768px) {
+    .game-title {
+        font-size: 2rem;
+    }
+
+    .level-grid {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+    }
+
+    .controls-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    #game-container {
+        aspect-ratio: 4/3;
+        border-radius: 12px;
+    }
+
+    .hud-left, .hud-right {
+        display: none;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .menu-panel {
+        padding: 1.5rem 2rem;
+        min-width: 280px;
+    }
+
+    .mode-buttons {
+        flex-direction: column;
+    }
+
+    .mode-btn.settings {
+        max-width: none;
+    }
+
+    .settings-panel {
+        min-width: 280px;
+    }
+
+    .setting-slider {
+        width: 80px;
+    }
+
+    .customization-panel {
+        min-width: 280px;
+        max-width: 350px;
+    }
+
+    .ship-select {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .level-grid {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
+    }
+
+    .level-btn .level-num {
+        font-size: 1.4rem;
+    }
+
+    .game-instructions {
+        padding: 1rem;
+    }
+
+    .joystick {
+        width: 100px;
+        height: 100px;
+    }
+
+    .joystick-stick {
+        width: 40px;
+        height: 40px;
+    }
+}

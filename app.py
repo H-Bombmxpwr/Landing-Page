@@ -209,6 +209,13 @@ def about():
                          page_id='about-page',
                          collage_density='medium')
 
+@app.route('/game')
+def game():
+    return render_template('game.html',
+                         active_page='game',
+                         page_id='game-page',
+                         collage_density='minimal')
+
 @app.route('/projects/personal')
 def personal_projects():
     projects = load_projects()

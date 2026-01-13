@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+
+{% block title %}Hunter - Space Docking Game{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/game.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="game-page">
+    <!-- Level Select Screen -->
+    <div id="level-select" class="game-screen active">
+        <h1 class="game-title">Space Docking</h1>
+        <p class="game-subtitle">Dock your spacecraft with the station</p>
+        <div id="level-grid" class="level-grid">
+            <!-- Levels populated by JS -->
+        </div>
+        <div class="mode-buttons">
+            <button id="freeroam-btn" class="mode-btn freeroam">
+                <i class="fas fa-rocket"></i>
+                <span>Freeroam Mode</span>
+                <small>Explore the vastness of space</small>
+            </button>
+            <button id="customize-btn" class="mode-btn customize">
+                <i class="fas fa-paint-brush"></i>
+                <span>Customize</span>
+            </button>
+            <button id="settings-btn" class="mode-btn settings">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </button>
+        </div>
+        <div class="game-instructions">
+            <h3>Controls</h3>
+            <div class="controls-grid">
+                <div class="control-item">
+                    <span class="key">W/S</span>
+                    <span class="action">Forward/Back</span>
+                </div>
+                <div class="control-item">
+                    <span class="key">A/D</span>
+                    <span class="action">Strafe Left/Right</span>
+                </div>
+                <div class="control-item">
+                    <span class="key">Q/E</span>
+                    <span class="action">Roll</span>
+                </div>
+                <div class="control-item">
+                    <span class="key">Shift/Ctrl</span>
+                    <span class="action">Up/Down</span>
+                </div>
+                <div class="control-item">
+                    <span class="key">Mouse</span>
+                    <span class="action">Look Around</span>
+                </div>
+                <div class="control-item">
+                    <span class="key">Space</span>
+                    <span class="action">Boost</span>
+                </div>
+                <div class="control-item">
+                    <span class="key">H</span>
+                    <span class="action">Hint (Auto-align)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Container -->
+    <div id="game-container" class="game-screen">
+        <canvas id="game-canvas"></canvas>
+
+        <!-- HUD -->
+        <div id="game-hud" class="game-hud">
+            <div class="hud-top">
+                <div class="hud-level">Level <span id="hud-level-num">1</span></div>
+                <div class="hud-timer"><i class="fas fa-clock"></i> <span id="hud-time">0:00</span></div>
+            </div>
+
+            <div class="hud-left">
+                <div class="hud-fuel">
+                    <div class="fuel-label"><i class="fas fa-gas-pump"></i> Fuel</div>
+                    <div class="fuel-bar-container">
+                        <div id="fuel-bar" class="fuel-bar"></div>
+                    </div>
+                    <div id="fuel-percent" class="fuel-percent">100%</div>
+                </div>
+            </div>
+
+            <div class="hud-right">
+                <div class="hud-proximity">
+                    <div class="proximity-label"><i class="fas fa-satellite"></i> Distance</div>
+                    <div id="proximity-value" class="proximity-value">--</div>
+                </div>
+                <div class="hud-alignment">
+                    <div class="alignment-label"><i class="fas fa-crosshairs"></i> Alignment</div>
+                    <div class="alignment-meter">
+                        <div id="alignment-bar" class="alignment-bar"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hud-bottom">
+                <button id="spawn-station-btn" class="hud-btn spawn-btn" title="Spawn practice station" style="display: none;"><i class="fas fa-satellite"></i></button>
+                <button id="hint-btn" class="hud-btn hint-btn" title="Auto-align to target (H)"><i class="fas fa-compass"></i></button>
+                <button id="pause-btn" class="hud-btn"><i class="fas fa-pause"></i></button>
+                <button id="fullscreen-btn" class="hud-btn"><i class="fas fa-expand"></i></button>
+            </div>
+        </div>
+
+        <!-- Touch Controls -->
+        <div id="touch-controls" class="touch-controls">
+            <div id="joystick-left" class="joystick joystick-left">
+                <div class="joystick-base"></div>
+                <div class="joystick-stick"></div>
+            </div>
+            <div id="joystick-right" class="joystick joystick-right">
+                <div class="joystick-base"></div>
+                <div class="joystick-stick"></div>
+            </div>
+            <button id="touch-boost" class="touch-btn boost-btn">BOOST</button>
+        </div>
+
+        <!-- Docking Indicator -->
+        <div id="docking-indicator" class="docking-indicator hidden">
+            <div class="docking-ring"></div>
+            <span>DOCKING...</span>
+        </div>
+    </div>
+
+    <!-- Pause Menu -->
+    <div id="pause-menu" class="game-screen overlay">
+        <div class="menu-panel">
+            <h2>Paused</h2>
+            <button id="resume-btn" class="menu-btn primary">Resume</button>
+            <button id="restart-btn" class="menu-btn">Restart Level</button>
+            <button id="quit-btn" class="menu-btn">Quit to Menu</button>
+        </div>
+    </div>
+
+    <!-- Success Screen -->
+    <div id="success-screen" class="game-screen overlay">
+        <div class="menu-panel success-panel">
+            <h2><i class="fas fa-check-circle"></i> Docked!</h2>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-label">Time</span>
+                    <span id="success-time" class="stat-value">0:00</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Fuel Remaining</span>
+                    <span id="success-fuel" class="stat-value">0%</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Score</span>
+                    <span id="success-score" class="stat-value">0</span>
+                </div>
+            </div>
+            <div id="new-best" class="new-best hidden">New Best!</div>
+            <button id="next-level-btn" class="menu-btn primary">Next Level</button>
+            <button id="replay-btn" class="menu-btn">Replay</button>
+            <button id="success-menu-btn" class="menu-btn">Menu</button>
+        </div>
+    </div>
+
+    <!-- Failure Screen -->
+    <div id="failure-screen" class="game-screen overlay">
+        <div class="menu-panel failure-panel">
+            <h2><i class="fas fa-times-circle"></i> Mission Failed</h2>
+            <p id="failure-reason" class="failure-reason">Out of fuel!</p>
+            <button id="retry-btn" class="menu-btn primary">Retry</button>
+            <button id="failure-menu-btn" class="menu-btn">Menu</button>
+        </div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div id="settings-panel" class="game-screen overlay">
+        <div class="menu-panel settings-panel">
+            <h2><i class="fas fa-cog"></i> Settings</h2>
+            <div class="settings-group">
+                <h4>Controls</h4>
+                <div class="setting-item">
+                    <label for="invert-y">Invert Mouse Y</label>
+                    <input type="checkbox" id="invert-y" class="setting-toggle">
+                </div>
+                <div class="setting-item">
+                    <label for="invert-ws">Invert W/S (Forward/Back)</label>
+                    <input type="checkbox" id="invert-ws" class="setting-toggle">
+                </div>
+                <div class="setting-item">
+                    <label for="invert-ad">Invert A/D (Strafe)</label>
+                    <input type="checkbox" id="invert-ad" class="setting-toggle">
+                </div>
+                <div class="setting-item">
+                    <label for="mouse-sens">Mouse Sensitivity</label>
+                    <input type="range" id="mouse-sens" min="0.1" max="3" step="0.1" value="1" class="setting-slider">
+                    <span id="mouse-sens-value" class="slider-value">1.0</span>
+                </div>
+            </div>
+            <div class="settings-group">
+                <h4>Progress</h4>
+                <button id="reset-progress-btn" class="menu-btn danger">Reset All Progress</button>
+            </div>
+            <button id="settings-close-btn" class="menu-btn primary">Done</button>
+        </div>
+    </div>
+
+    <!-- Customization Panel -->
+    <div id="customization-panel" class="game-screen overlay">
+        <div class="menu-panel customization-panel">
+            <h2><i class="fas fa-paint-brush"></i> Customize Ship</h2>
+
+            <div class="customization-group">
+                <h4>Ship Type</h4>
+                <div class="ship-select">
+                    <button class="ship-btn" data-ship="default" title="Default Fighter">
+                        <i class="fas fa-fighter-jet"></i>
+                        <span>Fighter</span>
+                    </button>
+                    <button class="ship-btn" data-ship="enterprise" title="Constitution Class">
+                        <i class="fas fa-space-shuttle"></i>
+                        <span>Explorer</span>
+                    </button>
+                    <button class="ship-btn" data-ship="xwing" title="X-Wing Fighter">
+                        <i class="fas fa-times"></i>
+                        <span>X-Wing</span>
+                    </button>
+                    <button class="ship-btn" data-ship="ywing" title="Y-Wing Bomber">
+                        <i class="fas fa-y-combinator"></i>
+                        <span>Y-Wing</span>
+                    </button>
+                    <button class="ship-btn" data-ship="icbm" title="Missile">
+                        <i class="fas fa-rocket"></i>
+                        <span>Missile</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="customization-group">
+                <h4>Ship Color</h4>
+                <div class="color-select">
+                    <button class="ship-color-btn" data-color="0.9,0.9,0.95" title="White"></button>
+                    <button class="ship-color-btn" data-color="0.2,0.2,0.25" title="Gunmetal"></button>
+                    <button class="ship-color-btn" data-color="0.8,0.2,0.2" title="Red"></button>
+                    <button class="ship-color-btn" data-color="0.2,0.4,0.8" title="Blue"></button>
+                    <button class="ship-color-btn" data-color="0.2,0.7,0.3" title="Green"></button>
+                    <button class="ship-color-btn" data-color="0.9,0.7,0.2" title="Gold"></button>
+                    <button class="ship-color-btn" data-color="0.6,0.2,0.8" title="Purple"></button>
+                    <button class="ship-color-btn" data-color="0.1,0.1,0.1" title="Black"></button>
+                </div>
+            </div>
+
+            <div class="customization-group">
+                <h4>Thruster Color</h4>
+                <div class="color-select">
+                    <button class="thruster-color-btn" data-color="1,0.4,0" title="Orange"></button>
+                    <button class="thruster-color-btn" data-color="0,0.8,1" title="Cyan"></button>
+                    <button class="thruster-color-btn" data-color="0.5,1,0.5" title="Green"></button>
+                    <button class="thruster-color-btn" data-color="1,0.2,0.5" title="Pink"></button>
+                    <button class="thruster-color-btn" data-color="1,1,0.3" title="Yellow"></button>
+                    <button class="thruster-color-btn" data-color="1,1,1" title="White"></button>
+                    <button class="thruster-color-btn" data-color="0.8,0.4,1" title="Purple"></button>
+                    <button class="thruster-color-btn" data-color="1,0,0" title="Red"></button>
+                </div>
+            </div>
+
+            <button id="customization-close-btn" class="menu-btn primary">Done</button>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<!-- Babylon.js -->
+<script src="https://cdn.babylonjs.com/babylon.js"></script>
+<script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+
+<!-- Game Modules -->
+<script src="{{ url_for('static', filename='js/game/levels.js') }}"></script>
+<script src="{{ url_for('static', filename='js/game/physics.js') }}"></script>
+<script src="{{ url_for('static', filename='js/game/controls.js') }}"></script>
+<script src="{{ url_for('static', filename='js/game/player.js') }}"></script>
+<script src="{{ url_for('static', filename='js/game/stations.js') }}"></script>
+<script src="{{ url_for('static', filename='js/game/obstacles.js') }}"></script>
+<script src="{{ url_for('static', filename='js/game/ui.js') }}"></script>
+<script src="{{ url_for('static', filename='js/game/main.js') }}"></script>
+{% endblock %}
