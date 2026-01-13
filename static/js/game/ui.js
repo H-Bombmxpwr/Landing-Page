@@ -53,6 +53,9 @@ const SpaceDockingUI = (() => {
             spawnStationBtn: document.getElementById('spawn-station-btn'),
             customizeBtn: document.getElementById('customize-btn'),
             customizationCloseBtn: document.getElementById('customization-close-btn'),
+            controlsPanel: document.getElementById('controls-panel'),
+            controlsCloseBtn: document.getElementById('controls-close-btn'),
+            controlsBtn: document.getElementById('controls-btn'),
 
             // Settings inputs
             invertY: document.getElementById('invert-y'),
@@ -311,10 +314,23 @@ const SpaceDockingUI = (() => {
             });
         });
 
+        // Controls close button
+        elements.controlsCloseBtn?.addEventListener('click', () => {
+            hideControls();
+        });
+
+        // Controls HUD button
+        elements.controlsBtn?.addEventListener('click', () => {
+            showControls();
+        });
+
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
+            // Escape key - pause/resume/close menus
             if (e.code === 'Escape') {
-                if (currentScreen === 'game-container') {
+                if (currentScreen === 'controls-panel') {
+                    hideControls();
+                } else if (currentScreen === 'game-container') {
                     if (window.SpaceDockingGame) {
                         window.SpaceDockingGame.togglePause();
                     }
@@ -324,7 +340,128 @@ const SpaceDockingUI = (() => {
                     }
                 }
             }
+
+            // ? or / key - show controls help (Shift+/ = ?)
+            if ((e.key === '?' || (e.code === 'Slash' && e.shiftKey))) {
+                e.preventDefault();
+                if (currentScreen === 'controls-panel') {
+                    hideControls();
+                } else if (currentScreen === 'game-container' || currentScreen === 'pause-menu') {
+                    showControls();
+                }
+            }
+
+            // R key - restart level (only in pause, success, or failure screens)
+            if (e.code === 'KeyR' && !e.ctrlKey && !e.altKey) {
+                if (currentScreen === 'pause-menu' || currentScreen === 'success-screen' || currentScreen === 'failure-screen') {
+                    e.preventDefault();
+                    if (window.SpaceDockingGame) {
+                        window.SpaceDockingGame.restartLevel();
+                    }
+                }
+            }
+
+            // N key - next level (only in success screen)
+            if (e.code === 'KeyN' && !e.ctrlKey && !e.altKey) {
+                if (currentScreen === 'success-screen') {
+                    e.preventDefault();
+                    if (window.SpaceDockingGame) {
+                        window.SpaceDockingGame.nextLevel();
+                    }
+                }
+            }
+
+            // M key - return to menu (in any gameplay-related screen)
+            if (e.code === 'KeyM' && !e.ctrlKey && !e.altKey) {
+                if (currentScreen === 'pause-menu' || currentScreen === 'success-screen' ||
+                    currentScreen === 'failure-screen' || currentScreen === 'controls-panel') {
+                    e.preventDefault();
+                    if (window.SpaceDockingGame) {
+                        window.SpaceDockingGame.quitToMenu();
+                    }
+                }
+            }
+
+            // P key - spawn practice station (freeroam only)
+            if (e.code === 'KeyP' && !e.ctrlKey && !e.altKey) {
+                if (currentScreen === 'game-container' && window.SpaceDockingGame?.gameState === 'freeroam') {
+                    e.preventDefault();
+                    window.SpaceDockingGame.spawnPracticeStation();
+                }
+            }
+
+            // F key - toggle fullscreen (during gameplay)
+            if (e.code === 'KeyF' && !e.ctrlKey && !e.altKey) {
+                if (currentScreen === 'game-container') {
+                    e.preventDefault();
+                    toggleFullscreen();
+                }
+            }
+
+            // Menu navigation hotkeys (only on level-select screen)
+            if (currentScreen === 'level-select') {
+                // Number keys 1-9, 0 (for level 10) to start levels
+                const levelKeys = ['Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5',
+                                   'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0'];
+                const keyIndex = levelKeys.indexOf(e.code);
+                if (keyIndex !== -1 && !e.ctrlKey && !e.altKey) {
+                    const levelId = keyIndex === 9 ? 10 : keyIndex + 1;
+                    const unlockedLevel = SpaceDockingLevels.getUnlockedLevel();
+                    if (levelId <= unlockedLevel) {
+                        e.preventDefault();
+                        window.SpaceDockingGame?.startLevel(levelId);
+                    }
+                }
+
+                // S key - Settings
+                if (e.code === 'KeyS' && !e.ctrlKey && !e.altKey) {
+                    e.preventDefault();
+                    showScreen('settings-panel');
+                }
+
+                // C key - Customize
+                if (e.code === 'KeyC' && !e.ctrlKey && !e.altKey) {
+                    e.preventDefault();
+                    showScreen('customization-panel');
+                    updateCustomizationUI();
+                }
+
+                // G key - Freeroam (Go explore)
+                if (e.code === 'KeyG' && !e.ctrlKey && !e.altKey) {
+                    e.preventDefault();
+                    window.SpaceDockingGame?.startFreeroam();
+                }
+            }
+
+            // Settings/Customization panel - Escape or Backspace to close
+            if (currentScreen === 'settings-panel' || currentScreen === 'customization-panel') {
+                if (e.code === 'Escape' || e.code === 'Backspace') {
+                    e.preventDefault();
+                    showScreen('level-select');
+                }
+            }
         });
+    }
+
+    // Show controls help panel
+    function showControls() {
+        // Release pointer lock to show cursor
+        if (window.SpaceDockingControls) {
+            window.SpaceDockingControls.releasePointerLock();
+        }
+        showScreen('controls-panel');
+    }
+
+    // Hide controls help panel - return to appropriate screen
+    function hideControls() {
+        const gameState = window.SpaceDockingGame?.gameState;
+        if (gameState === 'paused') {
+            showScreen('pause-menu');
+        } else if (gameState === 'playing' || gameState === 'freeroam') {
+            showScreen('game-container');
+        } else {
+            showScreen('level-select');
+        }
     }
 
     // Setup settings panel
@@ -431,7 +568,7 @@ const SpaceDockingUI = (() => {
     // Show a specific screen
     function showScreen(screenId) {
         // Hide all screens
-        const screens = ['level-select', 'game-container', 'pause-menu', 'success-screen', 'failure-screen', 'settings-panel', 'customization-panel'];
+        const screens = ['level-select', 'game-container', 'pause-menu', 'success-screen', 'failure-screen', 'settings-panel', 'customization-panel', 'controls-panel'];
 
         screens.forEach(id => {
             const el = document.getElementById(id);

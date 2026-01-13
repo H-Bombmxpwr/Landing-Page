@@ -100,10 +100,31 @@
             </div>
 
             <div class="hud-bottom">
-                <button id="spawn-station-btn" class="hud-btn spawn-btn" title="Spawn practice station" style="display: none;"><i class="fas fa-satellite"></i></button>
-                <button id="hint-btn" class="hud-btn hint-btn" title="Auto-align to target (H)"><i class="fas fa-compass"></i></button>
-                <button id="pause-btn" class="hud-btn"><i class="fas fa-pause"></i></button>
-                <button id="fullscreen-btn" class="hud-btn"><i class="fas fa-expand"></i></button>
+                <button id="spawn-station-btn" class="hud-btn labeled-btn spawn-btn" title="Spawn practice station (P)" style="display: none;">
+                    <i class="fas fa-satellite"></i>
+                    <span class="btn-label">Station</span>
+                    <span class="btn-hotkey">P</span>
+                </button>
+                <button id="controls-btn" class="hud-btn labeled-btn" title="Show controls (?)">
+                    <i class="fas fa-gamepad"></i>
+                    <span class="btn-label">Controls</span>
+                    <span class="btn-hotkey">?</span>
+                </button>
+                <button id="hint-btn" class="hud-btn labeled-btn hint-btn" title="Auto-align to target (H)">
+                    <i class="fas fa-compass"></i>
+                    <span class="btn-label">Align</span>
+                    <span class="btn-hotkey">H</span>
+                </button>
+                <button id="pause-btn" class="hud-btn labeled-btn" title="Pause game (Esc)">
+                    <i class="fas fa-pause"></i>
+                    <span class="btn-label">Pause</span>
+                    <span class="btn-hotkey">Esc</span>
+                </button>
+                <button id="fullscreen-btn" class="hud-btn labeled-btn" title="Toggle fullscreen (F)">
+                    <i class="fas fa-expand"></i>
+                    <span class="btn-label">Fullscreen</span>
+                    <span class="btn-hotkey">F</span>
+                </button>
             </div>
         </div>
 
@@ -201,6 +222,51 @@
                 <button id="reset-progress-btn" class="menu-btn danger">Reset All Progress</button>
             </div>
             <button id="settings-close-btn" class="menu-btn primary">Done</button>
+        </div>
+    </div>
+
+    <!-- Controls Help Panel (can be shown during gameplay) -->
+    <div id="controls-panel" class="game-screen overlay">
+        <div class="menu-panel controls-panel">
+            <h2><i class="fas fa-gamepad"></i> Controls</h2>
+            <div class="controls-help-grid">
+                <div class="control-section">
+                    <h4>Movement</h4>
+                    <div class="control-row"><span class="key">W / S</span> Forward / Back</div>
+                    <div class="control-row"><span class="key">A / D</span> Strafe Left / Right</div>
+                    <div class="control-row"><span class="key">Shift / Ctrl</span> Up / Down</div>
+                    <div class="control-row"><span class="key">Q / E</span> Roll</div>
+                    <div class="control-row"><span class="key">Space</span> Boost</div>
+                </div>
+                <div class="control-section">
+                    <h4>Camera</h4>
+                    <div class="control-row"><span class="key">Mouse</span> Look Around</div>
+                    <div class="control-row"><span class="key">Click</span> Lock Mouse</div>
+                </div>
+                <div class="control-section">
+                    <h4>Game</h4>
+                    <div class="control-row"><span class="key">H</span> Auto-Align Hint</div>
+                    <div class="control-row"><span class="key">Esc</span> Pause / Resume</div>
+                    <div class="control-row"><span class="key">?</span> Show Controls</div>
+                </div>
+                <div class="control-section">
+                    <h4>In-Game</h4>
+                    <div class="control-row"><span class="key">R</span> Restart Level</div>
+                    <div class="control-row"><span class="key">N</span> Next Level</div>
+                    <div class="control-row"><span class="key">M</span> Return to Menu</div>
+                    <div class="control-row"><span class="key">F</span> Fullscreen</div>
+                    <div class="control-row"><span class="key">P</span> Spawn Station</div>
+                </div>
+                <div class="control-section">
+                    <h4>Menu Navigation</h4>
+                    <div class="control-row"><span class="key">1-0</span> Select Level 1-10</div>
+                    <div class="control-row"><span class="key">G</span> Start Freeroam</div>
+                    <div class="control-row"><span class="key">S</span> Settings</div>
+                    <div class="control-row"><span class="key">C</span> Customize Ship</div>
+                </div>
+            </div>
+            <p class="controls-note">Press <span class="key">?</span> or <span class="key">Esc</span> to close</p>
+            <button id="controls-close-btn" class="menu-btn primary">Got it!</button>
         </div>
     </div>
 

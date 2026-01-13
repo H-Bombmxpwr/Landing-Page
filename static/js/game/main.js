@@ -30,6 +30,10 @@ const SpaceDockingGame = (() => {
     let lastFrameTime = 0;
     let hintCooldown = 0;
 
+    // Freeroam tracking
+    let freeroamDistance = 0;
+    let lastPlayerPos = null;
+
     // Initialize the game
     function init() {
         canvas = document.getElementById('game-canvas');
@@ -274,6 +278,12 @@ const SpaceDockingGame = (() => {
             return;
         }
 
+        // Check for collision with station body
+        if (SpaceDockingStations.checkCollision(SpaceDockingPlayer.mesh, BABYLON)) {
+            handleFailure('Collision with station!');
+            return;
+        }
+
         // Check for success (docking complete)
         if (physicsResult.docked) {
             handleSuccess();
@@ -328,6 +338,15 @@ const SpaceDockingGame = (() => {
         // Update player (no fuel limit in freeroam)
         SpaceDockingPlayer.update(input, deltaTime);
 
+        // Track distance traveled
+        if (SpaceDockingPlayer.mesh) {
+            const currentPos = SpaceDockingPlayer.mesh.position;
+            if (lastPlayerPos) {
+                freeroamDistance += BABYLON.Vector3.Distance(currentPos, lastPlayerPos);
+            }
+            lastPlayerPos = currentPos.clone();
+        }
+
         // Update camera
         updateCamera();
 
@@ -338,6 +357,12 @@ const SpaceDockingGame = (() => {
 
         // Check for collisions with obstacles
         if (checkFreeroamCollision()) {
+            triggerExplosion();
+            return;
+        }
+
+        // Check for collision with practice station (if spawned)
+        if (freeroamPracticeStation && SpaceDockingStations.checkCollision(SpaceDockingPlayer.mesh, BABYLON)) {
             triggerExplosion();
             return;
         }
@@ -530,7 +555,39 @@ const SpaceDockingGame = (() => {
         SpaceDockingStations.create(scene, BABYLON, randomType, practiceConfig);
         freeroamPracticeStation = true;
 
-        console.log(`Spawned practice station: ${randomType}`);
+        // Show distance traveled notification
+        const distanceKm = (freeroamDistance / 1000).toFixed(2);
+        console.log(`Spawned practice station: ${randomType} | Distance traveled: ${distanceKm}km`);
+
+        // Show distance in UI (temporary notification)
+        showFreeroamNotification(`Station Spawned | Distance: ${Math.round(freeroamDistance)}m`);
+    }
+
+    // Show temporary notification in freeroam
+    function showFreeroamNotification(message) {
+        const existing = document.getElementById('freeroam-notification');
+        if (existing) existing.remove();
+
+        const notif = document.createElement('div');
+        notif.id = 'freeroam-notification';
+        notif.style.cssText = `
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: #00ff88;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 14px;
+            z-index: 1001;
+            border: 1px solid #00ff88;
+        `;
+        notif.textContent = message;
+        document.body.appendChild(notif);
+
+        setTimeout(() => notif.remove(), 3000);
     }
 
     // Use hint to auto-align
@@ -581,7 +638,8 @@ const SpaceDockingGame = (() => {
         // Clean up any freeroam objects
         disposeFreeroamObjects();
 
-        // Reset player
+        // Reset player (disable infinite fuel for levels)
+        SpaceDockingPlayer.setInfiniteFuel(false);
         SpaceDockingPlayer.reset(levelConfig.fuel);
         SpaceDockingPhysics.reset(BABYLON);
 
@@ -628,9 +686,14 @@ const SpaceDockingGame = (() => {
         SpaceDockingStations.dispose();
         SpaceDockingObstacles.dispose();
 
-        // Reset player with unlimited fuel
-        SpaceDockingPlayer.reset(999999);
+        // Reset player with infinite fuel
+        SpaceDockingPlayer.reset(100);
+        SpaceDockingPlayer.setInfiniteFuel(true);
         SpaceDockingPhysics.reset(BABYLON);
+
+        // Reset distance tracking
+        freeroamDistance = 0;
+        lastPlayerPos = null;
 
         // Position player at origin
         SpaceDockingPlayer.setPosition(
@@ -699,7 +762,7 @@ const SpaceDockingGame = (() => {
                 rings.material = ringMat;
             }
 
-            planet.metadata = { speed: config.speed, angle: angle, distance: config.distance };
+            planet.metadata = { speed: config.speed, angle: angle, distance: config.distance, collisionRadius: config.size / 2 };
             planet.update = (dt) => {
                 planet.metadata.angle += planet.metadata.speed;
                 planet.position.x = Math.cos(planet.metadata.angle) * planet.metadata.distance;
@@ -708,6 +771,7 @@ const SpaceDockingGame = (() => {
             };
 
             freeroamObjects.push(planet);
+            freeroamObstacles.push(planet); // Planets are solid/collidable
         });
 
         // Floating astronauts
@@ -716,16 +780,18 @@ const SpaceDockingGame = (() => {
             freeroamObjects.push(astro);
         }
 
-        // Satellites
+        // Satellites (collidable)
         for (let i = 0; i < 10; i++) {
             const sat = createFreeroamSatellite(i);
             freeroamObjects.push(sat);
+            freeroamObstacles.push(sat);
         }
 
-        // Other spacecraft
+        // Other spacecraft (collidable)
         for (let i = 0; i < 5; i++) {
             const ship = createFreeroamSpacecraft(i);
             freeroamObjects.push(ship);
+            freeroamObstacles.push(ship);
         }
 
         // Asteroid field (collidable)
@@ -821,7 +887,7 @@ const SpaceDockingGame = (() => {
         mat.diffuseColor = new BABYLON.Color3(0.7, 0.7, 0.75);
         mesh.material = mat;
 
-        mesh.metadata = { orbitRadius, orbitSpeed, angle: orbitOffset };
+        mesh.metadata = { orbitRadius, orbitSpeed, angle: orbitOffset, collisionRadius: 8 };
 
         mesh.update = (dt) => {
             mesh.metadata.angle += mesh.metadata.orbitSpeed;
@@ -865,7 +931,8 @@ const SpaceDockingGame = (() => {
                 (Math.random() - 0.5) * 0.3,
                 (Math.random() - 0.5) * 0.1,
                 (Math.random() - 0.5) * 0.3
-            )
+            ),
+            collisionRadius: 5
         };
 
         mesh.update = (dt) => {

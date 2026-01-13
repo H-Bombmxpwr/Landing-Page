@@ -401,10 +401,13 @@ const SpaceDockingPlayer = (() => {
         }
     };
 
-    // Fuel consumption rates
-    const FUEL_IDLE = 0.01;
-    const FUEL_THRUST = 0.15;
-    const FUEL_BOOST = 0.4;
+    // Fuel consumption rates - balanced for ~30 seconds of thrust
+    const FUEL_IDLE = 0.02;
+    const FUEL_THRUST = 0.5;  // Much faster consumption
+    const FUEL_BOOST = 1.2;   // Boosting uses lots of fuel
+
+    // Infinite fuel mode for freeroam
+    let infiniteFuel = false;
 
     // Thrust forces
     const THRUST_FORCE = 0.008;
@@ -710,10 +713,20 @@ const SpaceDockingPlayer = (() => {
         // Update thruster visuals
         updateThrusterVisuals(hasThrust && fuel > 0, input.boost, input.forward > 0);
 
-        // Consume fuel
-        fuel = Math.max(0, fuel - fuelUsed);
+        // Consume fuel (unless infinite fuel mode)
+        if (!infiniteFuel) {
+            fuel = Math.max(0, fuel - fuelUsed);
+        }
 
         return fuel;
+    }
+
+    // Set infinite fuel mode
+    function setInfiniteFuel(enabled) {
+        infiniteFuel = enabled;
+        if (enabled) {
+            fuel = maxFuel; // Refuel when enabling infinite
+        }
     }
 
     // Update thruster particle effects and engine glows
@@ -842,6 +855,7 @@ const SpaceDockingPlayer = (() => {
         setShipType,
         setShipColor,
         setBoostColor,
+        setInfiniteFuel,
         getShipTypes: () => Object.keys(shipBuilders),
         get mesh() { return mesh; },
         get fuel() { return fuel; },

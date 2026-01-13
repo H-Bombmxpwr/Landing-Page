@@ -4,27 +4,27 @@
  */
 
 const SpaceDockingPhysics = (() => {
-    // Physics constants
-    const DRAG = 0.98; // Space has some drag for playability
-    const ROTATION_DRAG = 0.95;
-    const MAX_VELOCITY = 2.0;
+    // Physics constants - realistic space movement
+    const DRAG = 1.0; // No friction in space - objects stay in motion
+    const ROTATION_DRAG = 0.92; // Slight rotation damping for playability
+    const MAX_VELOCITY = 5.0; // Higher max speed since no friction
     const MAX_ANGULAR_VELOCITY = 0.05;
 
     // Docking constants - balanced for playability
     // ADJUSTABLE: Increase SOFT_DOCK_RANGE for earlier magnetic assistance
-    const SOFT_DOCK_RANGE = 12; // Start magnetic pull when fairly close (slightly increased)
+    const SOFT_DOCK_RANGE = 15; // Start magnetic pull when approaching
     // ADJUSTABLE: Increase DOCK_COMPLETE_RANGE for easier docking
-    const DOCK_COMPLETE_RANGE = 4; // Need to get close to complete dock (slightly increased)
+    const DOCK_COMPLETE_RANGE = 5; // Need to get reasonably close to complete dock
     // ADJUSTABLE: Increase MAGNETIC_STRENGTH for stronger pull toward dock
-    const MAGNETIC_STRENGTH = 0.012; // Gentle pull - assists but doesn't take over
+    const MAGNETIC_STRENGTH = 0.008; // Gentle pull - assists but player stays in control
     // ADJUSTABLE: Increase ALIGN_STRENGTH for faster auto-alignment
-    const ALIGN_STRENGTH = 0.02; // Gradual alignment help
+    const ALIGN_STRENGTH = 0.015; // Gradual alignment help
     // ADJUSTABLE: Increase GRACE_PERIOD_SECONDS for longer immunity at start
     const GRACE_PERIOD_SECONDS = 2.0; // Seconds before docking assistance kicks in
     // ADJUSTABLE: Decrease DOCK_HOLD_TIME for faster docking confirmation
-    const DOCK_HOLD_TIME = 1.5; // Seconds to hold in dock zone to complete
+    const DOCK_HOLD_TIME = 0.8; // Seconds to hold in dock zone to complete
     // ADJUSTABLE: Increase RING_PASS_TOLERANCE for easier ring pass-through
-    const RING_PASS_TOLERANCE = 5; // Distance tolerance for ring pass-through
+    const RING_PASS_TOLERANCE = 6; // Distance tolerance for ring pass-through
 
     // State
     let velocity = null;
@@ -133,10 +133,13 @@ const SpaceDockingPhysics = (() => {
         const dockTolerance = levelConfig?.dockTolerance || 4.0;
         const alignTolerance = levelConfig?.dockAlignTolerance || 0.4; // More forgiving
 
+        // Get world position of docking port (it's parented to station)
+        const dockWorldPos = dockingPort.getAbsolutePosition();
+
         // Get distance to docking port
         const distance = BABYLON.Vector3.Distance(
             playerMesh.position,
-            dockingPort.position
+            dockWorldPos
         );
 
         // Calculate alignment (dot product of forward vectors)
@@ -178,7 +181,7 @@ const SpaceDockingPhysics = (() => {
             isDocking = true;
 
             // Apply magnetic pull toward docking port (gentler than before)
-            const pullDirection = dockingPort.position.subtract(playerMesh.position).normalize();
+            const pullDirection = dockWorldPos.subtract(playerMesh.position).normalize();
             const pullStrength = MAGNETIC_STRENGTH * (1 - distance / SOFT_DOCK_RANGE);
             velocity.addInPlace(pullDirection.scale(pullStrength));
 
@@ -264,9 +267,12 @@ const SpaceDockingPhysics = (() => {
             return { distance: Infinity, alignment: 0, isDocking: false };
         }
 
+        // Get world position of docking port
+        const dockWorldPos = dockingPort.getAbsolutePosition();
+
         const distance = BABYLON.Vector3.Distance(
             playerMesh.position,
-            dockingPort.position
+            dockWorldPos
         );
 
         // Calculate alignment

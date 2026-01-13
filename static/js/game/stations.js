@@ -11,12 +11,16 @@ const SpaceDockingStations = (() => {
     let dockingBeacon = null;
     let dockingArrow = null;
     let dockingGlow = null;
+    let approachRings = []; // Visual guide rings showing dock zone
+    let dockingHologram = null; // Ghost ship showing correct orientation
+    let hologramMaterial = null;
 
     // Movement state
     let movePattern = null;
     let moveSpeed = 0;
     let moveTime = 0;
     let initialPosition = null;
+    let stationCollisionRadius = 10; // Base collision radius for station body
 
     // Station preset builders
     const stationBuilders = {
@@ -66,7 +70,7 @@ const SpaceDockingStations = (() => {
             panel2.position.x = -8;
             parts.push(panel2);
 
-            return { parts, dockingOffset: new BABYLON.Vector3(0, 0, 9) };
+            return { parts, dockingOffset: new BABYLON.Vector3(0, 0, 9), collisionRadius: 8 };
         },
 
         // Cross-shaped station
@@ -115,7 +119,7 @@ const SpaceDockingStations = (() => {
             arm4.position.z = -armLength / 2 - 2;
             parts.push(arm4);
 
-            return { parts, dockingOffset: new BABYLON.Vector3(0, 0, armLength / 2 + 5) };
+            return { parts, dockingOffset: new BABYLON.Vector3(0, 0, armLength / 2 + 5), collisionRadius: 12 };
         },
 
         // Ring station
@@ -151,7 +155,7 @@ const SpaceDockingStations = (() => {
                 parts.push(spoke);
             }
 
-            return { parts, dockingOffset: new BABYLON.Vector3(0, 5, 0) };
+            return { parts, dockingOffset: new BABYLON.Vector3(0, 5, 0), collisionRadius: 10 };
         },
 
         // Multi-module station
@@ -201,7 +205,7 @@ const SpaceDockingStations = (() => {
             solarArray.position.y = 6;
             parts.push(solarArray);
 
-            return { parts, dockingOffset: new BABYLON.Vector3(0, 0, 9) };
+            return { parts, dockingOffset: new BABYLON.Vector3(0, 0, 9), collisionRadius: 10 };
         },
 
         // Complex station (for harder levels)
@@ -269,7 +273,7 @@ const SpaceDockingStations = (() => {
             cupola.position.set(0, 0, -5);
             parts.push(cupola);
 
-            return { parts, dockingOffset: new BABYLON.Vector3(0, 0, -8) };
+            return { parts, dockingOffset: new BABYLON.Vector3(0, 0, -8), collisionRadius: 20 };
         },
 
         // Large station - extended complex with more modules
@@ -337,7 +341,7 @@ const SpaceDockingStations = (() => {
             solar2.position.x = -20;
             parts.push(solar2);
 
-            return { parts, dockingOffset: new BABYLON.Vector3(0, 0, 28) };
+            return { parts, dockingOffset: new BABYLON.Vector3(0, 0, 28), collisionRadius: 25 };
         },
 
         // Cruiser - elongated ship-like station
@@ -424,7 +428,7 @@ const SpaceDockingStations = (() => {
             nacelle2.position.z = -25;
             parts.push(nacelle2);
 
-            return { parts, dockingOffset: new BABYLON.Vector3(0, -5, 38) };
+            return { parts, dockingOffset: new BABYLON.Vector3(0, -5, 38), collisionRadius: 30 };
         },
 
         // Carrier - massive ship with hangar bays
@@ -505,7 +509,7 @@ const SpaceDockingStations = (() => {
                 parts.push(antenna);
             }
 
-            return { parts, dockingOffset: new BABYLON.Vector3(-18, 0, 0) };
+            return { parts, dockingOffset: new BABYLON.Vector3(-18, 0, 0), collisionRadius: 35 };
         },
 
         // Battleship - heavily armored and complex
@@ -606,7 +610,7 @@ const SpaceDockingStations = (() => {
             bow.position.z = 42;
             parts.push(bow);
 
-            return { parts, dockingOffset: new BABYLON.Vector3(0, 12, 50) };
+            return { parts, dockingOffset: new BABYLON.Vector3(0, 12, 50), collisionRadius: 40 };
         },
 
         // Mothership - absolutely massive with internal structure visible
@@ -715,7 +719,7 @@ const SpaceDockingStations = (() => {
                 parts.push(dish);
             }
 
-            return { parts, dockingOffset: new BABYLON.Vector3(35, 0, 30) };
+            return { parts, dockingOffset: new BABYLON.Vector3(35, 0, 30), collisionRadius: 60 };
         }
     };
 
@@ -724,7 +728,13 @@ const SpaceDockingStations = (() => {
         dispose();
 
         const builder = stationBuilders[stationType] || stationBuilders.basic;
-        const { parts, dockingOffset } = builder(scene, BABYLON);
+        const { parts, dockingOffset, collisionRadius } = builder(scene, BABYLON);
+
+        // Apply station scale from level config
+        const scale = levelConfig.stationScale || 1.0;
+
+        // Store collision radius (scaled by station scale)
+        stationCollisionRadius = (collisionRadius || 10) * scale;
 
         // Create material
         const stationMaterial = new BABYLON.StandardMaterial('stationMat', scene);
@@ -741,8 +751,7 @@ const SpaceDockingStations = (() => {
         stationMesh = BABYLON.Mesh.MergeMeshes(parts, true, true, undefined, false, true);
         stationMesh.name = 'station';
 
-        // Apply station scale from level config
-        const scale = levelConfig.stationScale || 1.0;
+        // Apply station scale
         stationMesh.scaling = new BABYLON.Vector3(scale, scale, scale);
 
         // Create docking port with enhanced visibility (scale the offset too)
@@ -782,19 +791,33 @@ const SpaceDockingStations = (() => {
         // Scale the docking port visuals based on station scale
         const portScale = Math.max(1, scale * 0.8);
 
-        // Docking ring
+        // Calculate direction from center to docking port for proper orientation
+        const direction = offset.clone().normalize();
+
+        // Docking ring - positioned right at the station edge
         dockingPort = BABYLON.MeshBuilder.CreateTorus('dockingPort', {
             diameter: 4 * portScale,
             thickness: 0.5 * portScale,
             tessellation: 32
         }, scene);
 
-        // Position relative to station
+        // Position at station surface (offset minus small amount to sit on edge)
         dockingPort.parent = stationMesh;
         dockingPort.position = offset.clone();
 
-        // Rotate to face outward
-        dockingPort.rotation.x = Math.PI / 2;
+        // Orient ring to face the approach direction
+        if (Math.abs(direction.y) > 0.9) {
+            // Vertical docking - ring horizontal
+            dockingPort.rotation.x = 0;
+            dockingPort.rotation.y = 0;
+        } else if (Math.abs(direction.x) > 0.9) {
+            // Side docking - ring vertical, facing X
+            dockingPort.rotation.y = Math.PI / 2;
+            dockingPort.rotation.z = Math.PI / 2;
+        } else {
+            // Front/back docking - ring vertical, facing Z
+            dockingPort.rotation.x = Math.PI / 2;
+        }
 
         // Docking port material - bright and visible
         const portMaterial = new BABYLON.StandardMaterial('portMat', scene);
@@ -803,16 +826,17 @@ const SpaceDockingStations = (() => {
         portMaterial.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
         dockingPort.material = portMaterial;
 
-        // Create glowing outline ring (larger, behind docking port)
+        // Create glowing outline ring (larger, slightly behind docking port)
         dockingGlow = BABYLON.MeshBuilder.CreateTorus('dockingGlow', {
             diameter: 6 * portScale,
             thickness: 0.3 * portScale,
             tessellation: 32
         }, scene);
         dockingGlow.parent = stationMesh;
-        dockingGlow.position = offset.clone();
-        dockingGlow.position.z += 0.5 * portScale; // Slightly behind
-        dockingGlow.rotation.x = Math.PI / 2;
+        // Position slightly inward from dock (toward station center)
+        dockingGlow.position = offset.subtract(direction.scale(0.5 * portScale));
+        // Same orientation as docking port
+        dockingGlow.rotation = dockingPort.rotation.clone();
 
         const glowMat = new BABYLON.StandardMaterial('glowMat', scene);
         glowMat.emissiveColor = new BABYLON.Color3(0, 1, 0);
@@ -821,22 +845,28 @@ const SpaceDockingStations = (() => {
         dockingGlow.material = glowMat;
 
         // Create beacon/arrow pointing to docking port
-        createDockingBeacon(scene, BABYLON, offset, portScale);
+        createDockingBeacon(scene, BABYLON, offset, direction, portScale);
 
         // Docking lights
         createDockingLights(scene, BABYLON, offset, portScale);
+
+        // Approach zone rings - visual guides showing the dock area
+        createApproachRings(scene, BABYLON, offset, direction, portScale);
+
+        // Docking hologram - ghost ship showing correct orientation
+        createDockingHologram(scene, BABYLON, offset, direction, portScale);
     }
 
     // Create a beacon that points to the docking port
-    function createDockingBeacon(scene, BABYLON, offset, scale = 1) {
+    function createDockingBeacon(scene, BABYLON, offset, direction, scale = 1) {
         // Large pulsing sphere beacon
         dockingBeacon = BABYLON.MeshBuilder.CreateSphere('beacon', {
             diameter: 2 * scale,
             segments: 16
         }, scene);
         dockingBeacon.parent = stationMesh;
-        dockingBeacon.position = offset.clone();
-        dockingBeacon.position.z += 8 * scale; // In front of docking port
+        // Position beacon in front of docking port along approach direction
+        dockingBeacon.position = offset.add(direction.scale(8 * scale));
 
         const beaconMat = new BABYLON.StandardMaterial('beaconMat', scene);
         beaconMat.emissiveColor = new BABYLON.Color3(0, 1, 0);
@@ -847,7 +877,7 @@ const SpaceDockingStations = (() => {
         // Arrow pointing toward dock
         dockingArrow = BABYLON.MeshBuilder.CreateCylinder('arrow', {
             height: 5 * scale,
-            diameterTop: 0,
+            diameterTop: 0.1,
             diameterBottom: 1.5 * scale,
             tessellation: 8
         }, scene);
@@ -892,6 +922,230 @@ const SpaceDockingStations = (() => {
 
             dockingLights.push({ mesh: light, material: lightMat });
         });
+    }
+
+    // Create approach zone rings to guide player toward docking port
+    function createApproachRings(scene, BABYLON, offset, direction, scale = 1) {
+        approachRings = [];
+
+        // Create multiple rings at increasing distances from dock
+        const ringConfigs = [
+            { distance: 6, size: 8, alpha: 0.4 },
+            { distance: 12, size: 10, alpha: 0.3 },
+            { distance: 20, size: 14, alpha: 0.2 },
+        ];
+
+        ringConfigs.forEach((config, i) => {
+            const ring = BABYLON.MeshBuilder.CreateTorus('approachRing' + i, {
+                diameter: config.size * scale,
+                thickness: 0.15 * scale,
+                tessellation: 32
+            }, scene);
+
+            ring.parent = stationMesh;
+
+            // Position ring along the docking direction (outward from dock)
+            ring.position = offset.add(direction.scale(config.distance * scale));
+
+            // Orient ring to face the approach direction
+            // Calculate rotation to align ring with the docking direction
+            const up = new BABYLON.Vector3(0, 1, 0);
+            const forward = direction;
+
+            // Use lookAt-style rotation calculation
+            if (Math.abs(forward.y) > 0.99) {
+                // Nearly vertical - use different up vector
+                ring.rotation.x = forward.y > 0 ? 0 : Math.PI;
+                ring.rotation.y = 0;
+                ring.rotation.z = 0;
+            } else {
+                // Calculate angles to face the docking direction
+                ring.rotation.y = Math.atan2(forward.x, forward.z);
+                ring.rotation.x = Math.PI / 2 - Math.asin(forward.y);
+                ring.rotation.z = 0;
+            }
+
+            const ringMat = new BABYLON.StandardMaterial('approachRingMat' + i, scene);
+            ringMat.emissiveColor = new BABYLON.Color3(0, 1, 0.5);
+            ringMat.disableLighting = true;
+            ringMat.alpha = config.alpha;
+            ring.material = ringMat;
+
+            approachRings.push({ mesh: ring, material: ringMat, baseAlpha: config.alpha });
+        });
+    }
+
+    // Create docking hologram - ghost ship showing correct orientation
+    function createDockingHologram(scene, BABYLON, offset, direction, scale = 1) {
+        // Dispose old hologram if exists
+        if (dockingHologram) {
+            dockingHologram.dispose();
+            dockingHologram = null;
+        }
+
+        // Create hologram material (green, semi-transparent, glowing)
+        hologramMaterial = new BABYLON.StandardMaterial('hologramMat', scene);
+        hologramMaterial.emissiveColor = new BABYLON.Color3(0, 1, 0.5);
+        hologramMaterial.diffuseColor = new BABYLON.Color3(0, 0.5, 0.3);
+        hologramMaterial.alpha = 0.3;
+        hologramMaterial.backFaceCulling = false;
+        hologramMaterial.wireframe = true;
+
+        // Get the player's current ship type and create matching hologram
+        const shipType = window.SpaceDockingPlayer?.currentShipType || 'default';
+        dockingHologram = createHologramShip(scene, BABYLON, shipType);
+
+        if (dockingHologram) {
+            dockingHologram.material = hologramMaterial;
+            dockingHologram.parent = stationMesh;
+            dockingHologram.position = offset.clone();
+
+            // Orient hologram to face inward (toward station)
+            // so player aligns with it by approaching from outside
+            if (Math.abs(direction.y) > 0.9) {
+                // Vertical approach
+                dockingHologram.rotation.x = direction.y > 0 ? -Math.PI / 2 : Math.PI / 2;
+            } else if (Math.abs(direction.x) > 0.9) {
+                // Side approach
+                dockingHologram.rotation.y = direction.x > 0 ? -Math.PI / 2 : Math.PI / 2;
+            } else {
+                // Front/back approach
+                dockingHologram.rotation.y = direction.z > 0 ? Math.PI : 0;
+            }
+        }
+    }
+
+    // Create a simplified hologram version of the ship
+    function createHologramShip(scene, BABYLON, shipType) {
+        let hologram;
+
+        switch (shipType) {
+            case 'enterprise':
+                // Saucer + engineering section outline
+                const saucer = BABYLON.MeshBuilder.CreateCylinder('holoSaucer', {
+                    height: 0.3,
+                    diameter: 3,
+                    tessellation: 16
+                }, scene);
+                const hull = BABYLON.MeshBuilder.CreateCylinder('holoHull', {
+                    height: 2,
+                    diameter: 0.6,
+                    tessellation: 8
+                }, scene);
+                hull.rotation.x = Math.PI / 2;
+                hull.position.z = -1.5;
+                hologram = BABYLON.Mesh.MergeMeshes([saucer, hull], true);
+                break;
+
+            case 'xwing':
+                // X-wing shape
+                const xBody = BABYLON.MeshBuilder.CreateBox('holoXBody', {
+                    width: 0.6,
+                    height: 0.4,
+                    depth: 3
+                }, scene);
+                const xWing1 = BABYLON.MeshBuilder.CreateBox('holoXWing1', {
+                    width: 3,
+                    height: 0.1,
+                    depth: 1.5
+                }, scene);
+                xWing1.rotation.z = Math.PI / 6;
+                const xWing2 = BABYLON.MeshBuilder.CreateBox('holoXWing2', {
+                    width: 3,
+                    height: 0.1,
+                    depth: 1.5
+                }, scene);
+                xWing2.rotation.z = -Math.PI / 6;
+                hologram = BABYLON.Mesh.MergeMeshes([xBody, xWing1, xWing2], true);
+                break;
+
+            case 'ywing':
+                // Y-wing shape
+                const yBody = BABYLON.MeshBuilder.CreateCylinder('holoYBody', {
+                    height: 3,
+                    diameter: 0.5,
+                    tessellation: 8
+                }, scene);
+                yBody.rotation.x = Math.PI / 2;
+                const yCockpit = BABYLON.MeshBuilder.CreateSphere('holoYCockpit', {
+                    diameter: 1,
+                    segments: 8
+                }, scene);
+                yCockpit.position.z = 1.5;
+                hologram = BABYLON.Mesh.MergeMeshes([yBody, yCockpit], true);
+                break;
+
+            case 'icbm':
+                // Missile shape
+                hologram = BABYLON.MeshBuilder.CreateCylinder('holoMissile', {
+                    height: 4,
+                    diameterTop: 0.3,
+                    diameterBottom: 0.8,
+                    tessellation: 8
+                }, scene);
+                hologram.rotation.x = Math.PI / 2;
+                break;
+
+            default:
+                // Default fighter - simple arrow shape
+                const body = BABYLON.MeshBuilder.CreateBox('holoBody', {
+                    width: 0.8,
+                    height: 0.4,
+                    depth: 2.5
+                }, scene);
+                const nose = BABYLON.MeshBuilder.CreateCylinder('holoNose', {
+                    height: 1,
+                    diameterTop: 0,
+                    diameterBottom: 0.8,
+                    tessellation: 8
+                }, scene);
+                nose.rotation.x = -Math.PI / 2;
+                nose.position.z = 1.75;
+                const wing1 = BABYLON.MeshBuilder.CreateBox('holoWing1', {
+                    width: 2,
+                    height: 0.1,
+                    depth: 1
+                }, scene);
+                wing1.position.x = 1;
+                const wing2 = BABYLON.MeshBuilder.CreateBox('holoWing2', {
+                    width: 2,
+                    height: 0.1,
+                    depth: 1
+                }, scene);
+                wing2.position.x = -1;
+                hologram = BABYLON.Mesh.MergeMeshes([body, nose, wing1, wing2], true);
+                break;
+        }
+
+        if (hologram) {
+            hologram.name = 'dockingHologram';
+        }
+
+        return hologram;
+    }
+
+    // Update the hologram to match player's current ship
+    function updateHologram(scene, BABYLON) {
+        if (!stationMesh || !dockingPort) return;
+
+        const shipType = window.SpaceDockingPlayer?.currentShipType || 'default';
+        const offset = dockingPort.position.clone();
+        const scale = stationMesh.scaling.x;
+
+        // Recreate hologram with current ship type
+        if (dockingHologram) {
+            const oldPos = dockingHologram.position.clone();
+            const oldRot = dockingHologram.rotation.clone();
+            dockingHologram.dispose();
+
+            dockingHologram = createHologramShip(scene, BABYLON, shipType);
+            if (dockingHologram && hologramMaterial) {
+                dockingHologram.material = hologramMaterial;
+                dockingHologram.parent = stationMesh;
+                dockingHologram.position = oldPos;
+                dockingHologram.rotation = oldRot;
+            }
+        }
     }
 
     // Update station (movement, lights)
@@ -989,6 +1243,27 @@ const SpaceDockingStations = (() => {
             dockingArrow.material.emissiveColor = color;
             dockingArrow.material.alpha = 0.5 + pulse * 0.3;
         }
+
+        // Update approach rings - pulsing animation
+        approachRings.forEach((ring, i) => {
+            if (ring.mesh && ring.material) {
+                // Stagger the pulse for each ring
+                const staggeredPulse = 0.5 + Math.sin(time + i * 0.8) * 0.5;
+                ring.material.emissiveColor = color.scale(0.7);
+                ring.material.alpha = ring.baseAlpha * (0.5 + staggeredPulse * 0.5);
+
+                // Subtle scale pulse
+                const ringScale = 1 + staggeredPulse * 0.05;
+                ring.mesh.scaling.set(ringScale, ringScale, 1);
+            }
+        });
+
+        // Update hologram - pulsing glow effect
+        if (dockingHologram && hologramMaterial) {
+            const holoPulse = 0.5 + Math.sin(time * 3) * 0.5;
+            hologramMaterial.alpha = 0.2 + holoPulse * 0.3;
+            hologramMaterial.emissiveColor = color.scale(0.8 + holoPulse * 0.2);
+        }
     }
 
     // Get docking port world position
@@ -1011,6 +1286,35 @@ const SpaceDockingStations = (() => {
         return stationMesh.rotation.clone();
     }
 
+    // Check collision with station body (excluding dock zone)
+    function checkCollision(playerMesh, BABYLON) {
+        if (!stationMesh || !playerMesh) return false;
+
+        const playerPos = playerMesh.position;
+        const stationPos = stationMesh.position;
+
+        // Distance from player to station center
+        const distance = BABYLON.Vector3.Distance(playerPos, stationPos);
+
+        const playerRadius = 2;
+
+        // If player is inside the station collision zone
+        if (distance < (stationCollisionRadius + playerRadius)) {
+            // But check if they're approaching the docking port area
+            const dockPos = getDockingPortPosition();
+            if (dockPos) {
+                const dockDistance = BABYLON.Vector3.Distance(playerPos, dockPos);
+                // Allow player near docking port (within approach corridor)
+                if (dockDistance < 15) {
+                    return false; // Not a collision - player is in docking approach
+                }
+            }
+            return true; // Collision with station body
+        }
+
+        return false;
+    }
+
     // Dispose of station
     function dispose() {
         dockingLights.forEach(light => {
@@ -1018,6 +1322,23 @@ const SpaceDockingStations = (() => {
             if (light.material) light.material.dispose();
         });
         dockingLights = [];
+
+        // Dispose approach rings
+        approachRings.forEach(ring => {
+            if (ring.mesh) ring.mesh.dispose();
+            if (ring.material) ring.material.dispose();
+        });
+        approachRings = [];
+
+        // Dispose hologram
+        if (dockingHologram) {
+            dockingHologram.dispose();
+            dockingHologram = null;
+        }
+        if (hologramMaterial) {
+            hologramMaterial.dispose();
+            hologramMaterial = null;
+        }
 
         if (dockingBeacon) {
             dockingBeacon.dispose();
@@ -1055,6 +1376,8 @@ const SpaceDockingStations = (() => {
         update,
         getDockingPortPosition,
         getDockingPortRotation,
+        checkCollision,
+        updateHologram,
         dispose,
         get mesh() { return stationMesh; },
         get dockingPort() { return dockingPort; }

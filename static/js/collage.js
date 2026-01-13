@@ -85,7 +85,16 @@
   // ============================================
   // STATE
   // ============================================
-  let currentCity = 'baltimore';
+  // Load saved city immediately to avoid flash (before any rendering)
+  let currentCity = (() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved && CITY_CONFIG[saved]) {
+        return saved;
+      }
+    } catch (e) {}
+    return 'baltimore';
+  })();
   let root = null;
   let shuffleTimer = null;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -288,22 +297,8 @@
       document.body.appendChild(root);
     }
 
-    // Load saved city preference
-    let savedCity = 'baltimore';
-    try {
-      savedCity = localStorage.getItem(STORAGE_KEY) || 'baltimore';
-    } catch (e) {
-      // localStorage may be unavailable
-    }
-
-    // Validate saved city exists
-    if (!CITY_CONFIG[savedCity]) {
-      savedCity = 'baltimore';
-    }
-
-    currentCity = savedCity;
-
-    // Apply theme and build
+    // currentCity is already loaded at module initialization to prevent flash
+    // Apply theme and build with the pre-loaded city
     applyTheme(currentCity);
     buildTiles();
     updateSliderUI(currentCity);
