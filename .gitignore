@@ -103,6 +103,9 @@ celerybeat.pid
 # SageMath parsed files
 *.sage.py
 
+#image cache
+static/data/image_cache.json
+
 # Environments
 *.env
 .venv
