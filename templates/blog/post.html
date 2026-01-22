@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }} - Hunter{% endblock %}
+
+{% block content %}
+<article class="blog-post-page">
+    <header class="post-header animate-on-scroll">
+        <a href="{{ url_for('blog') }}" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Blog
+        </a>
+        <h1 class="post-title">{{ post.title }}</h1>
+        <p class="post-date">{{ post.date }}</p>
+        {% if post.tags %}
+        <div class="blog-tags" style="justify-content: center; margin-top: 1rem;">
+            {% for tag in post.tags %}
+            <span class="tag">{{ tag }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </header>
+
+    <div class="post-content animate-on-scroll">
+        {{ post.content|safe }}
+    </div>
+</article>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate-in');
+            }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+    document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+});
+</script>
+{% endblock %}

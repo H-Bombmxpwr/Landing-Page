@@ -1,13 +1,12 @@
 /**
  * City Collage System
  * Manages background collages and theme switching between cities
- * Easy to extend: just add more cities to CITY_CONFIG
+ * Supports both static and dynamic (Unsplash) images
  */
 
 (() => {
   // ============================================
-  // CITY CONFIGURATION - Easy to extend!
-  // Add new cities here with their images and theme colors
+  // CITY CONFIGURATION
   // ============================================
   const CITY_CONFIG = {
     baltimore: {
@@ -17,7 +16,6 @@
       primary700: '#ef4b00',
       ring: 'rgba(255,106,0,.35)',
       accentLight: '#ffd2bf',
-      // Images array - add more paths as needed
       images: window.BALTIMORE_IMAGES || []
     },
     dc: {
@@ -41,18 +39,77 @@
   };
 
   // ============================================
+  // DYNAMIC IMAGE CACHE
+  // ============================================
+  const dynamicImageCache = {
+    baltimore: null,
+    dc: null,
+    chicago: null
+  };
+  let dynamicImagesEnabled = window.DYNAMIC_IMAGES_ENABLED || false;
+  let prefetchInProgress = false;
+
+  // ============================================
   // COLLAGE SETTINGS
   // ============================================
   const DENSITY_LEVELS = {
-    minimal: 6,
-    low: 10,
-    medium: 15,
-    high: 22
+    minimal: 12,
+    low: 18,
+    medium: 24,
+    high: 36
   };
-  let TILE_COUNT = 20;
-  const SPAN_CLASSES = ['', 'w2', 'w3', 'h2'];
-  const SHUFFLE_INTERVAL = 45000; // ms between random tile swaps
+  let TILE_COUNT = 24;
+  // Reduced span classes to fill more consistently (fewer large tiles = fewer gaps)
+  const SPAN_CLASSES = ['', '', '', 'w2', 'h2'];
+  const SHUFFLE_INTERVAL = 45000;
   const STORAGE_KEY = 'selectedCity';
+
+  /**
+   * Fetch dynamic images for a city from the API
+   */
+  async function fetchDynamicImages(city) {
+    if (dynamicImageCache[city]) {
+      return dynamicImageCache[city];
+    }
+
+    try {
+      const response = await fetch(`/api/images/${city}`);
+      const data = await response.json();
+
+      if (data.images && data.images.length > 0) {
+        dynamicImageCache[city] = data.images;
+        // Also update the city config for immediate use
+        CITY_CONFIG[city].dynamicImages = data.images;
+        return data.images;
+      }
+    } catch (e) {
+      console.warn(`Failed to fetch dynamic images for ${city}:`, e);
+    }
+
+    return null;
+  }
+
+  /**
+   * Prefetch dynamic images for all cities
+   */
+  async function prefetchAllDynamicImages() {
+    if (!dynamicImagesEnabled || prefetchInProgress) return;
+
+    prefetchInProgress = true;
+
+    try {
+      // Fetch all cities in parallel
+      await Promise.all([
+        fetchDynamicImages('baltimore'),
+        fetchDynamicImages('dc'),
+        fetchDynamicImages('chicago')
+      ]);
+    } catch (e) {
+      console.warn('Failed to prefetch dynamic images:', e);
+    } finally {
+      prefetchInProgress = false;
+    }
+  }
 
   /**
    * Set collage density based on page configuration
@@ -61,7 +118,6 @@
     const density = DENSITY_LEVELS[level] || DENSITY_LEVELS.medium;
     TILE_COUNT = density;
 
-    // Adjust opacity based on density
     const opacityMap = {
       minimal: 0.15,
       low: 0.18,
@@ -73,9 +129,6 @@
     return density;
   }
 
-  /**
-   * Initialize density from body data attribute
-   */
   function initDensity() {
     const body = document.body;
     const densityAttr = body.dataset.collageDensity || 'medium';
@@ -85,7 +138,6 @@
   // ============================================
   // STATE
   // ============================================
-  // Load saved city immediately to avoid flash (before any rendering)
   let currentCity = (() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -105,7 +157,16 @@
   const rand = arr => arr[Math.floor(Math.random() * arr.length)];
 
   function getImages() {
-    return CITY_CONFIG[currentCity]?.images || [];
+    const config = CITY_CONFIG[currentCity];
+    if (!config) return [];
+
+    // Prefer dynamic images if available and enabled
+    if (dynamicImagesEnabled && dynamicImageCache[currentCity]) {
+      return dynamicImageCache[currentCity];
+    }
+
+    // Fall back to static images
+    return config.images || [];
   }
 
   function setTileImage(tile, url) {
@@ -232,14 +293,13 @@
     r.style.setProperty('--ring', config.ring);
     r.style.setProperty('--accent-light', config.accentLight);
 
-    // Update body data attribute for CSS hooks
     document.body.dataset.city = cityKey;
   }
 
   // ============================================
   // CITY SWITCHING
   // ============================================
-  function switchCity(cityKey) {
+  async function switchCity(cityKey) {
     if (!CITY_CONFIG[cityKey]) {
       console.warn(`Unknown city: ${cityKey}`);
       return;
@@ -247,27 +307,25 @@
 
     currentCity = cityKey;
 
-    // Persist selection
     try {
       localStorage.setItem(STORAGE_KEY, cityKey);
-    } catch (e) {
-      // localStorage may be unavailable
-    }
+    } catch (e) {}
 
-    // Apply theme colors
     applyTheme(cityKey);
 
-    // Rebuild collage with new images
-    buildTiles();
+    // If dynamic images enabled, ensure we have them cached
+    if (dynamicImagesEnabled && !dynamicImageCache[cityKey]) {
+      await fetchDynamicImages(cityKey);
+    }
 
-    // Update slider UI
+    buildTiles();
     updateSliderUI(cityKey);
   }
 
   function updateSliderUI(cityKey) {
     const slider = document.getElementById('city-slider');
     const options = document.querySelectorAll('.city-option');
-    
+
     if (slider) {
       const cities = Object.keys(CITY_CONFIG);
       const index = cities.indexOf(cityKey);
@@ -276,7 +334,6 @@
       }
     }
 
-    // Update active state on city options (flags + labels)
     options.forEach(option => {
       option.classList.toggle('active', option.dataset.city === cityKey);
     });
@@ -285,11 +342,9 @@
   // ============================================
   // INITIALIZATION
   // ============================================
-  function init() {
-    // Initialize density from page data attribute
+  async function init() {
     initDensity();
 
-    // Create or get collage root
     root = document.getElementById('bmore-collage');
     if (!root) {
       root = document.createElement('div');
@@ -297,13 +352,22 @@
       document.body.appendChild(root);
     }
 
-    // currentCity is already loaded at module initialization to prevent flash
-    // Apply theme and build with the pre-loaded city
     applyTheme(currentCity);
-    buildTiles();
-    updateSliderUI(currentCity);
 
-    // Start shuffle timer
+    // If dynamic images enabled, fetch them before building
+    if (dynamicImagesEnabled) {
+      // Fetch current city images first for fast initial render
+      await fetchDynamicImages(currentCity);
+      buildTiles();
+      updateSliderUI(currentCity);
+
+      // Then prefetch other cities in background
+      prefetchAllDynamicImages();
+    } else {
+      buildTiles();
+      updateSliderUI(currentCity);
+    }
+
     if (!reduceMotion) {
       if (shuffleTimer) clearInterval(shuffleTimer);
       shuffleTimer = setInterval(shuffleSome, SHUFFLE_INTERVAL);
@@ -319,10 +383,11 @@
     getCityConfig: () => CITY_CONFIG,
     rebuild: buildTiles,
     setDensity,
-    getDensityLevels: () => DENSITY_LEVELS
+    getDensityLevels: () => DENSITY_LEVELS,
+    prefetchImages: prefetchAllDynamicImages,
+    isDynamicEnabled: () => dynamicImagesEnabled
   };
 
-  // Initialize when DOM ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {

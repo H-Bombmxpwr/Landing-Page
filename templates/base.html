@@ -16,11 +16,17 @@
                 <a href="{{ url_for('index') }}" class="brand-link">
                     <h1 class="brand">Hunter</h1>
                 </a>
+                {% if show_resume %}
+                <a href="{{ url_for('static', filename='files/resume.pdf') }}" class="resume-btn" target="_blank" download>
+                    <i class="fas fa-file-pdf"></i> Resume
+                </a>
+                {% endif %}
             </div>
         </header>
 
         <!-- City Switcher Slider -->
         <div class="city-switcher">
+            <h3 class="city-heading">My Favorite Cities</h3>
             <div class="city-options">
                 <div class="city-option" data-city="baltimore" onclick="CityCollage.switchCity('baltimore')">
                     <img src="{{ url_for('static', filename='images/flags/baltimore_flag.png') }}" alt="Baltimore Flag" class="city-flag">
@@ -55,7 +61,12 @@
                 <li><a href="{{ url_for('personal_projects') }}" class="{% if active_page == 'personal' %}nav-active{% endif %}">Personal</a></li>
                 <li><a href="{{ url_for('academic_projects') }}" class="{% if active_page == 'academic' %}nav-active{% endif %}">Academic</a></li>
                 <li><a href="{{ url_for('about') }}" class="{% if active_page == 'about' %}nav-active{% endif %}">About</a></li>
-                <!-- <li><a href="{{ url_for('game') }}" class="{% if active_page == 'game' %}nav-active{% endif %}">Spacecraft Docker</a></li> -->
+                {% if show_blog %}
+                <li><a href="{{ url_for('blog') }}" class="{% if active_page == 'blog' %}nav-active{% endif %}">Blog</a></li>
+                {% endif %}
+                {% if show_game %}
+                <li><a href="{{ url_for('game') }}" class="{% if active_page == 'game' %}nav-active{% endif %}">Spacecraft Docker</a></li>
+                {% endif %}
             </ul>
         </nav>
 
@@ -143,6 +154,9 @@
         "{{ url_for('static', filename='images/chicago/hancock.jpg') }}",
         "{{ url_for('static', filename='images/chicago/daley.jpg') }}"
     ];
+
+    // Dynamic images configuration
+    window.DYNAMIC_IMAGES_ENABLED = {{ 'true' if dynamic_images else 'false' }};
     </script>
 
     <!-- Core Scripts -->

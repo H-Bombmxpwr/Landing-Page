@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Hunter - Blog{% endblock %}
+
+{% block content %}
+<section class="blog-page">
+    <div class="page-header animate-on-scroll">
+        <h1 class="page-title">
+            <i class="fas fa-blog"></i>
+            Blog
+        </h1>
+        <p class="page-subtitle">Thoughts on engineering, coding, and life.</p>
+    </div>
+
+    {% if posts %}
+    <div class="blog-grid animate-on-scroll">
+        {% for post in posts %}
+        <a href="{{ url_for('blog_post', post_id=post.id) }}" class="blog-card">
+            <div class="blog-card-content">
+                <span class="blog-date">{{ post.date }}</span>
+                <h3 class="blog-title">{{ post.title }}</h3>
+                <p class="blog-summary">{{ post.summary }}</p>
+                {% if post.tags %}
+                <div class="blog-tags">
+                    {% for tag in post.tags[:3] %}
+                    <span class="tag">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state animate-on-scroll">
+        <p>No blog posts yet. Check back soon!</p>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate-in');
+            }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+    document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+});
+</script>
+{% endblock %}

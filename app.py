@@ -1,11 +1,207 @@
 from flask import Flask, render_template, jsonify, abort
+from dotenv import load_dotenv
 import requests
 import random
 import json
 import os
 import glob
+import hashlib
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
+
+# Feature flags
+SHOW_GAME = False    # Set to True to display the game tab in navigation
+SHOW_RESUME = False  # Set to True to display the resume download button
+SHOW_BLOG = False    # Set to True to display the blog section
+
+# Dynamic background images configuration
+DYNAMIC_IMAGES = True  # Set to True to fetch images from Unsplash instead of local files
+UNSPLASH_ACCESS_KEY = os.getenv('UNSPLASH_ACCESS', '')  # From .env file
+UNSPLASH_SECRET_KEY = os.getenv('UNSPLASH_SECRET', '')  # From .env file (not currently used but available)
+
+# City search queries for dynamic images
+# Edit these to customize what images are fetched for each city
+# More specific/local queries = more authentic feeling images
+CITY_SEARCH_QUERIES = {
+    'baltimore': [
+        'baltimore inner harbor',
+        'fells point baltimore',
+        'camden yards orioles',
+        'baltimore rowhouses',
+        'fort mchenry',
+        'federal hill baltimore',
+        'mount vernon baltimore',
+        'chesapeake bay maryland',
+        'baltimore aquarium',
+        'domino sugars baltimore'
+    ],
+    'dc': [
+        'washington monument dc',
+        'lincoln memorial',
+        'capitol building washington',
+        'georgetown washington dc',
+        'nationals park dc',
+        'dupont circle',
+        'adams morgan dc',
+        'tidal basin cherry blossoms',
+        'smithsonian museum',
+        'union station washington'
+    ],
+    'chicago': [
+        'millennium park chicago',
+        'chicago bean cloudgate',
+        'wrigley field cubs',
+        'chicago riverwalk',
+        'navy pier chicago',
+        'magnificent mile',
+        'lincoln park chicago',
+        'chicago theater sign',
+        'lake michigan chicago',
+        'wicker park chicago'
+    ]
+}
+
+# Image cache (in-memory for speed, persisted to disk)
+_image_cache = {}
+_cache_file = 'static/data/image_cache.json'
+_cache_lock = False
+
+def load_image_cache():
+    """Load cached images from disk"""
+    global _image_cache
+    try:
+        if os.path.exists(_cache_file):
+            with open(_cache_file, 'r') as f:
+                _image_cache = json.load(f)
+    except:
+        _image_cache = {}
+
+def save_image_cache():
+    """Save image cache to disk"""
+    try:
+        os.makedirs(os.path.dirname(_cache_file), exist_ok=True)
+        with open(_cache_file, 'w') as f:
+            json.dump(_image_cache, f)
+    except:
+        pass
+
+def fetch_unsplash_images(query, count=10):
+    """Fetch images from Unsplash API for a query with randomness"""
+    if not UNSPLASH_ACCESS_KEY:
+        return []
+
+    try:
+        url = 'https://api.unsplash.com/search/photos'
+        # Add randomness by selecting a random page (1-3)
+        random_page = random.randint(1, 3)
+        params = {
+            'query': query,
+            'per_page': count,
+            'page': random_page,
+            'orientation': 'landscape',
+            'content_filter': 'high',
+            'order_by': random.choice(['relevant', 'latest'])  # Mix up ordering
+        }
+        headers = {'Authorization': f'Client-ID {UNSPLASH_ACCESS_KEY}'}
+        response = requests.get(url, params=params, headers=headers, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+
+        # Extract image URLs with their IDs for deduplication
+        images = []
+        for photo in data.get('results', []):
+            photo_id = photo.get('id', '')
+            urls = photo.get('urls', {})
+            img_url = urls.get('regular') or urls.get('small')
+            if img_url and photo_id:
+                # Include photo_id in tuple for deduplication
+                images.append((photo_id, img_url))
+        return images
+    except Exception as e:
+        print(f"Error fetching Unsplash images for '{query}': {e}")
+        return []
+
+def get_dynamic_images_for_city(city):
+    """Get dynamic images for a city, using cache if available"""
+    global _image_cache, _cache_lock
+
+    cache_key = f'dynamic_{city}'
+    cache_time_key = f'dynamic_{city}_time'
+
+    # Check if cache is fresh (less than 1 hour old)
+    if cache_key in _image_cache:
+        cache_time = _image_cache.get(cache_time_key, 0)
+        if time.time() - cache_time < 3600:  # 1 hour cache
+            return _image_cache[cache_key]
+
+    # Prevent concurrent fetches
+    if _cache_lock:
+        return _image_cache.get(cache_key, [])
+
+    _cache_lock = True
+
+    try:
+        queries = CITY_SEARCH_QUERIES.get(city, [city])
+        all_images = []
+
+        # Shuffle queries for variety each time
+        shuffled_queries = queries.copy()
+        random.shuffle(shuffled_queries)
+
+        # Fetch images from multiple queries in parallel
+        with ThreadPoolExecutor(max_workers=6) as executor:
+            futures = {executor.submit(fetch_unsplash_images, q, 8): q for q in shuffled_queries}
+            for future in as_completed(futures):
+                images = future.result()
+                all_images.extend(images)
+
+        # Remove duplicates by photo ID and limit to 50 images
+        seen_ids = set()
+        unique_images = []
+        for item in all_images:
+            if isinstance(item, tuple) and len(item) == 2:
+                photo_id, img_url = item
+                if photo_id not in seen_ids:
+                    seen_ids.add(photo_id)
+                    unique_images.append(img_url)
+            elif isinstance(item, str):
+                # Fallback for old format
+                if item not in seen_ids:
+                    seen_ids.add(item)
+                    unique_images.append(item)
+
+            if len(unique_images) >= 50:
+                break
+
+        # Shuffle for variety
+        random.shuffle(unique_images)
+
+        # Cache the results (just URLs, not IDs)
+        _image_cache[cache_key] = unique_images
+        _image_cache[cache_time_key] = time.time()
+        save_image_cache()
+
+        return unique_images
+    finally:
+        _cache_lock = False
+
+# Load cache on startup
+load_image_cache()
+
+@app.context_processor
+def inject_feature_flags():
+    """Make feature flags available to all templates"""
+    return {
+        'show_game': SHOW_GAME,
+        'show_resume': SHOW_RESUME,
+        'show_blog': SHOW_BLOG,
+        'dynamic_images': DYNAMIC_IMAGES
+    }
 
 # Image extensions to look for
 IMAGE_EXTENSIONS = ['*.png', '*.jpg', '*.jpeg', '*.gif', '*.svg', '*.webp']
@@ -14,6 +210,49 @@ def load_projects():
     """Load projects from JSON file"""
     with open('static/data/projects.json', 'r') as f:
         return json.load(f)
+
+def load_blog_posts():
+    """Load blog posts from JSON file"""
+    try:
+        with open('static/data/blog.json', 'r') as f:
+            data = json.load(f)
+            return data.get('posts', [])
+    except FileNotFoundError:
+        return []
+
+def get_quick_stats():
+    """Calculate quick stats for the home page"""
+    from datetime import datetime
+    projects = load_projects()
+    all_projects = projects.get('personal', []) + projects.get('academic', [])
+
+    # Count unique technologies
+    all_tags = set()
+    for project in all_projects:
+        all_tags.update(project.get('tags', []))
+
+    # Calculate years coding (from earliest project date)
+    earliest_date = None
+    for project in all_projects:
+        date_str = project.get('date', '')
+        if date_str:
+            try:
+                year, month = date_str.split('-')
+                project_date = datetime(int(year), int(month), 1)
+                if earliest_date is None or project_date < earliest_date:
+                    earliest_date = project_date
+            except:
+                pass
+
+    years_coding = 0
+    if earliest_date:
+        years_coding = (datetime.now() - earliest_date).days // 365
+
+    return {
+        'projects_count': len(all_projects),
+        'tech_count': len(all_tags),
+        'years_coding': max(years_coding, 5)
+    }
 
 def get_project_images(category, project_id, icon_image):
     """
@@ -196,8 +435,10 @@ def group_academic_projects(projects):
 @app.route('/')
 def index():
     featured = get_featured_project()
+    stats = get_quick_stats()
     return render_template('index.html',
                          featured_project=featured,
+                         stats=stats,
                          active_page='home',
                          page_id='home-page',
                          collage_density='low')
@@ -282,6 +523,33 @@ def random_lyric():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/images/<city>')
+def get_city_images(city):
+    """Get images for a city - dynamic from Unsplash or static from local files"""
+    if city not in ['baltimore', 'dc', 'chicago']:
+        return jsonify({"error": "Invalid city"}), 400
+
+    if DYNAMIC_IMAGES and UNSPLASH_ACCESS_KEY:
+        images = get_dynamic_images_for_city(city)
+        if images:
+            return jsonify({"images": images, "source": "dynamic"})
+
+    # Fallback to static images - return empty to use frontend defaults
+    return jsonify({"images": [], "source": "static"})
+
+@app.route('/api/images/prefetch')
+def prefetch_all_images():
+    """Prefetch dynamic images for all cities (call on page load for faster switching)"""
+    if not DYNAMIC_IMAGES or not UNSPLASH_ACCESS_KEY:
+        return jsonify({"status": "disabled"})
+
+    result = {}
+    for city in ['baltimore', 'dc', 'chicago']:
+        images = get_dynamic_images_for_city(city)
+        result[city] = len(images)
+
+    return jsonify({"status": "ok", "counts": result})
+
 @app.route('/lyrics')
 def all_lyrics():
     with open('static/data/lyrics.json', 'r') as f:
@@ -296,6 +564,27 @@ def all_lyrics():
 @app.route('/all-lyrics')
 def all_lyrics_redirect():
     return all_lyrics()
+
+@app.route('/blog')
+def blog():
+    posts = load_blog_posts()
+    return render_template('blog/index.html',
+                         posts=posts,
+                         active_page='blog',
+                         page_id='blog-page',
+                         collage_density='medium')
+
+@app.route('/blog/<post_id>')
+def blog_post(post_id):
+    posts = load_blog_posts()
+    post = next((p for p in posts if p.get('id') == post_id), None)
+    if not post:
+        abort(404)
+    return render_template('blog/post.html',
+                         post=post,
+                         active_page='blog',
+                         page_id='blog-post-page',
+                         collage_density='minimal')
 
 @app.errorhandler(404)
 def page_not_found(e):

@@ -29,6 +29,25 @@
     </div>
 </section>
 
+{% if stats %}
+<section class="quick-stats animate-on-scroll">
+    <div class="stats-container">
+        <div class="stat-item">
+            <span class="stat-number" data-count="{{ stats.years_coding }}">0</span>
+            <span class="stat-label">Years Coding</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number" data-count="{{ stats.projects_count }}">0</span>
+            <span class="stat-label">Projects</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number" data-count="{{ stats.tech_count }}">0</span>
+            <span class="stat-label">Technologies</span>
+        </div>
+    </div>
+</section>
+{% endif %}
+
 {% if featured_project %}
 <section class="featured-section animate-on-scroll">
     <h2 class="section-title">
@@ -97,6 +116,31 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.animate-on-scroll').forEach(el => {
         observer.observe(el);
     });
+
+    // Animate stat counters
+    const statNumbers = document.querySelectorAll('.stat-number');
+    const statsObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const el = entry.target;
+                const target = parseInt(el.dataset.count, 10);
+                let current = 0;
+                const increment = Math.ceil(target / 30);
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        el.textContent = target + '+';
+                        clearInterval(timer);
+                    } else {
+                        el.textContent = current;
+                    }
+                }, 50);
+                statsObserver.unobserve(el);
+            }
+        });
+    }, { threshold: 0.5 });
+
+    statNumbers.forEach(el => statsObserver.observe(el));
 });
 </script>
 {% endblock %}
