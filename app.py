@@ -15,30 +15,30 @@ load_dotenv()
 app = Flask(__name__)
 
 # Feature flags
-SHOW_GAME = False    # Set to True to display the game tab in navigation
-SHOW_RESUME = False  # Set to True to display the resume download button
-SHOW_BLOG = False    # Set to True to display the blog section
+SHOW_GAME = False    
+SHOW_RESUME = False  
+SHOW_BLOG = False    
 
 # Dynamic background images configuration
 DYNAMIC_IMAGES = True  # Set to True to fetch images from Unsplash instead of local files
 UNSPLASH_ACCESS_KEY = os.getenv('UNSPLASH_ACCESS', '')  # From .env file
-UNSPLASH_SECRET_KEY = os.getenv('UNSPLASH_SECRET', '')  # From .env file (not currently used but available)
+UNSPLASH_SECRET_KEY = os.getenv('UNSPLASH_SECRET', '')  # From .env file 
 
-# City search queries for dynamic images
-# Edit these to customize what images are fetched for each city
-# More specific/local queries = more authentic feeling images
 CITY_SEARCH_QUERIES = {
     'baltimore': [
-        'baltimore inner harbor',
+        'inner harbor baltimore',
         'fells point baltimore',
         'camden yards orioles',
         'baltimore rowhouses',
         'fort mchenry',
         'federal hill baltimore',
         'mount vernon baltimore',
-        'chesapeake bay maryland',
-        'baltimore aquarium',
-        'domino sugars baltimore'
+        'chesapeake bay baltimore',
+        'national baltimore aquarium',
+        'domino sugar baltimore',
+        'baltimore canton coal',
+        'national bohemian baltimore',
+        'patterson park baltimore observatory'
     ],
     'dc': [
         'washington monument dc',
@@ -46,11 +46,15 @@ CITY_SEARCH_QUERIES = {
         'capitol building washington',
         'georgetown washington dc',
         'nationals park dc',
-        'dupont circle',
+        'dupont circle dc',
         'adams morgan dc',
         'tidal basin cherry blossoms',
         'smithsonian museum',
-        'union station washington'
+        'union station washington',
+        'u street corridor dc',
+        'decades bar dc',
+        'union market dc',
+        'h street dc'
     ],
     'chicago': [
         'millennium park chicago',
@@ -62,7 +66,13 @@ CITY_SEARCH_QUERIES = {
         'lincoln park chicago',
         'chicago theater sign',
         'lake michigan chicago',
-        'wicker park chicago'
+        'wicker park chicago',
+        'logan square improv',
+        'logan square chicago',
+        'lincoln park zoo',
+        'chicago cubs wrigley field',
+        'chicago cta train car',
+        'chicago metra train'
     ]
 }
 
