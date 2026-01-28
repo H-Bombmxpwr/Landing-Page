@@ -149,7 +149,7 @@
       "title": "Clarence",
       "shortDescription": "Feature-rich Discord bot with music, trivia, and more",
       "description": [
-        "My first ever Discord bot! Built using discord.py, it was an incredibly janky but a good learning experience.",
+        "My first ever Discord bot! Built using discord.py, it was incredibly janky at first but now is refined and was a good learning experience.",
         "It now has a wide range of features including music playback, trivia games, image manipulation, and more, spanning over 70 commands."
       ],
       "iconImage": "clarence.png",
