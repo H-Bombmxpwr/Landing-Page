@@ -6,7 +6,7 @@
       "shortDescription": "Generate cool album posters using the Spotify API",
       "description": [
         "This is a website to generate a cool album poster. It interacts with the Spotify API for all of the album data.",
-        "It will take an artist, an album, or both and generate a poster with the album artwork, tracklist, and other metadata beautifully arranged."
+        "It will take an album and generate a poster with the album artwork, tracklist, and other metadata beautifully arranged."
       ],
       "iconImage": "The_Secret_of_Us_.png",
       "tags": ["Python", "Flask", "Spotify API", "Web"],
