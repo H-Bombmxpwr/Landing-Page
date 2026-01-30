@@ -12,8 +12,17 @@
         <p class="page-subtitle">School Projects</p>
     </div>
 
+    <nav class="section-nav animate-on-scroll">
+        {% for university, projects in grouped_projects %}
+        <a href="#section-{{ university|lower|replace(' ', '-') }}" class="section-nav-link">
+            <i class="fas fa-university"></i>
+            {{ university }}
+        </a>
+        {% endfor %}
+    </nav>
+
     {% for university, projects in grouped_projects %}
-    <div class="project-group animate-on-scroll">
+    <div class="project-group animate-on-scroll" id="section-{{ university|lower|replace(' ', '-') }}">
         <h2 class="group-title">
             <i class="fas fa-university"></i>
             {{ university }}

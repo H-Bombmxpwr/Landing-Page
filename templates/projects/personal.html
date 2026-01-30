@@ -12,8 +12,23 @@
         <p class="page-subtitle">Various borderline useful projects.</p>
     </div>
 
+    <nav class="section-nav animate-on-scroll">
+        {% for subcategory, projects in grouped_projects %}
+        <a href="#section-{{ subcategory|lower|replace(' ', '-') }}" class="section-nav-link">
+            {% if subcategory == 'Websites' %}
+            <i class="fas fa-globe"></i>
+            {% elif subcategory == 'Mobile Applications' %}
+            <i class="fas fa-mobile-alt"></i>
+            {% else %}
+            <i class="fas fa-code"></i>
+            {% endif %}
+            {{ subcategory }}
+        </a>
+        {% endfor %}
+    </nav>
+
     {% for subcategory, projects in grouped_projects %}
-    <div class="project-group animate-on-scroll">
+    <div class="project-group animate-on-scroll" id="section-{{ subcategory|lower|replace(' ', '-') }}">
         <h2 class="group-title">
             {% if subcategory == 'Websites' %}
             <i class="fas fa-globe"></i>
