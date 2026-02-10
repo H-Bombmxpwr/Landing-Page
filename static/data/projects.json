@@ -57,7 +57,7 @@
         "The seam carving feature allows for intelligent resizing that preserves important content in images.",
         "Used to be on a website, currently being worked on so not actively deployed to production."
       ],
-      "iconImage": "il.png",
+      "iconImage": "icon.svg",
       "tags": ["Python", "Flask", "Image Processing", "Web"],
       "hasGithub": true,
       "githubLink": "https://github.com/H-Bombmxpwr/image",
