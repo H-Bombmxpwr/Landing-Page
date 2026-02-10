@@ -9,7 +9,27 @@
     <title>{% block title %}Hunter{% endblock %}</title>
     {% block head %}{% endblock %}
 </head>
-<body id="{{ page_id|default('index-page') }}" data-city="baltimore" data-collage-density="{{ collage_density|default('medium') }}">
+<body id="{{ page_id|default('index-page') }}" data-collage-density="{{ collage_density|default('medium') }}">
+    <script>
+    (function() {
+        var themes = {
+            baltimore: { p:'#ff6a00', p6:'#ff5c00', p7:'#ef4b00', r:'rgba(255,106,0,.35)', a:'#ffd2bf' },
+            dc:        { p:'#c41e3a', p6:'#b01830', p7:'#9a1528', r:'rgba(196,30,58,.35)', a:'#f5c6ce' },
+            chicago:   { p:'#41b6e6', p6:'#35a5d4', p7:'#2994c2', r:'rgba(65,182,230,.35)', a:'#c5e8f7' }
+        };
+        try {
+            var city = localStorage.getItem('selectedCity') || 'baltimore';
+            if (!themes[city]) city = 'baltimore';
+            document.body.dataset.city = city;
+            var t = themes[city], s = document.documentElement.style;
+            s.setProperty('--primary', t.p);
+            s.setProperty('--primary-600', t.p6);
+            s.setProperty('--primary-700', t.p7);
+            s.setProperty('--ring', t.r);
+            s.setProperty('--accent-light', t.a);
+        } catch(e) { document.body.dataset.city = 'baltimore'; }
+    })();
+    </script>
     <div class="container">
         <header class="site-header">
             <div class="wrap">
@@ -26,7 +46,7 @@
 
         <!-- City Switcher Slider -->
         <div class="city-switcher">
-            <h3 class="city-heading">My Favorite Cities</h3>
+            <h3 class="city-heading"></h3>
             <div class="city-options">
                 <div class="city-option" data-city="baltimore" onclick="CityCollage.switchCity('baltimore')">
                     <img src="{{ url_for('static', filename='images/flags/baltimore_flag.png') }}" alt="Baltimore Flag" class="city-flag">
@@ -170,22 +190,19 @@
         const cities = ['baltimore', 'dc', 'chicago'];
 
         if (slider) {
+            // Set slider to saved city immediately
+            try {
+                const saved = localStorage.getItem('selectedCity') || 'baltimore';
+                const idx = cities.indexOf(saved);
+                if (idx !== -1) slider.value = idx;
+            } catch(e) {}
+
             slider.addEventListener('input', function() {
                 const cityIndex = parseInt(this.value, 10);
                 const city = cities[cityIndex];
                 if (city && window.CityCollage) {
                     window.CityCollage.switchCity(city);
                 }
-            });
-
-            document.addEventListener('DOMContentLoaded', function() {
-                try {
-                    const saved = localStorage.getItem('selectedCity') || 'baltimore';
-                    const idx = cities.indexOf(saved);
-                    if (idx !== -1) {
-                        slider.value = idx;
-                    }
-                } catch(e) {}
             });
         }
     })();
