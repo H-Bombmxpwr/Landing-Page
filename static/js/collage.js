@@ -160,13 +160,15 @@
     const config = CITY_CONFIG[currentCity];
     if (!config) return [];
 
-    // Prefer dynamic images if available and enabled
+    const staticImages = config.images || [];
+
+    // Combine dynamic and static images when both are available
     if (dynamicImagesEnabled && dynamicImageCache[currentCity]) {
-      return dynamicImageCache[currentCity];
+      return [...staticImages, ...dynamicImageCache[currentCity]];
     }
 
-    // Fall back to static images
-    return config.images || [];
+    // Fall back to static images only
+    return staticImages;
   }
 
   function setTileImage(tile, url) {
