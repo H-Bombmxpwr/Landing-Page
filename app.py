@@ -385,7 +385,7 @@ def enrich_project_list(projects, category):
 def group_personal_projects(projects):
     """Group personal projects by subcategory and sort by rank"""
     # Define the order of subcategories
-    subcategory_order = ['Websites', 'Mobile Applications', 'Other Software']
+    subcategory_order = ['Websites', 'Mobile Applications', 'Bots', 'Other Software']
 
     # Group projects by subcategory
     grouped = {}

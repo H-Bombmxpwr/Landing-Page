@@ -1786,6 +1786,23 @@ nav ul li a.nav-active {
   opacity: 1;
 }
 
+/* Lichess Embed Section */
+.detail-lichess-section {
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.lichess-embed-container {
+  display: flex;
+  justify-content: center;
+}
+
+.lichess-loading {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
 /* Gallery Section */
 .detail-gallery-section {
   margin-top: 2.5rem;

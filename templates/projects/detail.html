@@ -63,6 +63,15 @@
         </div>
     </div>
 
+    {% if project.lichessUser %}
+    <div class="detail-lichess-section">
+        <h2 class="gallery-header"><i class="fas fa-chess"></i> Most Recent Game</h2>
+        <div id="lichess-embed-container" class="lichess-embed-container">
+            <p class="lichess-loading">Loading most recent game...</p>
+        </div>
+    </div>
+    {% endif %}
+
     {% if project.galleryImages and project.galleryImages|length > 0 %}
     <div class="detail-gallery-section">
         <h2 class="gallery-header"><i class="fas fa-images"></i> Gallery</h2>
@@ -142,6 +151,35 @@ function updateLightboxImage() {
         counter.style.display = 'block';
     }
 }
+
+// Lichess embed - fetch most recent game
+{% if project.lichessUser %}
+(function() {
+    const container = document.getElementById('lichess-embed-container');
+    if (!container) return;
+
+    fetch('https://lichess.org/api/games/user/{{ project.lichessUser }}?max=1&pgnInJson=true', {
+        headers: { 'Accept': 'application/x-ndjson' }
+    })
+    .then(response => response.text())
+    .then(text => {
+        const line = text.trim().split('\n')[0];
+        if (!line) throw new Error('No games found');
+        const game = JSON.parse(line);
+        const gameId = game.id;
+        if (!gameId) throw new Error('No game ID');
+
+        container.innerHTML = '<iframe src="https://lichess.org/embed/game/' + gameId + '?theme=auto&bg=auto" ' +
+            'width="100%" height="400" frameborder="0" allowtransparency="true" ' +
+            'style="border-radius: 8px; max-width: 600px;"></iframe>';
+    })
+    .catch(err => {
+        console.error('Failed to load Lichess game:', err);
+        container.innerHTML = '<p>Could not load the most recent game. ' +
+            '<a href="https://lichess.org/@/{{ project.lichessUser }}" target="_blank">View on Lichess</a></p>';
+    });
+})();
+{% endif %}
 
 // Keyboard navigation
 document.addEventListener('keydown', function(e) {

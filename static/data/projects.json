@@ -150,9 +150,10 @@
       "shortDescription": "Feature-rich Discord bot with music, trivia, and more",
       "description": [
         "My first ever Discord bot! Built using discord.py, it was incredibly janky at first but now is refined and was a good learning experience.",
-        "It now has a wide range of features including music playback, trivia games, image manipulation, and more, spanning over 70 commands."
+        "It now has a wide range of features including music playback, trivia games, image manipulation, and more, spanning over 70 commands.",
+        "He is named Clarence, and is Clarice's brother"
       ],
-      "iconImage": "clarence.png",
+      "iconImage": "clarence.jpg",
       "tags": ["Python", "discord.py", "Bot"],
       "hasGithub": false,
       "githubLink": "",
@@ -165,7 +166,7 @@
       "featured": false,
       "date": "2021-08",
       "rank": 1,
-      "subcategory": "Other Software"
+      "subcategory": "Bots"
     },
     {
       "id": "ti-programs",
@@ -260,7 +261,34 @@
       "date": "2022-05",
       "rank": 6,
       "subcategory": "Websites"
+    },
+    {
+      "id": "clarice-the-bot",
+      "title": "Clarice",
+      "shortDescription": "A chess bot I made to help me practice",
+      "description": [
+        "A chess bot that I built with the help of Claude to help me practice the openings I play in chess",
+        "Plays moves based on random seeding from the masters database, and then plays a user set stockfish level after the opening book hit its limit",
+        "Named Clarice as she is Clarence's sister"
+      ],
+      "iconImage": "clarice.webp",
+      "tags": ["Python", "Lichess API", "Stockfish", "Chess"],
+      "hasGithub": true,
+      "githubLink": "https://github.com/H-Bombmxpwr/clarice",
+      "hasLive": true,
+      "liveLink": "https://lichess.org/@/claricethebot",
+      "hasVideo": false,
+      "videoLink": "",
+      "hasDownload": false,
+      "downloadLink": "",
+      "featured": false,
+      "date": "2026-02",
+      "rank": 2,
+      "subcategory": "Bots",
+      "lichessUser": "claricethebot"
     }
+
+
   ],
   "academic": [
     {
