@@ -54,8 +54,7 @@
       "description": [
         "Image Lab is a fast, browser-based image editor with a Python (Flask) backend.",
         "It supports cropping, resizing, color adjustments, filters, background removal, histogram equalization, and content-aware seam carving.",
-        "The seam carving feature allows for intelligent resizing that preserves important content in images.",
-        "Used to be on a website, currently being worked on so not actively deployed to production."
+        "The seam carving feature allows for intelligent resizing that preserves important content in images. See my academic project on seam carving for more info."
       ],
       "iconImage": "icon.svg",
       "tags": ["Python", "Flask", "Image Processing", "Web"],
