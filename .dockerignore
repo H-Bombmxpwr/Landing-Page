@@ -1,0 +1,9 @@
+.venv
+__pycache__
+*.pyc
+*.pyo
+.git
+.gitignore
+.env
+static/data/image_cache.json
+static/data/visits.json
