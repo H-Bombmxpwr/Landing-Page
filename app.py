@@ -13,6 +13,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 load_dotenv()
 
 app = Flask(__name__)
+app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-change-in-production')
 
 # Feature flags
 SHOW_GAME = False    
@@ -80,6 +81,34 @@ CITY_SEARCH_QUERIES = {
 _image_cache = {}
 _cache_file = 'static/data/image_cache.json'
 _cache_lock = False
+
+# Visit counter
+# DATA_DIR can be set to a Railway Volume mount path (e.g. /data) for persistence across deploys
+_visit_count = 0
+_data_dir = os.getenv('DATA_DIR', 'static/data')
+_visits_file = os.path.join(_data_dir, 'visits.json')
+
+def load_visit_count():
+    """Load visit count from disk"""
+    global _visit_count
+    try:
+        if os.path.exists(_visits_file):
+            with open(_visits_file, 'r') as f:
+                data = json.load(f)
+                _visit_count = data.get('count', 0)
+    except:
+        _visit_count = 0
+
+def increment_visit_count():
+    """Increment and persist the visit count"""
+    global _visit_count
+    _visit_count += 1
+    try:
+        os.makedirs(os.path.dirname(_visits_file), exist_ok=True)
+        with open(_visits_file, 'w') as f:
+            json.dump({'count': _visit_count}, f)
+    except:
+        pass
 
 def load_image_cache():
     """Load cached images from disk"""
@@ -200,8 +229,20 @@ def get_dynamic_images_for_city(city):
     finally:
         _cache_lock = False
 
-# Load cache on startup
+# Load cache and visit count on startup
 load_image_cache()
+load_visit_count()
+
+@app.before_request
+def count_visit():
+    """Increment visit counter once per browser session"""
+    from flask import request, session
+    # Only count HTML page requests, not API calls or static files
+    if not request.path.startswith('/api/') and not request.path.startswith('/static/'):
+        if not session.get('visited'):
+            session['visited'] = True
+            session.permanent = False  # expires when browser closes
+            increment_visit_count()
 
 @app.context_processor
 def inject_feature_flags():
@@ -210,7 +251,8 @@ def inject_feature_flags():
         'show_game': SHOW_GAME,
         'show_resume': SHOW_RESUME,
         'show_blog': SHOW_BLOG,
-        'dynamic_images': DYNAMIC_IMAGES
+        'dynamic_images': DYNAMIC_IMAGES,
+        'visit_count': _visit_count
     }
 
 # Image extensions to look for

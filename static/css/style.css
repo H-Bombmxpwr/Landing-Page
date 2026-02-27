@@ -2546,6 +2546,12 @@ nav ul li a.nav-active {
   text-align: center;
 }
 
+.visit-counter {
+  margin-top: 0.4rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
 /* =========================
    Error Page
    ========================= */

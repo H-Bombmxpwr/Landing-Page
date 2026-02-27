@@ -106,6 +106,9 @@ celerybeat.pid
 #image cache
 static/data/image_cache.json
 
+# Visit counter (persisted externally, not in git)
+static/data/visits.json
+
 # Environments
 *.env
 .venv
