@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Visitors – Hunter{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+{% endblock %}
+
+{% block content %}
+<section class="visitors-page">
+    <div class="visitors-header">
+        <h2 class="visitors-title">Visitor Map</h2>
+        <p class="visitors-subtitle">Approximate locations of everyone who has stopped by — plotted to the nearest ~11 km, no IPs stored.</p>
+    </div>
+
+    <div class="visitors-stats">
+        <div class="vstat">
+            <span class="vstat-number" id="stat-visits">{{ "{:,}".format(total_visits) }}</span>
+            <span class="vstat-label">Total Visits</span>
+        </div>
+        <div class="vstat-divider"></div>
+        <div class="vstat">
+            <span class="vstat-number" id="stat-locations">{{ "{:,}".format(location_count) }}</span>
+            <span class="vstat-label">Mapped Locations</span>
+        </div>
+        <div class="vstat-divider"></div>
+        <div class="vstat">
+            <span class="vstat-number" id="stat-countries">{{ unique_countries }}</span>
+            <span class="vstat-label">Countries</span>
+        </div>
+    </div>
+
+    <div class="map-wrapper">
+        <div id="visitor-map"></div>
+        <div class="map-loading" id="map-loading">
+            <i class="fas fa-globe-americas fa-spin"></i>
+            <span>Loading locations…</span>
+        </div>
+    </div>
+
+    <p class="map-note">
+        <i class="fas fa-lock"></i>
+        Locations are city-level only. IP addresses are never logged or stored.
+    </p>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script>
+(function () {
+    const map = L.map('visitor-map', {
+        center: [20, 0],
+        zoom: 2,
+        minZoom: 2,
+        maxZoom: 10,
+        zoomControl: true,
+        attributionControl: true
+    });
+
+    // Dark CartoDB tile layer — matches site aesthetic
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 19
+    }).addTo(map);
+
+    // Cluster group with custom styling
+    const clusters = L.markerClusterGroup({
+        maxClusterRadius: 40,
+        iconCreateFunction: function (cluster) {
+            const count = cluster.getChildCount();
+            return L.divIcon({
+                html: `<div class="cluster-icon"><span>${count}</span></div>`,
+                className: '',
+                iconSize: [36, 36]
+            });
+        }
+    });
+
+    fetch('/api/visitor-locations')
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('map-loading').style.display = 'none';
+
+            // Sync all visit counts from the single API response so footer + stat bar always match
+            const totalVisits = data.total_visits || 0;
+            const formatted = totalVisits.toLocaleString();
+            document.getElementById('stat-visits').textContent = formatted;
+            document.getElementById('stat-locations').textContent = (data.locations || []).length.toLocaleString();
+            document.getElementById('stat-countries').textContent = data.unique_countries || 0;
+
+            // Also update the footer counter to the same number
+            const footerCounter = document.querySelector('.visit-counter');
+            if (footerCounter) {
+                footerCounter.innerHTML = `<i class="fas fa-eye"></i> ${formatted} visits`;
+            }
+
+            (data.locations || []).forEach(function (loc) {
+                const marker = L.circleMarker([loc.lat, loc.lon], {
+                    radius: 6,
+                    fillColor: getComputedStyle(document.documentElement)
+                        .getPropertyValue('--primary').trim() || '#ff6a00',
+                    color: 'rgba(255,255,255,0.3)',
+                    weight: 1,
+                    fillOpacity: 0.85
+                });
+                const label = [loc.city, loc.country].filter(Boolean).join(', ') || 'Unknown';
+                marker.bindPopup(`<div class="map-popup"><i class="fas fa-map-marker-alt"></i> ${label}</div>`);
+                clusters.addLayer(marker);
+            });
+
+            map.addLayer(clusters);
+        })
+        .catch(() => {
+            document.getElementById('map-loading').innerHTML =
+                '<i class="fas fa-exclamation-circle"></i> Could not load locations.';
+        });
+})();
+</script>
+{% endblock %}

@@ -106,8 +106,9 @@ celerybeat.pid
 #image cache
 static/data/image_cache.json
 
-# Visit counter (persisted externally, not in git)
+# Visit counter + visitor locations (persisted externally on Railway Volume)
 static/data/visits.json
+static/data/visitor_locations.json
 
 # Environments
 *.env

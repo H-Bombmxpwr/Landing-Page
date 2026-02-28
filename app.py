@@ -7,6 +7,8 @@ import os
 import glob
 import hashlib
 import time
+import threading
+import ipaddress
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Load environment variables from .env file
@@ -82,11 +84,14 @@ _image_cache = {}
 _cache_file = 'static/data/image_cache.json'
 _cache_lock = False
 
-# Visit counter
+# Visit counter + visitor locations
 # DATA_DIR can be set to a Railway Volume mount path (e.g. /data) for persistence across deploys
 _visit_count = 0
 _data_dir = os.getenv('DATA_DIR', 'static/data')
 _visits_file = os.path.join(_data_dir, 'visits.json')
+_locations_file = os.path.join(_data_dir, 'visitor_locations.json')
+_visitor_locations = []
+_locations_lock = threading.Lock()
 
 def load_visit_count():
     """Load visit count from disk"""
@@ -107,6 +112,68 @@ def increment_visit_count():
         os.makedirs(os.path.dirname(_visits_file), exist_ok=True)
         with open(_visits_file, 'w') as f:
             json.dump({'count': _visit_count}, f)
+    except:
+        pass
+
+def load_visitor_locations():
+    """Load visitor locations from disk"""
+    global _visitor_locations
+    try:
+        if os.path.exists(_locations_file):
+            with open(_locations_file, 'r') as f:
+                data = json.load(f)
+                _visitor_locations = data.get('locations', [])
+    except:
+        _visitor_locations = []
+
+def save_visitor_location(entry):
+    """Append a location entry and persist to disk"""
+    global _visitor_locations
+    with _locations_lock:
+        _visitor_locations.append(entry)
+        try:
+            os.makedirs(os.path.dirname(_locations_file), exist_ok=True)
+            with open(_locations_file, 'w') as f:
+                json.dump({'locations': _visitor_locations}, f)
+        except:
+            pass
+
+def get_real_ip():
+    """Get the real client IP, accounting for Railway's proxy"""
+    from flask import request
+    forwarded = request.headers.get('X-Forwarded-For')
+    if forwarded:
+        return forwarded.split(',')[0].strip()
+    return request.remote_addr
+
+def is_private_ip(ip):
+    """Return True for localhost / private network IPs"""
+    try:
+        return ipaddress.ip_address(ip).is_private
+    except ValueError:
+        return True
+
+def geolocate_and_save(ip):
+    """Geolocate an IP via ipinfo.io and save the approximate location (runs in background thread)"""
+    try:
+        resp = requests.get(f'https://ipinfo.io/{ip}/json', timeout=5)
+        if resp.status_code != 200:
+            return
+        data = resp.json()
+        loc = data.get('loc', '')
+        if not loc:
+            return
+        lat_str, lon_str = loc.split(',')
+        # Round to 1 decimal place (~11 km) for anonymization — no raw IPs stored
+        lat = round(float(lat_str), 1)
+        lon = round(float(lon_str), 1)
+        entry = {
+            'lat': lat,
+            'lon': lon,
+            'city': data.get('city', ''),
+            'country': data.get('country', '')
+        }
+        save_visitor_location(entry)
     except:
         pass
 
@@ -229,13 +296,14 @@ def get_dynamic_images_for_city(city):
     finally:
         _cache_lock = False
 
-# Load cache and visit count on startup
+# Load cache, visit count, and visitor locations on startup
 load_image_cache()
 load_visit_count()
+load_visitor_locations()
 
 @app.before_request
 def count_visit():
-    """Increment visit counter once per browser session"""
+    """Increment visit counter once per browser session and geolocate in background"""
     from flask import request, session
     # Only count HTML page requests, not API calls or static files
     if not request.path.startswith('/api/') and not request.path.startswith('/static/'):
@@ -243,6 +311,10 @@ def count_visit():
             session['visited'] = True
             session.permanent = False  # expires when browser closes
             increment_visit_count()
+            # Geolocate in background — never blocks the page load
+            ip = get_real_ip()
+            if ip and not is_private_ip(ip):
+                threading.Thread(target=geolocate_and_save, args=(ip,), daemon=True).start()
 
 @app.context_processor
 def inject_feature_flags():
@@ -574,6 +646,35 @@ def random_lyric():
         return jsonify({"error": "No lyrics available"}), 500
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route('/api/visitor-locations')
+def visitor_locations_api():
+    """Return all visitor locations for the map"""
+    # Read visit count fresh from file so all gunicorn workers agree on the same number
+    authoritative_count = _visit_count
+    try:
+        if os.path.exists(_visits_file):
+            with open(_visits_file, 'r') as f:
+                authoritative_count = json.load(f).get('count', _visit_count)
+    except:
+        pass
+    unique_countries = len(set(loc['country'] for loc in _visitor_locations if loc.get('country')))
+    return jsonify({
+        'locations': _visitor_locations,
+        'total_visits': authoritative_count,
+        'unique_countries': unique_countries
+    })
+
+@app.route('/visitors')
+def visitors():
+    unique_countries = len(set(loc['country'] for loc in _visitor_locations if loc.get('country')))
+    return render_template('visitors.html',
+                         active_page='visitors',
+                         page_id='visitors-page',
+                         collage_density='minimal',
+                         total_visits=_visit_count,
+                         unique_countries=unique_countries,
+                         location_count=len(_visitor_locations))
 
 @app.route('/api/images/<city>')
 def get_city_images(city):
