@@ -105,15 +105,20 @@ def load_visit_count():
         _visit_count = 0
 
 def increment_visit_count():
-    """Increment and persist the visit count"""
+    """Increment and persist the visit count, always reading file first to prevent data loss"""
     global _visit_count
-    _visit_count += 1
     try:
         os.makedirs(os.path.dirname(_visits_file), exist_ok=True)
+        current = 0
+        if os.path.exists(_visits_file):
+            with open(_visits_file, 'r') as f:
+                current = json.load(f).get('count', 0)
+        current += 1
+        _visit_count = current
         with open(_visits_file, 'w') as f:
-            json.dump({'count': _visit_count}, f)
+            json.dump({'count': current}, f)
     except:
-        pass
+        _visit_count += 1
 
 def load_visitor_locations():
     """Load visitor locations from disk"""
@@ -127,14 +132,20 @@ def load_visitor_locations():
         _visitor_locations = []
 
 def save_visitor_location(entry):
-    """Append a location entry and persist to disk"""
+    """Append a location entry and persist to disk, always reading file first to prevent data loss"""
     global _visitor_locations
     with _locations_lock:
-        _visitor_locations.append(entry)
         try:
             os.makedirs(os.path.dirname(_locations_file), exist_ok=True)
+            # Read current file contents before writing so no worker can overwrite another's data
+            current = []
+            if os.path.exists(_locations_file):
+                with open(_locations_file, 'r') as f:
+                    current = json.load(f).get('locations', [])
+            current.append(entry)
             with open(_locations_file, 'w') as f:
-                json.dump({'locations': _visitor_locations}, f)
+                json.dump({'locations': current}, f)
+            _visitor_locations = current
         except:
             pass
 

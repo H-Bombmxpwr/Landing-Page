@@ -51,6 +51,23 @@
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script>
 (function () {
+    // Match the site's city theme colours exactly
+    const CITY_COLORS = { baltimore: '#ff6a00', dc: '#c41e3a', chicago: '#41b6e6' };
+    function getThemeColor() {
+        return CITY_COLORS[document.body.dataset.city] || '#ff6a00';
+    }
+
+    // Deterministic jitter so same-city visitors don't stack on top of each other.
+    // Uses a seeded pseudo-random based on array index — consistent across page loads,
+    // stays well within the existing ~11 km anonymisation radius.
+    function seededRand(seed) {
+        const x = Math.sin(seed + 1) * 10000;
+        return x - Math.floor(x); // [0, 1)
+    }
+    function jitter(val, seed) {
+        return val + (seededRand(seed) - 0.5) * 0.09; // ±0.045° ≈ ±5 km
+    }
+
     const map = L.map('visitor-map', {
         center: [20, 0],
         zoom: 2,
@@ -80,35 +97,41 @@
         }
     });
 
+    // Keep refs to all markers so we can recolour them when the city theme changes
+    const allMarkers = [];
+
     fetch('/api/visitor-locations')
         .then(r => r.json())
         .then(data => {
             document.getElementById('map-loading').style.display = 'none';
 
-            // Sync all visit counts from the single API response so footer + stat bar always match
+            // Sync all counts from the single API response so footer + stat bar always match
             const totalVisits = data.total_visits || 0;
             const formatted = totalVisits.toLocaleString();
             document.getElementById('stat-visits').textContent = formatted;
             document.getElementById('stat-locations').textContent = (data.locations || []).length.toLocaleString();
             document.getElementById('stat-countries').textContent = data.unique_countries || 0;
 
-            // Also update the footer counter to the same number
             const footerCounter = document.querySelector('.visit-counter');
             if (footerCounter) {
                 footerCounter.innerHTML = `<i class="fas fa-eye"></i> ${formatted} visits`;
             }
 
-            (data.locations || []).forEach(function (loc) {
-                const marker = L.circleMarker([loc.lat, loc.lon], {
+            (data.locations || []).forEach(function (loc, idx) {
+                // Apply per-entry jitter so same-city dots spread apart at any zoom level
+                const lat = jitter(loc.lat, idx * 2);
+                const lon = jitter(loc.lon, idx * 2 + 1);
+
+                const marker = L.circleMarker([lat, lon], {
                     radius: 6,
-                    fillColor: getComputedStyle(document.documentElement)
-                        .getPropertyValue('--primary').trim() || '#ff6a00',
+                    fillColor: getThemeColor(),
                     color: 'rgba(255,255,255,0.3)',
                     weight: 1,
                     fillOpacity: 0.85
                 });
                 const label = [loc.city, loc.country].filter(Boolean).join(', ') || 'Unknown';
                 marker.bindPopup(`<div class="map-popup"><i class="fas fa-map-marker-alt"></i> ${label}</div>`);
+                allMarkers.push(marker);
                 clusters.addLayer(marker);
             });
 
@@ -118,6 +141,18 @@
             document.getElementById('map-loading').innerHTML =
                 '<i class="fas fa-exclamation-circle"></i> Could not load locations.';
         });
+
+    // Recolour all dots when the user switches city theme
+    const origSwitch = window.CityCollage && window.CityCollage.switchCity
+        ? window.CityCollage.switchCity.bind(window.CityCollage)
+        : null;
+    if (origSwitch) {
+        window.CityCollage.switchCity = function (city) {
+            origSwitch(city);
+            const color = CITY_COLORS[city] || '#ff6a00';
+            allMarkers.forEach(function (m) { m.setStyle({ fillColor: color }); });
+        };
+    }
 })();
 </script>
 {% endblock %}
