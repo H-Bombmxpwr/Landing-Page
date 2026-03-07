@@ -2667,20 +2667,38 @@ nav ul li a.nav-active {
   opacity: 0.8;
 }
 
-/* Cluster icon */
-.cluster-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
+/* Visitor pin markers */
+.visitor-pin-wrapper {
+  background: none;
+  border: none;
+}
+
+.visitor-pin {
+  width: 26px;
+  height: 26px;
+  border-radius: 50% 50% 50% 0;
   background: var(--primary);
-  border: 2px solid rgba(255,255,255,0.25);
+  transform: rotate(-45deg);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: #fff;
+  border: 2px solid rgba(255,255,255,0.3);
+  box-sizing: border-box;
   box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  transition: background 0.3s;
+}
+
+.visitor-pin--multi {
+  width: 32px;
+  height: 32px;
+}
+
+.visitor-pin span {
+  transform: rotate(45deg);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.72rem;
+  line-height: 1;
 }
 
 /* Leaflet popup styling */

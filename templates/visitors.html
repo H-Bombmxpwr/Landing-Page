@@ -4,7 +4,6 @@
 
 {% block head %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
 {% endblock %}
 
 {% block content %}
@@ -48,27 +47,9 @@
 
 {% block scripts %}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script>
 (function () {
-    // Match the site's city theme colours exactly
-    const CITY_COLORS = { baltimore: '#ff6a00', dc: '#c41e3a', chicago: '#41b6e6' };
-    function getThemeColor() {
-        return CITY_COLORS[document.body.dataset.city] || '#ff6a00';
-    }
-
-    // Deterministic jitter so same-city visitors don't stack on top of each other.
-    // Uses a seeded pseudo-random based on array index — consistent across page loads,
-    // stays well within the existing ~11 km anonymisation radius.
-    function seededRand(seed) {
-        const x = Math.sin(seed + 1) * 10000;
-        return x - Math.floor(x); // [0, 1)
-    }
-    function jitter(val, seed) {
-        return val + (seededRand(seed) - 0.5) * 0.09; // ±0.045° ≈ ±5 km
-    }
-
-    const map = L.map('visitor-map', {
+    var map = L.map('visitor-map', {
         center: [20, 0],
         zoom: 2,
         minZoom: 2,
@@ -77,82 +58,71 @@
         attributionControl: true
     });
 
-    // Dark CartoDB tile layer — matches site aesthetic
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
         subdomains: 'abcd',
         maxZoom: 19
     }).addTo(map);
 
-    // Cluster group with custom styling
-    const clusters = L.markerClusterGroup({
-        maxClusterRadius: 40,
-        iconCreateFunction: function (cluster) {
-            const count = cluster.getChildCount();
-            return L.divIcon({
-                html: `<div class="cluster-icon"><span>${count}</span></div>`,
-                className: '',
-                iconSize: [36, 36]
-            });
-        }
-    });
-
-    // Keep refs to all markers so we can recolour them when the city theme changes
-    const allMarkers = [];
+    function pinIcon(count) {
+        var multi = count > 1;
+        var size = multi ? 32 : 26;
+        var box = Math.ceil(size * 1.42);
+        var inner = multi
+            ? '<div class="visitor-pin visitor-pin--multi"><span>' + count + '</span></div>'
+            : '<div class="visitor-pin"></div>';
+        return L.divIcon({
+            html: inner,
+            className: 'visitor-pin-wrapper',
+            iconSize: [box, box],
+            iconAnchor: [Math.round(box / 2), box]
+        });
+    }
 
     fetch('/api/visitor-locations')
-        .then(r => r.json())
-        .then(data => {
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
             document.getElementById('map-loading').style.display = 'none';
 
-            // Sync all counts from the single API response so footer + stat bar always match
-            const totalVisits = data.total_visits || 0;
-            const formatted = totalVisits.toLocaleString();
+            var totalVisits = data.total_visits || 0;
+            var formatted = totalVisits.toLocaleString();
             document.getElementById('stat-visits').textContent = formatted;
             document.getElementById('stat-locations').textContent = (data.locations || []).length.toLocaleString();
             document.getElementById('stat-countries').textContent = data.unique_countries || 0;
 
-            const footerCounter = document.querySelector('.visit-counter');
+            var footerCounter = document.querySelector('.visit-counter');
             if (footerCounter) {
-                footerCounter.innerHTML = `<i class="fas fa-eye"></i> ${formatted} visits`;
+                footerCounter.innerHTML = '<i class="fas fa-eye"></i> ' + formatted + ' visits';
             }
 
-            (data.locations || []).forEach(function (loc, idx) {
-                // Apply per-entry jitter so same-city dots spread apart at any zoom level
-                const lat = jitter(loc.lat, idx * 2);
-                const lon = jitter(loc.lon, idx * 2 + 1);
-
-                const marker = L.circleMarker([lat, lon], {
-                    radius: 6,
-                    fillColor: getThemeColor(),
-                    color: 'rgba(255,255,255,0.3)',
-                    weight: 1,
-                    fillOpacity: 0.85
-                });
-                const label = [loc.city, loc.country].filter(Boolean).join(', ') || 'Unknown';
-                marker.bindPopup(`<div class="map-popup"><i class="fas fa-map-marker-alt"></i> ${label}</div>`);
-                allMarkers.push(marker);
-                clusters.addLayer(marker);
+            // Group visits by coordinates
+            var groups = {};
+            (data.locations || []).forEach(function (loc) {
+                var key = loc.lat + ',' + loc.lon;
+                if (!groups[key]) {
+                    groups[key] = { lat: loc.lat, lon: loc.lon, city: loc.city, country: loc.country, count: 0 };
+                }
+                groups[key].count++;
             });
 
-            map.addLayer(clusters);
+            // Place pins — add copies at ±360° so they tile with the map
+            Object.keys(groups).forEach(function (key) {
+                var g = groups[key];
+                var label = [g.city, g.country].filter(Boolean).join(', ') || 'Unknown';
+                var visits = g.count === 1 ? '1 visit' : g.count.toLocaleString() + ' visits';
+                var popup = '<div class="map-popup"><i class="fas fa-map-marker-alt"></i> ' + label + '<br><small>' + visits + '</small></div>';
+
+                [-360, 0, 360].forEach(function (offset) {
+                    L.marker([g.lat, g.lon + offset], { icon: pinIcon(g.count) })
+                        .bindPopup(popup)
+                        .addTo(map);
+                });
+            });
         })
-        .catch(() => {
+        .catch(function () {
             document.getElementById('map-loading').innerHTML =
                 '<i class="fas fa-exclamation-circle"></i> Could not load locations.';
         });
-
-    // Recolour all dots when the user switches city theme
-    const origSwitch = window.CityCollage && window.CityCollage.switchCity
-        ? window.CityCollage.switchCity.bind(window.CityCollage)
-        : null;
-    if (origSwitch) {
-        window.CityCollage.switchCity = function (city) {
-            origSwitch(city);
-            const color = CITY_COLORS[city] || '#ff6a00';
-            allMarkers.forEach(function (m) { m.setStyle({ fillColor: color }); });
-        };
-    }
 })();
 </script>
 {% endblock %}

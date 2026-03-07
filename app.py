@@ -658,6 +658,27 @@ def random_lyric():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/reset-visitors', methods=['POST'])
+def reset_visitors():
+    """Reset visit counter and location data. Requires ADMIN_KEY."""
+    from flask import request
+    admin_key = os.getenv('ADMIN_KEY', '')
+    provided = request.headers.get('X-Admin-Key', '')
+    if not admin_key or provided != admin_key:
+        return jsonify({'error': 'unauthorized'}), 401
+    global _visit_count, _visitor_locations
+    _visit_count = 0
+    _visitor_locations = []
+    try:
+        os.makedirs(os.path.dirname(_visits_file), exist_ok=True)
+        with open(_visits_file, 'w') as f:
+            json.dump({'count': 0}, f)
+        with open(_locations_file, 'w') as f:
+            json.dump({'locations': []}, f)
+    except:
+        pass
+    return jsonify({'status': 'reset', 'visits': 0, 'locations': 0})
+
 @app.route('/api/visitor-locations')
 def visitor_locations_api():
     """Return all visitor locations for the map"""
