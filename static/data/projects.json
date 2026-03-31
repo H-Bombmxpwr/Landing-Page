@@ -407,6 +407,30 @@
       "downloadLink": "",
       "featured": false,
       "date": "2024-04",
+      "rank": 6,
+      "university": "Johns Hopkins University"
+    },
+    {
+      "id": "flyback-converter",
+      "title": "12V -> 5V DCM Flyback Converter",
+      "shortDescription": "Controlled flyback converter designed to convert 12V DC to 5V DC over 0-5A loads",
+      "description": [
+        "The class goal was to design a converter that fit a long list of requirements including:",
+        "Voltage-Mode Control, 12V in, 5V +/- 0.1V, 0-5A load range, 45 degrees phase margin and 10dB of gain margin across all conditions, 75+% efficient, ouput impedance of < 0.1 ohms",
+        "The entire class was designing this converter from the groundup "
+      ],
+      "iconImage": "3D.png",
+      "tags": ["Power Electronics", "MATLAB", "Hardware", "Circuit Design","Analog Control"],
+      "hasGithub": false,
+      "githubLink": "",
+      "hasLive": false,
+      "liveLink": "",
+      "hasVideo": false,
+      "videoLink": "",
+      "hasDownload": false,
+      "downloadLink": "",
+      "featured": false,
+      "date": "2026-05",
       "rank": 5,
       "university": "Johns Hopkins University"
     }
