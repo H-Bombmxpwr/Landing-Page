@@ -407,7 +407,7 @@
       "downloadLink": "",
       "featured": false,
       "date": "2024-04",
-      "rank": 6,
+      "rank": 7,
       "university": "Johns Hopkins University"
     },
     {
@@ -432,6 +432,31 @@
       "featured": false,
       "date": "2026-05",
       "rank": 5,
+      "university": "Johns Hopkins University"
+    },
+    {
+      "id": "baltimore-wheelabrator",
+      "title": "Baltimore Air Quality Analysis",
+      "shortDescription": "Data-driven investigation of Wheelabrator Baltimore's air pollution impact vs the I-95 corridor using 6 years of EPA data",
+      "description": [
+        "Investigates whether neighborhoods downwind of Wheelabrator Baltimore (the city's largest stationary air pollution source) experience worse air quality than those downwind of I-95 highway traffic.",
+        "Built a full data pipeline that pulls 6 years of hourly wind data from Iowa Mesonet, daily pollutant readings from EPA AQS, and facility emissions from EPA NEI, then classifies each day by wind exposure and compares pollution levels across monitor stations.",
+        "Features an interactive dashboard with Folium maps, Plotly charts, wind roses, pollution roses, directional comparisons, and seasonal breakdowns across 15 study neighborhoods in 3 exposure groups.",
+        "Made in my \"Geospatial Intelligence: the art and science for better understanding our world\" Class"
+      ],
+      "iconImage": "map.png",
+      "tags": ["Python", "Flask", "Data Analysis", "Pandas", "Plotly", "EPA API", "Environmental"],
+      "hasGithub": true,
+      "githubLink": "https://github.com/H-Bombmxpwr/baltimore-wheelabrator-",
+      "hasLive": true,
+      "liveLink": "https://h-bombmxpwr.github.io/baltimore-wheelabrator-/",
+      "hasVideo": false,
+      "videoLink": "",
+      "hasDownload": false,
+      "downloadLink": "",
+      "featured": false,
+      "date": "2026-04",
+      "rank": 6,
       "university": "Johns Hopkins University"
     }
   ]
