@@ -3,31 +3,35 @@
 {% block title %}{{ project.title }} - Hunter{% endblock %}
 
 {% block content %}
-<section class="project-detail">
-    <div class="detail-header">
+<section class="page-shell project-detail">
+    <div class="detail-header page-panel">
         <a href="{{ url_for('personal_projects') if project.category == 'personal' else url_for('academic_projects') }}" class="back-link">
             <i class="fas fa-arrow-left"></i>
             Back to {{ 'Personal' if project.category == 'personal' else 'Academic' }} Projects
         </a>
+        <p class="page-eyebrow">Project / {{ project.category|title }}</p>
+        <h1 class="detail-title">{{ project.title }}</h1>
+        {% if project.shortDescription %}
+        <p class="detail-summary">{{ project.shortDescription }}</p>
+        {% endif %}
+        <div class="detail-tags">
+            {% for tag in project.tags %}
+            <span class="tag">{{ tag }}</span>
+            {% endfor %}
+        </div>
     </div>
 
     <div class="detail-layout">
         <div class="detail-image-side">
-            <div class="detail-image-container" onclick="openLightbox(0)">
-                <img src="{{ url_for('static', filename=project.iconImagePath) }}" alt="{{ project.title }}" class="detail-main-image">
-                <div class="image-zoom-hint"><i class="fas fa-expand"></i></div>
+            <div class="page-panel detail-image-panel">
+                <div class="detail-image-container" onclick="openLightbox(0)">
+                    <img src="{{ image_url(project.iconImagePath) }}" alt="{{ project.title }}" class="detail-main-image" loading="eager" decoding="async">
+                    <div class="image-zoom-hint"><i class="fas fa-expand"></i></div>
+                </div>
             </div>
         </div>
 
-        <div class="detail-content-side">
-            <h1 class="detail-title">{{ project.title }}</h1>
-
-            <div class="detail-tags">
-                {% for tag in project.tags %}
-                <span class="tag">{{ tag }}</span>
-                {% endfor %}
-            </div>
-
+        <div class="detail-content-side page-panel">
             <div class="detail-description">
                 {% for paragraph in project.description %}
                 <p>{{ paragraph }}</p>
@@ -36,25 +40,25 @@
 
             <div class="detail-links">
                 {% if project.hasLive and project.liveLink %}
-                <a href="{{ project.liveLink }}" target="_blank" class="detail-link-btn primary">
+                <a href="{{ project.liveLink }}" target="_blank" rel="noopener noreferrer" class="detail-link-btn primary">
                     <i class="fas fa-external-link-alt"></i>
                     Visit Site
                 </a>
                 {% endif %}
                 {% if project.hasGithub and project.githubLink %}
-                <a href="{{ project.githubLink }}" target="_blank" class="detail-link-btn github">
+                <a href="{{ project.githubLink }}" target="_blank" rel="noopener noreferrer" class="detail-link-btn github">
                     <i class="fab fa-github"></i>
                     View Code
                 </a>
                 {% endif %}
                 {% if project.hasVideo and project.videoLink %}
-                <a href="{{ project.videoLink }}" target="_blank" class="detail-link-btn video">
+                <a href="{{ project.videoLink }}" target="_blank" rel="noopener noreferrer" class="detail-link-btn video">
                     <i class="fas fa-play-circle"></i>
                     Watch Video
                 </a>
                 {% endif %}
                 {% if project.hasDownload and project.downloadLink %}
-                <a href="{{ project.downloadLink }}" target="_blank" class="detail-link-btn download">
+                <a href="{{ project.downloadLink }}" target="_blank" rel="noopener noreferrer" class="detail-link-btn download">
                     <i class="fas fa-download"></i>
                     Download
                 </a>
@@ -64,7 +68,7 @@
     </div>
 
     {% if project.lichessUser %}
-    <div class="detail-lichess-section">
+    <div class="detail-lichess-section page-panel">
         <h2 class="gallery-header"><i class="fas fa-chess"></i> Most Recent Game</h2>
         <div id="lichess-embed-container" class="lichess-embed-container">
             <p class="lichess-loading">Loading most recent game...</p>
@@ -73,12 +77,12 @@
     {% endif %}
 
     {% if project.galleryImages and project.galleryImages|length > 0 %}
-    <div class="detail-gallery-section">
+    <div class="detail-gallery-section page-panel">
         <h2 class="gallery-header"><i class="fas fa-images"></i> Gallery</h2>
         <div class="gallery-grid">
             {% for image in project.galleryImages %}
             <div class="gallery-item" onclick="openLightbox({{ loop.index }})">
-                <img src="{{ url_for('static', filename=image) }}" alt="{{ project.title }} screenshot {{ loop.index }}" loading="lazy">
+                <img src="{{ image_url(image) }}" alt="{{ project.title }} screenshot {{ loop.index }}" loading="lazy" decoding="async">
                 <div class="gallery-overlay"><i class="fas fa-expand"></i></div>
             </div>
             {% endfor %}
@@ -87,12 +91,11 @@
     {% endif %}
 </section>
 
-<!-- Lightbox Modal with Navigation -->
 <div id="lightbox" class="lightbox">
     <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
-    <button class="lightbox-nav lightbox-prev" onclick="navigateLightbox(-1)"><i class="fas fa-chevron-left"></i></button>
+    <button class="lightbox-nav lightbox-prev" onclick="navigateLightbox(-1, event)"><i class="fas fa-chevron-left"></i></button>
     <img class="lightbox-content" id="lightbox-img" onclick="event.stopPropagation()">
-    <button class="lightbox-nav lightbox-next" onclick="navigateLightbox(1)"><i class="fas fa-chevron-right"></i></button>
+    <button class="lightbox-nav lightbox-next" onclick="navigateLightbox(1, event)"><i class="fas fa-chevron-right"></i></button>
     <div class="lightbox-counter" id="lightbox-counter"></div>
     <div class="lightbox-backdrop" onclick="closeLightbox()"></div>
 </div>
@@ -100,12 +103,11 @@
 
 {% block scripts %}
 <script>
-// Gallery images array (main image + gallery images)
 const galleryImages = [
-    "{{ url_for('static', filename=project.iconImagePath) }}"
+    "{{ image_url(project.iconImagePath) }}"
     {% if project.galleryImages %}
     {% for image in project.galleryImages %}
-    , "{{ url_for('static', filename=image) }}"
+    , "{{ image_url(image) }}"
     {% endfor %}
     {% endif %}
 ];
@@ -124,8 +126,8 @@ function closeLightbox() {
     document.body.style.overflow = '';
 }
 
-function navigateLightbox(direction) {
-    event.stopPropagation();
+function navigateLightbox(direction, evt) {
+    if (evt) evt.stopPropagation();
     currentImageIndex += direction;
     if (currentImageIndex < 0) currentImageIndex = galleryImages.length - 1;
     if (currentImageIndex >= galleryImages.length) currentImageIndex = 0;
@@ -138,7 +140,6 @@ function updateLightboxImage() {
     img.src = galleryImages[currentImageIndex];
     counter.textContent = `${currentImageIndex + 1} / ${galleryImages.length}`;
 
-    // Hide nav buttons if only one image
     const prevBtn = document.querySelector('.lightbox-prev');
     const nextBtn = document.querySelector('.lightbox-next');
     if (galleryImages.length <= 1) {
@@ -152,7 +153,6 @@ function updateLightboxImage() {
     }
 }
 
-// Lichess embed - fetch most recent game
 {% if project.lichessUser %}
 (function() {
     const container = document.getElementById('lichess-embed-container');
@@ -176,12 +176,11 @@ function updateLightboxImage() {
     .catch(err => {
         console.error('Failed to load Lichess game:', err);
         container.innerHTML = '<p>Could not load the most recent game. ' +
-            '<a href="https://lichess.org/@/{{ project.lichessUser }}" target="_blank">View on Lichess</a></p>';
+            '<a href="https://lichess.org/@/{{ project.lichessUser }}" target="_blank" rel="noopener noreferrer">View on Lichess</a></p>';
     });
 })();
 {% endif %}
 
-// Keyboard navigation
 document.addEventListener('keydown', function(e) {
     const lightbox = document.getElementById('lightbox');
     if (!lightbox.classList.contains('active')) return;

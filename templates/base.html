@@ -11,7 +11,7 @@
 </head>
 <body id="{{ page_id|default('index-page') }}"
       data-collage-density="{{ collage_density|default('medium') }}"
-      data-collage-layout="{{ collage_layout|default('grid') }}">
+      data-collage-layout="{{ collage_layout|default('ambient') }}">
     <script>
     (function() {
         var themes = {
@@ -48,18 +48,18 @@
 
         <!-- City Switcher Slider -->
         <div class="city-switcher">
-            <h3 class="city-heading"></h3>
+            <h3 class="city-heading">City Mood</h3>
             <div class="city-options">
                 <div class="city-option" data-city="baltimore" onclick="CityCollage.switchCity('baltimore')">
-                    <img src="{{ url_for('static', filename='images/flags/baltimore_flag.png') }}" alt="Baltimore Flag" class="city-flag">
+                    <img src="{{ image_url('images/flags/baltimore_flag.png') }}" alt="Baltimore Flag" class="city-flag" decoding="async">
                     <span class="city-label">Baltimore</span>
                 </div>
                 <div class="city-option" data-city="dc" onclick="CityCollage.switchCity('dc')">
-                    <img src="{{ url_for('static', filename='images/flags/dc_flag.png') }}" alt="DC Flag" class="city-flag">
+                    <img src="{{ image_url('images/flags/dc_flag.png') }}" alt="DC Flag" class="city-flag" decoding="async">
                     <span class="city-label">DC</span>
                 </div>
                 <div class="city-option" data-city="chicago" onclick="CityCollage.switchCity('chicago')">
-                    <img src="{{ url_for('static', filename='images/flags/chicago_flag.png') }}" alt="Chicago Flag" class="city-flag">
+                    <img src="{{ image_url('images/flags/chicago_flag.png') }}" alt="Chicago Flag" class="city-flag" decoding="async">
                     <span class="city-label">Chicago</span>
                 </div>
             </div>
@@ -131,55 +131,9 @@
 
     <!-- City Image Arrays -->
     <script>
-    window.BALTIMORE_IMAGES = [
-        "{{ url_for('static', filename='images/baltimore/harbor.jpg') }}",
-        "{{ url_for('static', filename='images/baltimore/skyline.jpg') }}",
-        "{{ url_for('static', filename='images/baltimore/rowhouses.jpg') }}",
-        "{{ url_for('static', filename='images/baltimore/domino.jpg') }}",
-        "{{ url_for('static', filename='images/baltimore/boh.jpg') }}",
-        "{{ url_for('static', filename='images/baltimore/observe.jpg') }}",
-        "{{ url_for('static', filename='images/baltimore/fedhill.jpg') }}",
-        "{{ url_for('static', filename='images/baltimore/scottkey.jpg') }}",
-        "{{ url_for('static', filename='images/baltimore/camden.jpg') }}",
-        "{{ url_for('static', filename='images/baltimore/powerplant.jpg') }}",
-        "{{ url_for('static', filename='images/baltimore/pickles.jpg') }}",
-        "{{ url_for('static', filename='images/baltimore/mchenry.jpg') }}",
-        "{{ url_for('static', filename='images/baltimore/homewood.jpg') }}",
-        "{{ url_for('static', filename='images/baltimore/charles.jpg') }}",
-        "{{ url_for('static', filename='images/baltimore/canton_gate.jpg') }}",
-        "{{ url_for('static', filename='images/baltimore/red.jpg') }}"
-    ];
-
-    window.DC_IMAGES = [
-        "{{ url_for('static', filename='images/dc/capitol.jpg') }}",
-        "{{ url_for('static', filename='images/dc/george_mason.jpg') }}",
-        "{{ url_for('static', filename='images/dc/lincoln.jpeg') }}",
-        "{{ url_for('static', filename='images/dc/lafayette.jpg') }}",
-        "{{ url_for('static', filename='images/dc/noma.jpg') }}",
-        "{{ url_for('static', filename='images/dc/jefferson.jpg') }}",
-        "{{ url_for('static', filename='images/dc/market.jpg') }}",
-        "{{ url_for('static', filename='images/dc/dupont.jpg') }}",
-        "{{ url_for('static', filename='images/dc/georgetown.jpg') }}",
-        "{{ url_for('static', filename='images/dc/cherryblossoms.jpg') }}",
-        "{{ url_for('static', filename='images/dc/union.jpg') }}",
-        "{{ url_for('static', filename='images/dc/nationals.jpg') }}"
-    ];
-
-    window.CHICAGO_IMAGES = [
-        "{{ url_for('static', filename='images/chicago/bean.jpg') }}",
-        "{{ url_for('static', filename='images/chicago/skyline.jpg') }}",
-        "{{ url_for('static', filename='images/chicago/wrigley.jpg') }}",
-        "{{ url_for('static', filename='images/chicago/wicker.jpg') }}",
-        "{{ url_for('static', filename='images/chicago/river.jpg') }}",
-        "{{ url_for('static', filename='images/chicago/pequods.jpg') }}",
-        "{{ url_for('static', filename='images/chicago/lincoln_park.jpg') }}",
-        "{{ url_for('static', filename='images/chicago/dawes.jpg') }}",
-        "{{ url_for('static', filename='images/chicago/crib.jpg') }}",
-        "{{ url_for('static', filename='images/chicago/logan.jpeg') }}",
-        "{{ url_for('static', filename='images/chicago/loop.jpg') }}",
-        "{{ url_for('static', filename='images/chicago/hancock.jpg') }}",
-        "{{ url_for('static', filename='images/chicago/daley.jpg') }}"
-    ];
+    window.BALTIMORE_IMAGES = {{ city_image_urls.baltimore | tojson }};
+    window.DC_IMAGES = {{ city_image_urls.dc | tojson }};
+    window.CHICAGO_IMAGES = {{ city_image_urls.chicago | tojson }};
 
     // Dynamic images configuration
     window.DYNAMIC_IMAGES_ENABLED = {{ 'true' if dynamic_images else 'false' }};

@@ -3,16 +3,17 @@
 {% block title %}Hunter - Academic Projects{% endblock %}
 
 {% block content %}
-<section class="projects-page academic-projects">
-    <div class="page-header animate-on-scroll">
+<section class="page-shell projects-page academic-projects">
+    <div class="page-header page-panel animate-on-scroll">
+        <p class="page-eyebrow">Portfolio / Academic Work</p>
         <h1 class="page-title">
             <i class="fas fa-graduation-cap"></i>
             Academic Projects
         </h1>
-        <p class="page-subtitle">School Projects</p>
+        <p class="page-subtitle">Coursework, research, and technical builds from school.</p>
     </div>
 
-    <nav class="section-nav animate-on-scroll">
+    <nav class="section-nav page-panel animate-on-scroll">
         {% for university, projects in grouped_projects %}
         <a href="#section-{{ university|lower|replace(' ', '-') }}" class="section-nav-link">
             <i class="fas fa-university"></i>
@@ -22,7 +23,7 @@
     </nav>
 
     {% for university, projects in grouped_projects %}
-    <div class="project-group animate-on-scroll" id="section-{{ university|lower|replace(' ', '-') }}">
+    <div class="project-group page-panel animate-on-scroll" id="section-{{ university|lower|replace(' ', '-') }}">
         <h2 class="group-title">
             <i class="fas fa-university"></i>
             {{ university }}
@@ -31,7 +32,7 @@
             {% for project in projects %}
             <a href="{{ url_for('project_detail', project_id=project.id) }}" class="project-card academic-card" data-index="{{ loop.index }}">
                 <div class="project-card-image">
-                    <img src="{{ url_for('static', filename=project.iconImagePath) }}" alt="{{ project.title }}" loading="lazy">
+                    <img src="{{ image_url(project.iconImagePath) }}" alt="{{ project.title }}" loading="lazy" decoding="async">
                     <div class="project-card-overlay">
                         <span class="view-btn">View Details <i class="fas fa-arrow-right"></i></span>
                     </div>
@@ -67,7 +68,6 @@
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Flip/reveal animation on scroll
     const cards = document.querySelectorAll('.project-card');
 
     const cardObserver = new IntersectionObserver((entries) => {
@@ -82,7 +82,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     cards.forEach(card => cardObserver.observe(card));
 
-    // Scroll animations
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -92,20 +91,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
     document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
-
-    // Card hover effect
-    cards.forEach(card => {
-        card.addEventListener('mousemove', function(e) {
-            const rect = card.getBoundingClientRect();
-            const x = (e.clientX - rect.left) / rect.width - 0.5;
-            const y = (e.clientY - rect.top) / rect.height - 0.5;
-            card.style.transform = `perspective(1000px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg) translateY(-8px)`;
-        });
-
-        card.addEventListener('mouseleave', function() {
-            card.style.transform = 'perspective(1000px) rotateY(0) rotateX(0) translateY(0)';
-        });
-    });
 });
 </script>
 {% endblock %}

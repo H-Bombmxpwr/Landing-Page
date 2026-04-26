@@ -39,7 +39,7 @@
                     <div class="hero-image-frame">
                         <div class="hero-image">
                             <img
-                                src="{{ url_for('static', filename='images/icon2.png') }}"
+                                src="{{ image_url('images/icon2.png') }}"
                                 alt="Hunter"
                                 width="225"
                                 height="169"
@@ -85,7 +85,7 @@
     <a href="{{ url_for('project_detail', project_id=featured_project.id) }}" class="featured-card">
         <div class="featured-image">
             <img
-                src="{{ url_for('static', filename=featured_project.iconImagePath) }}"
+                src="{{ image_url(featured_project.iconImagePath) }}"
                 alt="{{ featured_project.title }}"
                 loading="lazy"
                 decoding="async">

@@ -3,11 +3,12 @@
 {% block title %}{{ post.title }} - Hunter{% endblock %}
 
 {% block content %}
-<article class="blog-post-page">
-    <header class="post-header animate-on-scroll">
+<article class="page-shell blog-post-page">
+    <header class="post-header page-panel animate-on-scroll">
         <a href="{{ url_for('blog') }}" class="back-link">
             <i class="fas fa-arrow-left"></i> Back to Blog
         </a>
+        <p class="page-eyebrow">Blog Post</p>
         <h1 class="post-title">{{ post.title }}</h1>
         <p class="post-date">{{ post.date }}</p>
         {% if post.tags %}
@@ -19,7 +20,7 @@
         {% endif %}
     </header>
 
-    <div class="post-content animate-on-scroll">
+    <div class="post-content page-panel animate-on-scroll">
         {{ post.content|safe }}
     </div>
 </article>

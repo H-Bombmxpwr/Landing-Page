@@ -1,19 +1,20 @@
 {% extends "base.html" %}
 
-{% block title %}Visitors – Hunter{% endblock %}
+{% block title %}Visitors - Hunter{% endblock %}
 
 {% block head %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 {% endblock %}
 
 {% block content %}
-<section class="visitors-page">
-    <div class="visitors-header">
+<section class="page-shell visitors-page">
+    <div class="visitors-header page-panel animate-on-scroll">
+        <p class="page-eyebrow">Visitors / Privacy First</p>
         <h2 class="visitors-title">Visitor Map</h2>
-        <p class="visitors-subtitle">Approximate locations of everyone who has stopped by — plotted to the nearest ~11 km, no IPs stored.</p>
+        <p class="visitors-subtitle">Approximate locations of everyone who has stopped by - plotted to the nearest ~11 km, with no IPs stored.</p>
     </div>
 
-    <div class="visitors-stats">
+    <div class="visitors-stats page-panel animate-on-scroll">
         <div class="vstat">
             <span class="vstat-number" id="stat-visits">{{ "{:,}".format(total_visits) }}</span>
             <span class="vstat-label">Total Visits</span>
@@ -30,15 +31,15 @@
         </div>
     </div>
 
-    <div class="map-wrapper">
+    <div class="map-wrapper page-panel animate-on-scroll">
         <div id="visitor-map"></div>
         <div class="map-loading" id="map-loading">
             <i class="fas fa-globe-americas fa-spin"></i>
-            <span>Loading locations…</span>
+            <span>Loading locations...</span>
         </div>
     </div>
 
-    <p class="map-note">
+    <p class="map-note animate-on-scroll">
         <i class="fas fa-lock"></i>
         Locations are city-level only. IP addresses are never logged or stored.
     </p>
@@ -55,8 +56,11 @@
         minZoom: 2,
         maxZoom: 10,
         zoomControl: true,
-        attributionControl: true
+        attributionControl: true,
+        worldCopyJump: true,
+        scrollWheelZoom: false
     });
+    var markerLayer = L.layerGroup().addTo(map);
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
@@ -95,7 +99,6 @@
                 footerCounter.innerHTML = '<i class="fas fa-eye"></i> ' + formatted + ' visits';
             }
 
-            // Group visits by coordinates
             var groups = {};
             (data.locations || []).forEach(function (loc) {
                 var key = loc.lat + ',' + loc.lon;
@@ -105,19 +108,27 @@
                 groups[key].count++;
             });
 
-            // Place pins — add copies at ±360° so they tile with the map
+            var bounds = [];
             Object.keys(groups).forEach(function (key) {
                 var g = groups[key];
                 var label = [g.city, g.country].filter(Boolean).join(', ') || 'Unknown';
                 var visits = g.count === 1 ? '1 visit' : g.count.toLocaleString() + ' visits';
                 var popup = '<div class="map-popup"><i class="fas fa-map-marker-alt"></i> ' + label + '<br><small>' + visits + '</small></div>';
+                var point = [g.lat, g.lon];
 
-                [-360, 0, 360].forEach(function (offset) {
-                    L.marker([g.lat, g.lon + offset], { icon: pinIcon(g.count) })
-                        .bindPopup(popup)
-                        .addTo(map);
-                });
+                bounds.push(point);
+                L.marker(point, { icon: pinIcon(g.count) })
+                    .bindPopup(popup)
+                    .addTo(markerLayer);
             });
+
+            if (bounds.length) {
+                map.fitBounds(bounds, { padding: [42, 42], maxZoom: 4 });
+            }
+
+            window.setTimeout(function () {
+                map.invalidateSize();
+            }, 0);
         })
         .catch(function () {
             document.getElementById('map-loading').innerHTML =

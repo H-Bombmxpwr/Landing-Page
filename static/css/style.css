@@ -1708,15 +1708,96 @@ nav ul li a.nav-active {
 }
 
 /* =========================
+   Shared Page Shell
+   ========================= */
+.page-shell {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.page-panel {
+  background: linear-gradient(180deg, rgba(16,19,25,.74), rgba(10,12,17,.58));
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 26px;
+  box-shadow: 0 24px 60px rgba(0,0,0,.22);
+  backdrop-filter: blur(16px) saturate(125%);
+  -webkit-backdrop-filter: blur(16px) saturate(125%);
+  padding: clamp(1.25rem, 2vw, 1.8rem);
+}
+
+.page-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  padding: .42rem .8rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.04);
+  color: var(--accent-light);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  margin: 0 0 1rem;
+}
+
+.page-meta-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .7rem;
+  margin-top: 1.2rem;
+}
+
+.page-meta-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: .48rem .85rem;
+  border-radius: 999px;
+  background: rgba(255,255,255,.035);
+  border: 1px solid rgba(255,255,255,.08);
+  color: var(--text);
+  font-size: .84rem;
+  font-weight: 600;
+}
+
+.page-hero-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.section-intro {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: .35rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (max-width: 900px) {
+  .page-hero-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-shell {
+    padding: 1.5rem 1rem 3rem;
+  }
+}
+
+/* =========================
    Projects Page
    ========================= */
 .projects-page {
-  padding: 2rem 1.5rem 3rem;
+  padding: 0;
 }
 
 .page-header {
   text-align: center;
-  margin-bottom: 2.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .page-title {
@@ -1745,11 +1826,8 @@ nav ul li a.nav-active {
   justify-content: center;
   gap: 0.5rem;
   flex-wrap: wrap;
-  margin-bottom: 2.5rem;
+  margin-bottom: 1.5rem;
   padding: 0.5rem;
-  background: linear-gradient(180deg, rgba(17,20,26,.45), rgba(17,20,26,.25));
-  border: 1px solid var(--border);
-  border-radius: 14px;
   max-width: 700px;
   margin-left: auto;
   margin-right: auto;
@@ -1798,8 +1876,19 @@ nav ul li a.nav-active {
 
 /* Project Group Styling */
 .project-group {
-  margin-bottom: 3rem;
+  margin-bottom: 1.5rem;
   scroll-margin-top: 100px;
+}
+
+.project-group,
+.blog-grid,
+.lyrics-grid,
+.social-section,
+.detail-gallery-section,
+.detail-lichess-section,
+.visitors-stats,
+.map-wrapper {
+  content-visibility: auto;
 }
 
 .group-title {
@@ -1823,8 +1912,7 @@ nav ul li a.nav-active {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
-  max-width: 1000px;
-  margin: 0 auto;
+  width: 100%;
 }
 
 .project-card {
@@ -1840,6 +1928,7 @@ nav ul li a.nav-active {
 }
 
 .project-card:hover {
+  transform: translateY(-6px);
   border-color: var(--primary);
   box-shadow: 0 20px 50px rgba(0,0,0,0.35);
 }
@@ -1956,9 +2045,7 @@ nav ul li a.nav-active {
    Project Detail Page
    ========================= */
 .project-detail {
-  padding: 1.5rem;
-  max-width: 1000px;
-  margin: 0 auto;
+  padding: 0;
 }
 
 .detail-header {
@@ -1986,7 +2073,7 @@ nav ul li a.nav-active {
 .detail-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 2.5rem;
+  gap: 1.5rem;
   align-items: start;
 }
 
@@ -1995,11 +2082,13 @@ nav ul li a.nav-active {
   top: 100px;
 }
 
+.detail-image-panel {
+  padding: 1rem;
+}
+
 .detail-image-container {
   border-radius: 16px;
   overflow: hidden;
-  border: 1px solid var(--border);
-  box-shadow: 0 15px 40px rgba(0,0,0,0.25);
 }
 
 .detail-image-container img {
@@ -2043,9 +2132,7 @@ nav ul li a.nav-active {
 
 /* Lichess Embed Section */
 .detail-lichess-section {
-  margin-top: 2.5rem;
-  padding-top: 2rem;
-  border-top: 1px solid var(--border);
+  margin-top: 1.5rem;
 }
 
 .lichess-embed-container {
@@ -2060,9 +2147,7 @@ nav ul li a.nav-active {
 
 /* Gallery Section */
 .detail-gallery-section {
-  margin-top: 2.5rem;
-  padding-top: 2rem;
-  border-top: 1px solid var(--border);
+  margin-top: 1.5rem;
 }
 
 .gallery-header {
@@ -2134,7 +2219,7 @@ nav ul li a.nav-active {
 
 /* Content side */
 .detail-content-side {
-  padding: 0.5rem 0;
+  padding: clamp(1.25rem, 2vw, 1.8rem);
 }
 
 .detail-title {
@@ -2147,11 +2232,18 @@ nav ul li a.nav-active {
   background-clip: text;
 }
 
+.detail-summary {
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.75;
+  margin: 0 0 1rem;
+}
+
 .detail-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin-bottom: 1.25rem;
+  margin-bottom: 0;
 }
 
 .detail-description {
@@ -2255,27 +2347,24 @@ nav ul li a.nav-active {
    About Page
    ========================= */
 .about-page {
-  padding: 2rem 1.5rem 3rem;
+  padding: 0;
 }
 
 .about-hero {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 3rem;
-  max-width: 800px;
-  margin: 0 auto 3rem;
+  align-items: stretch;
+  margin-bottom: 1.5rem;
 }
 
 .about-image-large {
-  width: 180px;
-  height: 180px;
-  border-radius: 50%;
+  width: min(100%, 340px);
+  aspect-ratio: 1 / 1;
+  height: auto;
+  border-radius: 30px;
   overflow: hidden;
-  border: 4px solid var(--border);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 0 40px var(--ring);
-  flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,.1);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.28), 0 0 40px var(--ring);
   animation: scaleIn 0.8s var(--ease-out-expo);
+  margin: 0 auto;
 }
 
 .about-image-large img {
@@ -2284,8 +2373,16 @@ nav ul li a.nav-active {
   object-fit: cover;
 }
 
+.about-portrait-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .about-intro {
-  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .about-title {
@@ -2330,16 +2427,15 @@ nav ul li a.nav-active {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
-  max-width: 1000px;
-  margin: 0 auto 3rem;
+  margin: 0 0 1.5rem;
 }
 
 .detail-section {
   text-align: center;
-  padding: 1.5rem;
-  background: linear-gradient(180deg, rgba(17,20,26,.4), rgba(17,20,26,.2));
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  padding: 1.35rem;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 18px;
   transition: all 0.3s ease;
 }
 
@@ -2380,13 +2476,11 @@ nav ul li a.nav-active {
 
 @media (max-width: 768px) {
   .about-hero {
-    flex-direction: column;
     text-align: center;
   }
 
   .about-image-large {
-    width: 150px;
-    height: 150px;
+    width: min(100%, 260px);
   }
 
   .about-details {
@@ -2396,8 +2490,7 @@ nav ul li a.nav-active {
 
 /* Social Section */
 .social-section {
-  max-width: 800px;
-  margin: 0 auto;
+  margin: 0;
 }
 
 .social-grid {
@@ -2411,15 +2504,16 @@ nav ul li a.nav-active {
   flex-direction: column;
   align-items: center;
   padding: 1.5rem;
-  background: linear-gradient(180deg, rgba(17,20,26,.5), rgba(17,20,26,.3));
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 18px;
   text-decoration: none;
   transition: all 0.3s var(--ease-out-expo);
 }
 
 .social-card:hover {
   border-color: var(--primary);
+  transform: translateY(-4px);
   box-shadow: 0 10px 30px rgba(0,0,0,0.25);
 }
 
@@ -2581,9 +2675,9 @@ nav ul li a.nav-active {
 
 /* Blog Post Page */
 .blog-post-page {
-  max-width: 750px;
+  max-width: 860px;
   margin: 0 auto;
-  padding: 2rem 1.5rem;
+  padding: 0;
 }
 
 .post-header {
@@ -2660,7 +2754,7 @@ nav ul li a.nav-active {
    Lyrics Page
    ========================= */
 .lyrics-page {
-  padding: 2rem 1.5rem 3rem;
+  padding: 0;
 }
 
 .lyrics-grid {
@@ -2812,14 +2906,14 @@ nav ul li a.nav-active {
    Visitors Map Page
    ========================= */
 .visitors-page {
-  padding: 2rem 1.5rem 3rem;
-  max-width: 960px;
+  padding: 0;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
 .visitors-header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .visitors-title {
@@ -2831,21 +2925,20 @@ nav ul li a.nav-active {
 
 .visitors-subtitle {
   color: var(--muted);
-  font-size: 0.95rem;
-  max-width: 520px;
+  font-size: 0.98rem;
+  max-width: 620px;
   margin: 0 auto;
+  line-height: 1.7;
 }
 
 .visitors-stats {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
   gap: 0;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid var(--border);
-  border-radius: 12px;
   padding: 1.25rem 2rem;
-  margin-bottom: 1.75rem;
+  margin-bottom: 1.5rem;
 }
 
 .vstat {
@@ -2878,10 +2971,9 @@ nav ul li a.nav-active {
 
 .map-wrapper {
   position: relative;
-  border-radius: 12px;
+  border-radius: 24px;
   overflow: hidden;
-  border: 1px solid var(--border);
-  box-shadow: 0 4px 32px rgba(0,0,0,0.4);
+  padding: 0;
 }
 
 #visitor-map {
@@ -2912,8 +3004,8 @@ nav ul li a.nav-active {
 .map-note {
   text-align: center;
   color: var(--muted);
-  font-size: 0.78rem;
-  margin-top: 0.9rem;
+  font-size: 0.82rem;
+  margin-top: 1rem;
   opacity: 0.7;
 }
 
@@ -2985,7 +3077,11 @@ nav ul li a.nav-active {
 }
 
 @media (max-width: 600px) {
-  .vstat { padding: 0 1rem; }
+  .visitors-stats {
+    padding: 1rem;
+  }
+
+  .vstat { padding: 0 .9rem; }
   .vstat-number { font-size: 1.5rem; }
   #visitor-map { height: 340px; }
 }
@@ -2994,7 +3090,7 @@ nav ul li a.nav-active {
    Error Page
    ========================= */
 .error-page {
-  padding: 4rem 1.5rem;
+  padding: 2rem 0 0;
   text-align: center;
   min-height: 60vh;
   display: flex;

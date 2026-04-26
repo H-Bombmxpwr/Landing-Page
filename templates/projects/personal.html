@@ -3,16 +3,17 @@
 {% block title %}Hunter - Personal Projects{% endblock %}
 
 {% block content %}
-<section class="projects-page">
-    <div class="page-header animate-on-scroll">
+<section class="page-shell projects-page">
+    <div class="page-header page-panel animate-on-scroll">
+        <p class="page-eyebrow">Portfolio / Personal Work</p>
         <h1 class="page-title">
             <i class="fas fa-rocket"></i>
             Personal Projects
         </h1>
-        <p class="page-subtitle">Various borderline useful projects.</p>
+        <p class="page-subtitle">Various borderline useful projects, experiments, and one-offs.</p>
     </div>
 
-    <nav class="section-nav animate-on-scroll">
+    <nav class="section-nav page-panel animate-on-scroll">
         {% for subcategory, projects in grouped_projects %}
         <a href="#section-{{ subcategory|lower|replace(' ', '-') }}" class="section-nav-link">
             {% if subcategory == 'Websites' %}
@@ -30,7 +31,7 @@
     </nav>
 
     {% for subcategory, projects in grouped_projects %}
-    <div class="project-group animate-on-scroll" id="section-{{ subcategory|lower|replace(' ', '-') }}">
+    <div class="project-group page-panel animate-on-scroll" id="section-{{ subcategory|lower|replace(' ', '-') }}">
         <h2 class="group-title">
             {% if subcategory == 'Websites' %}
             <i class="fas fa-globe"></i>
@@ -47,7 +48,7 @@
             {% for project in projects %}
             <a href="{{ url_for('project_detail', project_id=project.id) }}" class="project-card" data-index="{{ loop.index }}">
                 <div class="project-card-image">
-                    <img src="{{ url_for('static', filename=project.iconImagePath) }}" alt="{{ project.title }}" loading="lazy">
+                    <img src="{{ image_url(project.iconImagePath) }}" alt="{{ project.title }}" loading="lazy" decoding="async">
                     <div class="project-card-overlay">
                         <span class="view-btn">View Details <i class="fas fa-arrow-right"></i></span>
                     </div>
@@ -83,13 +84,11 @@
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Masonry-style cascade animation
     const cards = document.querySelectorAll('.project-card');
     cards.forEach((card, index) => {
         card.style.animationDelay = `${index * 0.08}s`;
     });
 
-    // Scroll animations
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -99,20 +98,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
     document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
-
-    // Card hover tilt effect
-    cards.forEach(card => {
-        card.addEventListener('mousemove', function(e) {
-            const rect = card.getBoundingClientRect();
-            const x = (e.clientX - rect.left) / rect.width - 0.5;
-            const y = (e.clientY - rect.top) / rect.height - 0.5;
-            card.style.transform = `perspective(1000px) rotateY(${x * 5}deg) rotateX(${-y * 5}deg) translateY(-8px)`;
-        });
-
-        card.addEventListener('mouseleave', function() {
-            card.style.transform = 'perspective(1000px) rotateY(0) rotateX(0) translateY(0)';
-        });
-    });
 });
 </script>
 {% endblock %}

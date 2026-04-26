@@ -3,8 +3,9 @@
 {% block title %}Hunter - Blog{% endblock %}
 
 {% block content %}
-<section class="blog-page">
-    <div class="page-header animate-on-scroll">
+<section class="page-shell blog-page">
+    <div class="page-header page-panel animate-on-scroll">
+        <p class="page-eyebrow">Writing / Notes / Experiments</p>
         <h1 class="page-title">
             <i class="fas fa-blog"></i>
             Blog
@@ -32,7 +33,7 @@
         {% endfor %}
     </div>
     {% else %}
-    <div class="empty-state animate-on-scroll">
+    <div class="empty-state page-panel animate-on-scroll">
         <p>No blog posts yet. Check back soon!</p>
     </div>
     {% endif %}

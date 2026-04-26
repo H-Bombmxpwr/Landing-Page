@@ -3,13 +3,14 @@
 {% block title %}All Lyrics - Hunter{% endblock %}
 
 {% block content %}
-<section class="lyrics-page">
-    <div class="page-header animate-on-scroll">
+<section class="page-shell lyrics-page">
+    <div class="page-header page-panel animate-on-scroll">
+        <p class="page-eyebrow">Lyrics / Favorites / Notes</p>
         <h1 class="page-title">
             <i class="fas fa-music"></i>
             Favorite Lyrics
         </h1>
-        <p class="page-subtitle">A collection of some of my favorite song lyrics</p>
+        <p class="page-subtitle">A collection of some of my favorite song lyrics.</p>
     </div>
 
     <div class="lyrics-grid stagger-children animate-on-scroll">
@@ -31,7 +32,6 @@
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Wave-in animation for lyrics cards
     const cards = document.querySelectorAll('.lyric-card');
 
     const cardObserver = new IntersectionObserver((entries) => {
@@ -46,7 +46,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     cards.forEach(card => cardObserver.observe(card));
 
-    // Scroll animations
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {

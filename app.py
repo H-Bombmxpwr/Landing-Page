@@ -1,10 +1,9 @@
-from flask import Flask, render_template, jsonify, abort
+from flask import Flask, render_template, jsonify, abort, url_for
 from dotenv import load_dotenv
 import requests
 import random
 import json
 import os
-import glob
 import hashlib
 import time
 import threading
@@ -23,7 +22,14 @@ SHOW_RESUME = False
 SHOW_BLOG = False    
 
 # Dynamic background images configuration
-DYNAMIC_IMAGES = True  # Set to True to fetch images from Unsplash instead of local files
+def env_flag(name, default=False):
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    return raw.strip().lower() in {'1', 'true', 'yes', 'on'}
+
+
+DYNAMIC_IMAGES = env_flag('DYNAMIC_IMAGES', default=False)
 UNSPLASH_ACCESS_KEY = os.getenv('UNSPLASH_ACCESS', '')  # From .env file
 UNSPLASH_SECRET_KEY = os.getenv('UNSPLASH_SECRET', '')  # From .env file 
 
@@ -335,11 +341,108 @@ def inject_feature_flags():
         'show_resume': SHOW_RESUME,
         'show_blog': SHOW_BLOG,
         'dynamic_images': DYNAMIC_IMAGES,
-        'visit_count': _visit_count
+        'visit_count': get_authoritative_visit_count(),
+        'city_image_urls': build_city_image_urls(),
+        'image_url': static_image_url,
     }
 
 # Image extensions to look for
-IMAGE_EXTENSIONS = ['*.png', '*.jpg', '*.jpeg', '*.gif', '*.svg', '*.webp']
+IMAGE_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp'}
+WEBP_SOURCE_EXTENSIONS = {'.png', '.jpg', '.jpeg'}
+CITY_IMAGE_FOLDERS = ('baltimore', 'dc', 'chicago')
+
+
+def normalize_static_path(path):
+    return path.replace('\\', '/').lstrip('/')
+
+
+def static_path_to_abspath(path):
+    return os.path.join('static', *normalize_static_path(path).split('/'))
+
+
+def prefer_webp_asset(path):
+    normalized = normalize_static_path(path)
+    stem, ext = os.path.splitext(normalized)
+    if ext.lower() in WEBP_SOURCE_EXTENSIONS:
+        webp_path = f'{stem}.webp'
+        if os.path.exists(static_path_to_abspath(webp_path)):
+            return webp_path
+    return normalized
+
+
+def dedupe_image_paths(paths):
+    seen = set()
+    result = []
+    for path in paths:
+        normalized = prefer_webp_asset(path)
+        key = os.path.splitext(normalized)[0].lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        result.append(normalized)
+    return result
+
+
+def static_image_url(path):
+    return url_for('static', filename=prefer_webp_asset(path))
+
+
+def list_city_static_images(city):
+    folder = os.path.join('static', 'images', city)
+    if not os.path.isdir(folder):
+        return []
+
+    rel_paths = []
+    for name in sorted(os.listdir(folder)):
+        rel_path = f'images/{city}/{name}'
+        if not os.path.isfile(static_path_to_abspath(rel_path)):
+            continue
+        if os.path.splitext(name)[1].lower() not in IMAGE_EXTENSIONS:
+            continue
+        rel_paths.append(rel_path)
+
+    return dedupe_image_paths(rel_paths)
+
+
+def build_city_image_urls():
+    return {
+        city: [static_image_url(path) for path in list_city_static_images(city)]
+        for city in CITY_IMAGE_FOLDERS
+    }
+
+
+def get_authoritative_visit_count():
+    count = _visit_count
+    try:
+        if os.path.exists(_visits_file):
+            with open(_visits_file, 'r') as f:
+                count = json.load(f).get('count', _visit_count)
+    except:
+        pass
+    return count
+
+
+def get_authoritative_visitor_locations():
+    locations = _visitor_locations
+    try:
+        if os.path.exists(_locations_file):
+            with open(_locations_file, 'r') as f:
+                locations = json.load(f).get('locations', _visitor_locations)
+    except:
+        pass
+    return locations
+
+
+def get_visitor_snapshot():
+    locations = get_authoritative_visitor_locations()
+    total_visits = get_authoritative_visit_count()
+    unique_countries = len(set(loc.get('country') for loc in locations if loc.get('country')))
+    return {
+        'locations': locations,
+        'total_visits': total_visits,
+        'unique_countries': unique_countries,
+        'location_count': len(locations),
+    }
 
 def load_projects():
     """Load projects from JSON file"""
@@ -402,21 +505,24 @@ def get_project_images(category, project_id, icon_image):
     }
     folder_name = folder_map.get(category, 'personal')
 
-    # Path to project images folder
     project_folder = os.path.join('static', 'images', 'projects', folder_name, project_id)
+    icon_stem = os.path.splitext(icon_image)[0].lower() if icon_image else ''
 
     images = []
-    if os.path.exists(project_folder):
-        for ext in IMAGE_EXTENSIONS:
-            pattern = os.path.join(project_folder, ext)
-            for filepath in glob.glob(pattern):
-                # Get path relative to static folder
-                rel_path = os.path.relpath(filepath, 'static').replace('\\', '/')
-                # Exclude the icon image from gallery
-                if icon_image and os.path.basename(filepath) != icon_image:
-                    images.append(rel_path)
+    if os.path.isdir(project_folder):
+        for name in sorted(os.listdir(project_folder)):
+            filepath = os.path.join(project_folder, name)
+            if not os.path.isfile(filepath):
+                continue
+            stem, ext = os.path.splitext(name)
+            if ext.lower() not in IMAGE_EXTENSIONS:
+                continue
+            if icon_stem and stem.lower() == icon_stem:
+                continue
+            rel_path = os.path.relpath(filepath, 'static').replace('\\', '/')
+            images.append(rel_path)
 
-    return sorted(images)
+    return dedupe_image_paths(images)
 
 def get_icon_image_path(category, project_id, icon_image):
     """
@@ -428,18 +534,15 @@ def get_icon_image_path(category, project_id, icon_image):
     }
     folder_name = folder_map.get(category, 'personal')
 
-    # First check in project folder
-    project_icon_path = os.path.join('static', 'images', 'projects', folder_name, project_id, icon_image)
-    if os.path.exists(project_icon_path):
-        return f'images/projects/{folder_name}/{project_id}/{icon_image}'
+    project_rel_path = f'images/projects/{folder_name}/{project_id}/{icon_image}'
+    root_rel_path = f'images/{icon_image}'
 
-    # Fall back to root images folder (for backward compatibility)
-    root_icon_path = os.path.join('static', 'images', icon_image)
-    if os.path.exists(root_icon_path):
-        return f'images/{icon_image}'
+    for candidate in (project_rel_path, root_rel_path):
+        resolved = prefer_webp_asset(candidate)
+        if os.path.exists(static_path_to_abspath(resolved)):
+            return resolved
 
-    # Return the project folder path even if it doesn't exist yet
-    return f'images/projects/{folder_name}/{project_id}/{icon_image}'
+    return prefer_webp_asset(project_rel_path)
 
 def get_featured_project():
     """Get the project marked as homeFeatured, or fall back to random featured"""
@@ -577,22 +680,23 @@ def index():
                          active_page='home',
                          page_id='home-page',
                          collage_density='minimal',
-                         collage_layout='ambient',
-                         dynamic_images=False)
+                         collage_layout='ambient')
 
 @app.route('/about')
 def about():
     return render_template('about.html',
                          active_page='about',
                          page_id='about-page',
-                         collage_density='medium')
+                         collage_density='low',
+                         collage_layout='ambient')
 
 @app.route('/game')
 def game():
     return render_template('game.html',
                          active_page='game',
                          page_id='game-page',
-                         collage_density='minimal')
+                         collage_density='minimal',
+                         collage_layout='ambient')
 
 @app.route('/projects/personal')
 def personal_projects():
@@ -603,7 +707,8 @@ def personal_projects():
                          grouped_projects=grouped,
                          active_page='personal',
                          page_id='personal-projects-page',
-                         collage_density='high')
+                         collage_density='low',
+                         collage_layout='ambient')
 
 @app.route('/projects/academic')
 def academic_projects():
@@ -614,7 +719,8 @@ def academic_projects():
                          grouped_projects=grouped,
                          active_page='academic',
                          page_id='academic-projects-page',
-                         collage_density='high')
+                         collage_density='low',
+                         collage_layout='ambient')
 
 @app.route('/projects/<project_id>')
 def project_detail(project_id):
@@ -628,7 +734,8 @@ def project_detail(project_id):
                          project=project,
                          active_page=category,
                          page_id='project-detail-page',
-                         collage_density='minimal')
+                         collage_density='minimal',
+                         collage_layout='ambient')
 
 @app.route("/api/quote")
 def get_quote():
@@ -684,31 +791,19 @@ def reset_visitors():
 @app.route('/api/visitor-locations')
 def visitor_locations_api():
     """Return all visitor locations for the map"""
-    # Read visit count fresh from file so all gunicorn workers agree on the same number
-    authoritative_count = _visit_count
-    try:
-        if os.path.exists(_visits_file):
-            with open(_visits_file, 'r') as f:
-                authoritative_count = json.load(f).get('count', _visit_count)
-    except:
-        pass
-    unique_countries = len(set(loc['country'] for loc in _visitor_locations if loc.get('country')))
-    return jsonify({
-        'locations': _visitor_locations,
-        'total_visits': authoritative_count,
-        'unique_countries': unique_countries
-    })
+    return jsonify(get_visitor_snapshot())
 
 @app.route('/visitors')
 def visitors():
-    unique_countries = len(set(loc['country'] for loc in _visitor_locations if loc.get('country')))
+    visitor_snapshot = get_visitor_snapshot()
     return render_template('visitors.html',
                          active_page='visitors',
                          page_id='visitors-page',
                          collage_density='minimal',
-                         total_visits=_visit_count,
-                         unique_countries=unique_countries,
-                         location_count=len(_visitor_locations))
+                         collage_layout='ambient',
+                         total_visits=visitor_snapshot['total_visits'],
+                         unique_countries=visitor_snapshot['unique_countries'],
+                         location_count=visitor_snapshot['location_count'])
 
 @app.route('/api/images/<city>')
 def get_city_images(city):
@@ -745,7 +840,8 @@ def all_lyrics():
                          lyrics=lyrics_data,
                          active_page='lyrics',
                          page_id='lyrics-page',
-                         collage_density='medium')
+                         collage_density='low',
+                         collage_layout='ambient')
 
 # Keep old route for backwards compatibility
 @app.route('/all-lyrics')
@@ -759,7 +855,8 @@ def blog():
                          posts=posts,
                          active_page='blog',
                          page_id='blog-page',
-                         collage_density='medium')
+                         collage_density='low',
+                         collage_layout='ambient')
 
 @app.route('/blog/<post_id>')
 def blog_post(post_id):
@@ -771,13 +868,15 @@ def blog_post(post_id):
                          post=post,
                          active_page='blog',
                          page_id='blog-post-page',
-                         collage_density='minimal')
+                         collage_density='minimal',
+                         collage_layout='ambient')
 
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html',
                          page_id='error-page',
-                         collage_density='minimal'), 404
+                         collage_density='minimal',
+                         collage_layout='ambient'), 404
 
 if __name__ == '__main__':
     port = int(os.getenv("PORT", 5000))
