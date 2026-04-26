@@ -576,7 +576,9 @@ def index():
                          stats=stats,
                          active_page='home',
                          page_id='home-page',
-                         collage_density='low')
+                         collage_density='minimal',
+                         collage_layout='ambient',
+                         dynamic_images=False)
 
 @app.route('/about')
 def about():

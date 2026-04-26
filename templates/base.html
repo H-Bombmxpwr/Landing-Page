@@ -9,7 +9,9 @@
     <title>{% block title %}Hunter{% endblock %}</title>
     {% block head %}{% endblock %}
 </head>
-<body id="{{ page_id|default('index-page') }}" data-collage-density="{{ collage_density|default('medium') }}">
+<body id="{{ page_id|default('index-page') }}"
+      data-collage-density="{{ collage_density|default('medium') }}"
+      data-collage-layout="{{ collage_layout|default('grid') }}">
     <script>
     (function() {
         var themes = {

@@ -4,26 +4,54 @@
 
 {% block content %}
 <section class="hero">
-    <div class="hero-content">
-        <div class="hero-text">
-            <h1 class="hero-title">
-                <span class="hero-greeting">Hello, I'm</span>
-                <span class="hero-name">Hunter</span>
-            </h1>
-            <p class="hero-subtitle">Electrical Engineer & Computer Scientist</p>
-            <p class="hero-location"><i class="fas fa-map-marker-alt"></i> Baltimore, MD</p>
-            <div class="hero-cta">
-                <a href="{{ url_for('personal_projects') }}" class="btn primary hero-btn">
-                    <i class="fas fa-code"></i> View Projects
-                </a>
-                <a href="{{ url_for('about') }}" class="btn ghost hero-btn">
-                    <i class="fas fa-user"></i> About Me
-                </a>
+    <div class="hero-shell">
+        <div class="hero-content">
+            <div class="hero-text">
+                <p class="hero-kicker">Portfolio / Software / Systems</p>
+                <h1 class="hero-title">
+                    <span class="hero-greeting">Hello, I'm</span>
+                    <span class="hero-name">Hunter</span>
+                </h1>
+                <p class="hero-subtitle">Electrical Engineer & Computer Scientist</p>
+                <p class="hero-summary">
+                    Projects here range from software tools and data work to experiments shaped by
+                    Baltimore, DC, and Chicago.
+                </p>
+                <div class="hero-pills" aria-label="Project focus areas">
+                    <span class="hero-pill">Web apps</span>
+                    <span class="hero-pill">Data tools</span>
+                    <span class="hero-pill">Creative builds</span>
+                </div>
+                <p class="hero-location"><i class="fas fa-map-marker-alt"></i> Baltimore, MD</p>
+                <div class="hero-cta">
+                    <a href="{{ url_for('personal_projects') }}" class="btn primary hero-btn">
+                        <i class="fas fa-code"></i> View Projects
+                    </a>
+                    <a href="{{ url_for('about') }}" class="btn ghost hero-btn">
+                        <i class="fas fa-user"></i> About Me
+                    </a>
+                </div>
             </div>
-        </div>
-        <div class="hero-image-wrapper">
-            <div class="hero-image">
-                <img src="{{ url_for('static', filename='images/icon2.png') }}" alt="Hunter">
+            <div class="hero-visual">
+                <div class="hero-image-card">
+                    <div class="hero-orb hero-orb-one"></div>
+                    <div class="hero-orb hero-orb-two"></div>
+                    <div class="hero-image-frame">
+                        <div class="hero-image">
+                            <img
+                                src="{{ url_for('static', filename='images/icon2.png') }}"
+                                alt="Hunter"
+                                width="225"
+                                height="169"
+                                decoding="async"
+                                fetchpriority="high">
+                        </div>
+                    </div>
+                    <div class="hero-image-note">
+                        <span class="hero-note-label">City Switcher</span>
+                        <span class="hero-note-text">Flip Baltimore, DC, or Chicago above to change the mood of the page.</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -56,7 +84,11 @@
     </h2>
     <a href="{{ url_for('project_detail', project_id=featured_project.id) }}" class="featured-card">
         <div class="featured-image">
-            <img src="{{ url_for('static', filename=featured_project.iconImagePath) }}" alt="{{ featured_project.title }}">
+            <img
+                src="{{ url_for('static', filename=featured_project.iconImagePath) }}"
+                alt="{{ featured_project.title }}"
+                loading="lazy"
+                decoding="async">
             <div class="featured-overlay">
                 <span class="view-project">View Project <i class="fas fa-arrow-right"></i></span>
             </div>
