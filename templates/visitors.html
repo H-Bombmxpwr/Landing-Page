@@ -8,13 +8,13 @@
 
 {% block content %}
 <section class="page-shell visitors-page">
-    <div class="visitors-header page-panel animate-on-scroll">
+    <div class="visitors-header page-panel">
         <p class="page-eyebrow">Visitors / Privacy First</p>
         <h2 class="visitors-title">Visitor Map</h2>
         <p class="visitors-subtitle">Approximate locations of everyone who has stopped by - plotted to the nearest ~11 km, with no IPs stored.</p>
     </div>
 
-    <div class="visitors-stats page-panel animate-on-scroll">
+    <div class="visitors-stats page-panel">
         <div class="vstat">
             <span class="vstat-number" id="stat-visits">{{ "{:,}".format(total_visits) }}</span>
             <span class="vstat-label">Total Visits</span>
@@ -31,7 +31,7 @@
         </div>
     </div>
 
-    <div class="map-wrapper page-panel animate-on-scroll">
+    <div class="map-wrapper page-panel">
         <div id="visitor-map"></div>
         <div class="map-loading" id="map-loading">
             <i class="fas fa-globe-americas fa-spin"></i>
@@ -39,7 +39,7 @@
         </div>
     </div>
 
-    <p class="map-note animate-on-scroll">
+    <p class="map-note">
         <i class="fas fa-lock"></i>
         Locations are city-level only. IP addresses are never logged or stored.
     </p>

@@ -48,7 +48,7 @@
 
         <!-- City Switcher Slider -->
         <div class="city-switcher">
-            <h3 class="city-heading">City Mood</h3>
+            <h3 class="city-heading"></h3>
             <div class="city-options">
                 <div class="city-option" data-city="baltimore" onclick="CityCollage.switchCity('baltimore')">
                     <img src="{{ image_url('images/flags/baltimore_flag.png') }}" alt="Baltimore Flag" class="city-flag" decoding="async">
@@ -166,6 +166,29 @@
             });
         }
     })();
+    </script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const items = document.querySelectorAll('.animate-on-scroll');
+        if (!items.length) return;
+
+        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reduced || !('IntersectionObserver' in window)) {
+            items.forEach(el => el.classList.add('animate-in'));
+            return;
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add('animate-in');
+                observer.unobserve(entry.target);
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+        items.forEach(el => observer.observe(el));
+    });
     </script>
 
     {% block scripts %}{% endblock %}
