@@ -8,6 +8,13 @@ import hashlib
 import time
 import threading
 import ipaddress
+import re
+import sqlite3
+import secrets
+import urllib.parse
+import urllib.request
+from contextlib import contextmanager
+from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Load environment variables from .env file
@@ -90,109 +97,285 @@ _image_cache = {}
 _cache_file = 'static/data/image_cache.json'
 _cache_lock = False
 
-# Visit counter + visitor locations
-# DATA_DIR can be set to a Railway Volume mount path (e.g. /data) for persistence across deploys
-_visit_count = 0
-_data_dir = os.getenv('DATA_DIR', 'static/data')
-_visits_file = os.path.join(_data_dir, 'visits.json')
-_locations_file = os.path.join(_data_dir, 'visitor_locations.json')
-_visitor_locations = []
-_locations_lock = threading.Lock()
+# ============================================
+# VISITOR COUNTER (SQLite-backed)
+# DATA_DIR can be set to a Railway Volume mount path (e.g. /data) for persistence.
+# ============================================
+_data_dir = os.getenv('DATA_DIR', os.path.join('static', 'data'))
+_visits_file = os.path.join(_data_dir, 'visits.json')         # legacy mirror
+_visitor_db_file = os.path.join(_data_dir, 'visitors.sqlite3')
+_visit_lock = threading.Lock()
 
-def load_visit_count():
-    """Load visit count from disk"""
-    global _visit_count
+_BOT_UA_RE = re.compile(
+    r'(bot|crawl|spider|slurp|facebookexternalhit|preview|scanner|uptime|monitor|headless)',
+    re.IGNORECASE,
+)
+
+
+def _utc_iso():
+    return datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'
+
+
+@contextmanager
+def _visitor_db():
+    os.makedirs(_data_dir, exist_ok=True)
+    conn = sqlite3.connect(_visitor_db_file, timeout=10)
+    conn.row_factory = sqlite3.Row
+    conn.execute('PRAGMA busy_timeout = 10000')
     try:
-        if os.path.exists(_visits_file):
-            with open(_visits_file, 'r') as f:
-                data = json.load(f)
-                _visit_count = data.get('count', 0)
-    except:
-        _visit_count = 0
-
-def increment_visit_count():
-    """Increment and persist the visit count, always reading file first to prevent data loss"""
-    global _visit_count
+        conn.execute('PRAGMA journal_mode = WAL')
+    except sqlite3.DatabaseError:
+        pass
     try:
-        os.makedirs(os.path.dirname(_visits_file), exist_ok=True)
-        current = 0
-        if os.path.exists(_visits_file):
-            with open(_visits_file, 'r') as f:
-                current = json.load(f).get('count', 0)
-        current += 1
-        _visit_count = current
-        with open(_visits_file, 'w') as f:
-            json.dump({'count': current}, f)
-    except:
-        _visit_count += 1
+        yield conn
+    finally:
+        conn.close()
 
-def load_visitor_locations():
-    """Load visitor locations from disk"""
-    global _visitor_locations
+
+def _legacy_visit_count():
     try:
-        if os.path.exists(_locations_file):
-            with open(_locations_file, 'r') as f:
-                data = json.load(f)
-                _visitor_locations = data.get('locations', [])
-    except:
-        _visitor_locations = []
+        with open(_visits_file, 'r') as f:
+            return int(json.load(f).get('count', 0))
+    except (FileNotFoundError, json.JSONDecodeError, TypeError, ValueError):
+        return 0
 
-def save_visitor_location(entry):
-    """Append a location entry and persist to disk, always reading file first to prevent data loss"""
-    global _visitor_locations
-    with _locations_lock:
-        try:
-            os.makedirs(os.path.dirname(_locations_file), exist_ok=True)
-            # Read current file contents before writing so no worker can overwrite another's data
-            current = []
-            if os.path.exists(_locations_file):
-                with open(_locations_file, 'r') as f:
-                    current = json.load(f).get('locations', [])
-            current.append(entry)
-            with open(_locations_file, 'w') as f:
-                json.dump({'locations': current}, f)
-            _visitor_locations = current
-        except:
-            pass
+
+def _write_visit_count_mirror(count):
+    try:
+        os.makedirs(_data_dir, exist_ok=True)
+        tmp_path = _visits_file + '.tmp'
+        with open(tmp_path, 'w') as f:
+            json.dump({'count': int(count)}, f)
+        os.replace(tmp_path, _visits_file)
+    except Exception:
+        pass
+
+
+def _ensure_visitor_db():
+    with _visitor_db() as conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS visitor_counter (
+                id INTEGER PRIMARY KEY CHECK (id = 1),
+                count INTEGER NOT NULL DEFAULT 0,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            )
+        """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS visitor_events (
+                id TEXT PRIMARY KEY,
+                sequence INTEGER NOT NULL,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                path TEXT,
+                referrer_host TEXT,
+                user_agent_family TEXT,
+                country TEXT,
+                region TEXT,
+                city TEXT,
+                lat REAL,
+                lon REAL,
+                geocode_status TEXT NOT NULL DEFAULT 'pending'
+            )
+        """)
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_visitor_events_created ON visitor_events(created_at)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_visitor_events_geo ON visitor_events(lat, lon)")
+        row = conn.execute("SELECT count FROM visitor_counter WHERE id = 1").fetchone()
+        if not row:
+            now = _utc_iso()
+            conn.execute(
+                "INSERT INTO visitor_counter (id, count, created_at, updated_at) VALUES (1, ?, ?, ?)",
+                (_legacy_visit_count(), now, now),
+            )
+        conn.commit()
+
+
+def _read_visit_count():
+    try:
+        _ensure_visitor_db()
+        with _visitor_db() as conn:
+            row = conn.execute("SELECT count FROM visitor_counter WHERE id = 1").fetchone()
+            return int(row['count']) if row else _legacy_visit_count()
+    except Exception:
+        return _legacy_visit_count()
+
 
 def get_real_ip():
-    """Get the real client IP, accounting for Railway's proxy"""
     from flask import request
-    forwarded = request.headers.get('X-Forwarded-For')
+    forwarded = request.headers.get('X-Forwarded-For', '')
     if forwarded:
         return forwarded.split(',')[0].strip()
-    return request.remote_addr
+    return request.headers.get('X-Real-IP') or request.remote_addr or ''
+
 
 def is_private_ip(ip):
-    """Return True for localhost / private network IPs"""
     try:
-        return ipaddress.ip_address(ip).is_private
+        parsed = ipaddress.ip_address(ip)
+        return parsed.is_private or parsed.is_loopback or parsed.is_reserved or parsed.is_link_local
     except ValueError:
         return True
 
-def geolocate_and_save(ip):
-    """Geolocate an IP via ipinfo.io and save the approximate location (runs in background thread)"""
+
+def _is_likely_bot():
+    from flask import request
+    ua = request.headers.get('User-Agent', '')
+    return bool(_BOT_UA_RE.search(ua))
+
+
+def _ua_family():
+    from flask import request
+    ua = request.headers.get('User-Agent', '')
+    if not ua:
+        return 'unknown'
+    checks = (
+        ('mobile_safari', 'Mobile', 'Safari'),
+        ('ios_webview', 'iPhone', 'AppleWebKit'),
+        ('chrome', 'Chrome'),
+        ('firefox', 'Firefox'),
+        ('safari', 'Safari'),
+        ('edge', 'Edg/'),
+    )
+    for label, *needles in checks:
+        if all(n in ua for n in needles):
+            return label
+    return 'browser'
+
+
+def _visit_path_from_request():
+    from flask import request
+    path = ''
+    if request.is_json:
+        data = request.get_json(silent=True) or {}
+        path = str(data.get('path') or '')
+    if not path:
+        referrer = request.headers.get('Referer', '')
+        parsed = urllib.parse.urlparse(referrer)
+        path = parsed.path or ''
+    if not path.startswith('/'):
+        path = '/'
+    return path[:160]
+
+
+def _referrer_host():
+    from flask import request
+    referrer = request.headers.get('Referer', '')
+    parsed = urllib.parse.urlparse(referrer)
+    host = parsed.netloc.lower()
+    return host[:120] if host else ''
+
+
+def _geocode_ip(ip):
+    if not ip or is_private_ip(ip):
+        return {'geocode_status': 'local_or_private'}
+    token = os.getenv('IPINFO_TOKEN', '').strip()
+    quoted_ip = urllib.parse.quote(ip, safe='')
+    url = f'https://ipinfo.io/{quoted_ip}/json'
+    if token:
+        url += f'?token={urllib.parse.quote(token)}'
+    req = urllib.request.Request(url, headers={'User-Agent': 'hunter-visitor-map/1.0'})
     try:
-        resp = requests.get(f'https://ipinfo.io/{ip}/json', timeout=5)
-        if resp.status_code != 200:
-            return
-        data = resp.json()
-        loc = data.get('loc', '')
-        if not loc:
-            return
-        lat_str, lon_str = loc.split(',')
-        # Round to 1 decimal place (~11 km) for anonymization — no raw IPs stored
+        with urllib.request.urlopen(req, timeout=4) as resp:
+            if getattr(resp, 'status', 200) != 200:
+                return {'geocode_status': f'http_{getattr(resp, "status", "error")}'}
+            data = json.loads(resp.read().decode('utf-8'))
+    except Exception:
+        return {'geocode_status': 'lookup_failed'}
+
+    loc = data.get('loc', '')
+    if not loc or ',' not in loc:
+        return {'geocode_status': 'no_location'}
+    try:
+        lat_str, lon_str = loc.split(',', 1)
         lat = round(float(lat_str), 1)
         lon = round(float(lon_str), 1)
-        entry = {
-            'lat': lat,
-            'lon': lon,
-            'city': data.get('city', ''),
-            'country': data.get('country', '')
-        }
-        save_visitor_location(entry)
-    except:
+    except (TypeError, ValueError):
+        return {'geocode_status': 'bad_location'}
+
+    return {
+        'geocode_status': 'mapped',
+        'lat': lat,
+        'lon': lon,
+        'city': str(data.get('city') or '')[:120],
+        'region': str(data.get('region') or '')[:120],
+        'country': str(data.get('country') or '')[:12],
+    }
+
+
+def _update_visitor_event_location(event_id, ip):
+    geo = _geocode_ip(ip)
+    try:
+        with _visitor_db() as conn:
+            conn.execute(
+                """
+                UPDATE visitor_events
+                   SET updated_at = ?,
+                       country = ?,
+                       region = ?,
+                       city = ?,
+                       lat = ?,
+                       lon = ?,
+                       geocode_status = ?
+                 WHERE id = ?
+                """,
+                (
+                    _utc_iso(),
+                    geo.get('country', ''),
+                    geo.get('region', ''),
+                    geo.get('city', ''),
+                    geo.get('lat'),
+                    geo.get('lon'),
+                    geo.get('geocode_status', 'lookup_failed'),
+                    event_id,
+                ),
+            )
+            conn.commit()
+    except Exception:
         pass
+
+
+def _record_visit_event():
+    """Increment the public counter and insert one visitor event.
+
+    Raw IPs and full user agents are intentionally not stored. The event is
+    inserted before geolocation so the footer count and event count stay
+    aligned even if the third-party lookup fails.
+    """
+    _ensure_visitor_db()
+    now = _utc_iso()
+    event_id = secrets.token_urlsafe(12)
+    ip = get_real_ip()
+    with _visit_lock:
+        with _visitor_db() as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            row = conn.execute("SELECT count FROM visitor_counter WHERE id = 1").fetchone()
+            current = int(row['count']) if row else _legacy_visit_count()
+            count = current + 1
+            conn.execute(
+                "UPDATE visitor_counter SET count = ?, updated_at = ? WHERE id = 1",
+                (count, now),
+            )
+            conn.execute(
+                """
+                INSERT INTO visitor_events
+                    (id, sequence, created_at, updated_at, path, referrer_host, user_agent_family, geocode_status)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    event_id,
+                    count,
+                    now,
+                    now,
+                    _visit_path_from_request(),
+                    _referrer_host(),
+                    _ua_family(),
+                    'pending' if not is_private_ip(ip) else 'local_or_private',
+                ),
+            )
+            conn.commit()
+        _write_visit_count_mirror(count)
+    if not is_private_ip(ip):
+        threading.Thread(target=_update_visitor_event_location, args=(event_id, ip), daemon=True).start()
+    return count
 
 def load_image_cache():
     """Load cached images from disk"""
@@ -313,25 +496,13 @@ def get_dynamic_images_for_city(city):
     finally:
         _cache_lock = False
 
-# Load cache, visit count, and visitor locations on startup
+# Load cache + initialize visitor DB on startup
 load_image_cache()
-load_visit_count()
-load_visitor_locations()
+_ensure_visitor_db()
 
-@app.before_request
-def count_visit():
-    """Increment visit counter once per browser session and geolocate in background"""
-    from flask import request, session
-    # Only count HTML page requests, not API calls or static files
-    if not request.path.startswith('/api/') and not request.path.startswith('/static/'):
-        if not session.get('visited'):
-            session['visited'] = True
-            session.permanent = False  # expires when browser closes
-            increment_visit_count()
-            # Geolocate in background — never blocks the page load
-            ip = get_real_ip()
-            if ip and not is_private_ip(ip):
-                threading.Thread(target=geolocate_and_save, args=(ip,), daemon=True).start()
+# Visits are recorded via POST /api/visit (triggered from base.html JS),
+# not in @before_request — so refreshes/asset re-requests don't double-count
+# and bots are filtered by user-agent.
 
 @app.context_processor
 def inject_feature_flags():
@@ -412,31 +583,29 @@ def build_city_image_urls():
 
 
 def get_authoritative_visit_count():
-    count = _visit_count
-    try:
-        if os.path.exists(_visits_file):
-            with open(_visits_file, 'r') as f:
-                count = json.load(f).get('count', _visit_count)
-    except:
-        pass
-    return count
+    return _read_visit_count()
 
 
 def get_authoritative_visitor_locations():
-    locations = _visitor_locations
     try:
-        if os.path.exists(_locations_file):
-            with open(_locations_file, 'r') as f:
-                locations = json.load(f).get('locations', _visitor_locations)
-    except:
-        pass
-    return locations
+        _ensure_visitor_db()
+        with _visitor_db() as conn:
+            rows = conn.execute(
+                """
+                SELECT lat, lon, city, country
+                  FROM visitor_events
+                 WHERE lat IS NOT NULL AND lon IS NOT NULL
+                """
+            ).fetchall()
+        return [dict(r) for r in rows]
+    except Exception:
+        return []
 
 
 def get_visitor_snapshot():
     locations = get_authoritative_visitor_locations()
-    total_visits = get_authoritative_visit_count()
-    unique_countries = len(set(loc.get('country') for loc in locations if loc.get('country')))
+    total_visits = _read_visit_count()
+    unique_countries = len({loc.get('country') for loc in locations if loc.get('country')})
     return {
         'locations': locations,
         'total_visits': total_visits,
@@ -767,26 +936,41 @@ def random_lyric():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/visit', methods=['POST'])
+def record_visit():
+    """Record one visit. Bots are filtered by user-agent and not counted."""
+    if _is_likely_bot():
+        return jsonify({'count': _read_visit_count(), 'counted': False})
+    count = _record_visit_event()
+    return jsonify({'count': count, 'counted': True})
+
+
+@app.route('/api/visit-count')
+def get_visit_count_route():
+    return jsonify({'count': _read_visit_count()})
+
+
 @app.route('/api/reset-visitors', methods=['POST'])
 def reset_visitors():
-    """Reset visit counter and location data. Requires ADMIN_KEY."""
+    """Reset visit counter and visitor events. Requires ADMIN_KEY header."""
     from flask import request
     admin_key = os.getenv('ADMIN_KEY', '')
     provided = request.headers.get('X-Admin-Key', '')
     if not admin_key or provided != admin_key:
         return jsonify({'error': 'unauthorized'}), 401
-    global _visit_count, _visitor_locations
-    _visit_count = 0
-    _visitor_locations = []
-    try:
-        os.makedirs(os.path.dirname(_visits_file), exist_ok=True)
-        with open(_visits_file, 'w') as f:
-            json.dump({'count': 0}, f)
-        with open(_locations_file, 'w') as f:
-            json.dump({'locations': []}, f)
-    except:
-        pass
+    _ensure_visitor_db()
+    now = _utc_iso()
+    with _visit_lock:
+        with _visitor_db() as conn:
+            conn.execute("DELETE FROM visitor_events")
+            conn.execute(
+                "UPDATE visitor_counter SET count = 0, updated_at = ? WHERE id = 1",
+                (now,),
+            )
+            conn.commit()
+        _write_visit_count_mirror(0)
     return jsonify({'status': 'reset', 'visits': 0, 'locations': 0})
+
 
 @app.route('/api/visitor-locations')
 def visitor_locations_api():

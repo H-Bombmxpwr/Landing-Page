@@ -119,13 +119,46 @@
                 </a>
                 <span id="year"></span> - Hunter Baisden
                 <div class="visit-counter">
-                    <i class="fas fa-eye"></i> {{ "{:,}".format(visit_count) }} visits
+                    <i class="fas fa-eye"></i> <span id="visit-count-text">{{ "{:,}".format(visit_count) }}</span> visits
                 </div>
             </div>
         </footer>
 
         <script>
             document.getElementById('year').textContent = new Date().getFullYear();
+        </script>
+
+        <!-- Visitor counter: POST once per session, otherwise just refresh display -->
+        <script>
+        (function () {
+            var el = document.getElementById('visit-count-text');
+            if (!el) return;
+            var display = function (n) {
+                if (typeof n === 'number') el.textContent = n.toLocaleString();
+            };
+            try {
+                if (!sessionStorage.getItem('hunterVisited')) {
+                    fetch('/api/visit', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        keepalive: true,
+                        body: JSON.stringify({ path: window.location.pathname })
+                    })
+                    .then(function (r) { return r.ok ? r.json() : null; })
+                    .then(function (d) {
+                        if (!d) return;
+                        if (d.counted !== false) sessionStorage.setItem('hunterVisited', '1');
+                        display(d.count);
+                    })
+                    .catch(function () {});
+                } else {
+                    fetch('/api/visit-count')
+                        .then(function (r) { return r.ok ? r.json() : null; })
+                        .then(function (d) { if (d) display(d.count); })
+                        .catch(function () {});
+                }
+            } catch (e) {}
+        })();
         </script>
     </div>
 
