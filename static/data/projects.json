@@ -386,6 +386,31 @@
       "rank": 4,
       "university": "University of Illinois"
     },
+        {
+      "id": "lc3-computer",
+      "title": "LC3 Computer",
+      "shortDescription": "A simple computer implemented in LC3 assembly language",
+      "description": [
+        "A simple computer implemented in LC3 assembly language, demonstrating the principles of computer architecture.",
+        "The project includes a complete implementation of the LC3 instruction set and a basic operating system.",
+        "All built on a breadboard with hand wired connections."
+      ],
+      "iconImage": "computer.jpg",
+      "tags": ["Assembly Language", "Computer Architecture", "Breadboard"],
+      "hasGithub": false,
+      "githubLink": "",
+      "hasLive": false,
+      "liveLink": "",
+      "hasVideo": false,
+      "videoLink": "",
+      "hasDownload": false,
+      "downloadLink": "",
+      "featured": false,
+      "date": "2023-05",
+      "rank": 5,
+      "university": "University of Illinois"
+    },
+  
     {
       "id": "seam-carving-manim",
       "title": "Demonstration of Seam Carving using Manim",
