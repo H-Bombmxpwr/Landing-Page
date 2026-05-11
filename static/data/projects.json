@@ -8,7 +8,7 @@
         "This is a website to generate a cool album poster. It interacts with the Spotify API for all of the album data.",
         "It will take an album and generate a poster with the album artwork, tracklist, and other metadata beautifully arranged."
       ],
-      "iconImage": "The_Secret_of_Us_.png",
+      "iconImage": "The_Queen_Is_Dead.png",
       "tags": ["Python", "Flask", "Spotify API", "Web"],
       "hasGithub": true,
       "githubLink": "https://github.com/H-Bombmxpwr/MusicPoster",
