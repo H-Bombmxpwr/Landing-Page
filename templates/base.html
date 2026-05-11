@@ -4,39 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="{{ url_for('static', filename='images/icon.png') }}" type="image/png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/terminal.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <title>{% block title %}Hunter{% endblock %}</title>
-    {% block head %}{% endblock %}
-</head>
-<body id="{{ page_id|default('index-page') }}"
-      data-collage-density="{{ collage_density|default('medium') }}"
-      data-collage-layout="{{ collage_layout|default('ambient') }}">
     <script>
-    (function() {
-        var themes = {
-            baltimore: { p:'#ff6a00', p6:'#ff5c00', p7:'#ef4b00', r:'rgba(255,106,0,.35)', a:'#ffd2bf' },
-            dc:        { p:'#c41e3a', p6:'#b01830', p7:'#9a1528', r:'rgba(196,30,58,.35)', a:'#f5c6ce' },
-            chicago:   { p:'#41b6e6', p6:'#35a5d4', p7:'#2994c2', r:'rgba(65,182,230,.35)', a:'#c5e8f7' }
-        };
+    /* Apply saved phosphor theme before paint to avoid a color flash. */
+    (function(){
         try {
-            var city = localStorage.getItem('selectedCity') || 'baltimore';
-            if (!themes[city]) city = 'baltimore';
-            document.body.dataset.city = city;
-            var t = themes[city], s = document.documentElement.style;
-            s.setProperty('--primary', t.p);
-            s.setProperty('--primary-600', t.p6);
-            s.setProperty('--primary-700', t.p7);
-            s.setProperty('--ring', t.r);
-            s.setProperty('--accent-light', t.a);
-        } catch(e) { document.body.dataset.city = 'baltimore'; }
+            var saved = localStorage.getItem('phosphorTheme');
+            if (saved !== 'green' && saved !== 'amber') saved = 'amber';
+            document.documentElement.setAttribute('data-theme', saved);
+        } catch (e) {
+            document.documentElement.setAttribute('data-theme', 'amber');
+        }
     })();
     </script>
+    {% block head %}{% endblock %}
+</head>
+<body id="{{ page_id|default('index-page') }}">
+    <aside class="bg-ascii" aria-hidden="true"><span class="bg-prompt">$</span> uname -a
+hunter@local 5.15.0
+<span class="bg-prompt">$</span> uptime
+&uarr; 412d 14h 12m
+<span class="bg-prompt">$</span> visits
+{{ "{:,}".format(visit_count) }}
+<span class="bg-prompt">$</span> load
+0.42 0.31 0.28
+<span class="bg-prompt">$</span> status
+ready_</aside>
+    <div class="scanlines" aria-hidden="true"></div>
+
     <div class="container">
         <header class="site-header">
             <div class="wrap">
-                <a href="{{ url_for('index') }}" class="brand-link">
-                    <h1 class="brand">Hunter</h1>
+                <a href="{{ url_for('index') }}" class="brand-link" aria-label="Home">
+                    <span class="brand-prompt">~/</span><h1 class="brand">Hunter</h1><span class="brand-caret">_</span>
                 </a>
                 {% if show_resume %}
                 <a href="{{ url_for('static', filename='files/resume.pdf') }}" class="resume-btn" target="_blank" download>
@@ -45,37 +53,6 @@
                 {% endif %}
             </div>
         </header>
-
-        <!-- City Switcher Slider -->
-        <div class="city-switcher">
-            <h3 class="city-heading"></h3>
-            <div class="city-options">
-                <div class="city-option" data-city="baltimore" onclick="CityCollage.switchCity('baltimore')">
-                    <img src="{{ image_url('images/flags/baltimore_flag.png') }}" alt="Baltimore Flag" class="city-flag" decoding="async">
-                    <span class="city-label">Baltimore</span>
-                </div>
-                <div class="city-option" data-city="dc" onclick="CityCollage.switchCity('dc')">
-                    <img src="{{ image_url('images/flags/dc_flag.png') }}" alt="DC Flag" class="city-flag" decoding="async">
-                    <span class="city-label">DC</span>
-                </div>
-                <div class="city-option" data-city="chicago" onclick="CityCollage.switchCity('chicago')">
-                    <img src="{{ image_url('images/flags/chicago_flag.png') }}" alt="Chicago Flag" class="city-flag" decoding="async">
-                    <span class="city-label">Chicago</span>
-                </div>
-            </div>
-            <div class="slider-container">
-                <input
-                    type="range"
-                    id="city-slider"
-                    class="city-slider-input"
-                    min="0"
-                    max="2"
-                    value="0"
-                    step="1"
-                    aria-label="Select city theme"
-                >
-            </div>
-        </div>
 
         <nav class="navbar">
             <ul>
@@ -95,134 +72,40 @@
 
         {% block content %}{% endblock %}
 
-        <!-- Lyrics Footer -->
-        <footer class="footer lyrics-footer">
-            <div class="lyrics-footer-content">
-                <blockquote id="footer-lyrics" class="footer-lyrics-text">
-                    <!-- Lyrics will be inserted here -->
-                </blockquote>
-                <p id="footer-song-info" class="footer-song-info">
-                    <!-- Song info will be inserted here -->
-                </p>
-                <div class="footer-lyrics-controls">
-                    <button onclick="changeFooterLyric()" class="lyrics-btn ghost" aria-label="Change lyrics">
-                        <i class="fas fa-random"></i>
-                    </button>
-                    <a href="{{ url_for('all_lyrics') }}" class="lyrics-btn ghost" aria-label="View all lyrics">
-                        <i class="fas fa-music"></i> All Lyrics
-                    </a>
-                </div>
+        <section class="terminal" id="terminal" aria-label="Site terminal">
+            <div class="terminal-bar">
+                <span class="terminal-dots">● ● ●</span>
+                <span class="terminal-title">hunter@local — sh</span>
+                <button type="button" class="terminal-clear" id="terminal-clear" aria-label="Clear terminal">clear</button>
             </div>
-            <div class="footer-bottom">
-                <a href="https://github.com/H-Bombmxpwr/Landing-Page" target="_blank" class="github-footer">
-                    <i class="fab fa-github"></i>
-                </a>
-                <span id="year"></span> - Hunter Baisden
-                <div class="visit-counter">
-                    <i class="fas fa-eye"></i> <span id="visit-count-text">{{ "{:,}".format(visit_count) }}</span> visits
-                </div>
+            <div class="terminal-output" id="terminal-output" role="log" aria-live="polite"></div>
+            <form class="terminal-input-line" id="terminal-form" autocomplete="off">
+                <span class="terminal-prompt"><span class="term-user">hunter@local</span>:<span class="term-cwd" id="terminal-cwd">~</span>$</span>
+                <input type="text" id="terminal-input" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Terminal input">
+            </form>
+        </section>
+
+        <footer class="footer-bottom">
+            <a href="https://github.com/H-Bombmxpwr/Landing-Page" target="_blank" class="github-footer">
+                <i class="fab fa-github"></i>
+            </a>
+            <span id="year"></span> - Hunter Baisden
+            <div class="phosphor-toggle" role="group" aria-label="Phosphor color theme">
+                <button type="button" class="theme-opt" data-theme="green" aria-pressed="false">green</button>
+                <button type="button" class="theme-opt" data-theme="amber" aria-pressed="false">amber</button>
+            </div>
+            <div class="visit-counter">
+                <i class="fas fa-eye"></i> <span id="visit-count-text">{{ "{:,}".format(visit_count) }}</span> visits
             </div>
         </footer>
-
-        <script>
-            document.getElementById('year').textContent = new Date().getFullYear();
-        </script>
-
-        <!-- Visitor counter: POST once per session, otherwise just refresh display -->
-        <script>
-        (function () {
-            var el = document.getElementById('visit-count-text');
-            if (!el) return;
-            var display = function (n) {
-                if (typeof n === 'number') el.textContent = n.toLocaleString();
-            };
-            try {
-                if (!sessionStorage.getItem('hunterVisited')) {
-                    fetch('/api/visit', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        keepalive: true,
-                        body: JSON.stringify({ path: window.location.pathname })
-                    })
-                    .then(function (r) { return r.ok ? r.json() : null; })
-                    .then(function (d) {
-                        if (!d) return;
-                        if (d.counted !== false) sessionStorage.setItem('hunterVisited', '1');
-                        display(d.count);
-                    })
-                    .catch(function () {});
-                } else {
-                    fetch('/api/visit-count')
-                        .then(function (r) { return r.ok ? r.json() : null; })
-                        .then(function (d) { if (d) display(d.count); })
-                        .catch(function () {});
-                }
-            } catch (e) {}
-        })();
-        </script>
     </div>
 
-    <!-- City Image Arrays -->
-    <script>
-    window.BALTIMORE_IMAGES = {{ city_image_urls.baltimore | tojson }};
-    window.DC_IMAGES = {{ city_image_urls.dc | tojson }};
-    window.CHICAGO_IMAGES = {{ city_image_urls.chicago | tojson }};
-
-    // Dynamic images configuration
-    window.DYNAMIC_IMAGES_ENABLED = {{ 'true' if dynamic_images else 'false' }};
-    </script>
-
-    <!-- Core Scripts -->
-    <script src="{{ url_for('static', filename='js/collage.js') }}"></script>
+    <script>window.TERMINAL_PROJECTS = {{ terminal_projects | tojson }};</script>
+    <script src="{{ url_for('static', filename='js/site.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/effects.js') }}"></script>
     <script src="{{ url_for('static', filename='js/lyrics-footer.js') }}"></script>
-
-    <!-- City Slider Logic -->
-    <script>
-    (function() {
-        const slider = document.getElementById('city-slider');
-        const cities = ['baltimore', 'dc', 'chicago'];
-
-        if (slider) {
-            // Set slider to saved city immediately
-            try {
-                const saved = localStorage.getItem('selectedCity') || 'baltimore';
-                const idx = cities.indexOf(saved);
-                if (idx !== -1) slider.value = idx;
-            } catch(e) {}
-
-            slider.addEventListener('input', function() {
-                const cityIndex = parseInt(this.value, 10);
-                const city = cities[cityIndex];
-                if (city && window.CityCollage) {
-                    window.CityCollage.switchCity(city);
-                }
-            });
-        }
-    })();
-    </script>
-
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const items = document.querySelectorAll('.animate-on-scroll');
-        if (!items.length) return;
-
-        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        if (reduced || !('IntersectionObserver' in window)) {
-            items.forEach(el => el.classList.add('animate-in'));
-            return;
-        }
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (!entry.isIntersecting) return;
-                entry.target.classList.add('animate-in');
-                observer.unobserve(entry.target);
-            });
-        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-
-        items.forEach(el => observer.observe(el));
-    });
-    </script>
+    <script src="{{ url_for('static', filename='js/terminal-dino.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/terminal.js') }}"></script>
 
     {% block scripts %}{% endblock %}
 </body>

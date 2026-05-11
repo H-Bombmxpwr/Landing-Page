@@ -1,0 +1,139 @@
+/* ============================================================================
+   Pseudo-terminal styling. Loaded after style.css so it can reference the
+   shared phosphor accent tokens (--accent, --accent-bright, --border, ...).
+   ========================================================================== */
+
+.terminal{
+  margin: 56px 0 0;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 2;
+}
+
+.terminal-bar{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 7px 12px;
+  background: var(--surface-3);
+  border-bottom: 1px solid var(--border-strong);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+.terminal-dots{
+  color: var(--dim);
+  letter-spacing: 0.5em;
+  font-size: 0.62rem;
+  user-select: none;
+}
+.terminal-title{
+  color: var(--muted);
+  flex: 1;
+  text-align: center;
+  letter-spacing: 0.04em;
+}
+.terminal-clear{
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  padding: 2px 8px;
+  cursor: pointer;
+  text-transform: lowercase;
+  letter-spacing: 0.04em;
+  border-radius: 0;
+}
+.terminal-clear:hover{
+  border-color: var(--accent);
+  color: var(--accent-bright);
+}
+
+.terminal-output{
+  font-family: var(--mono);
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: var(--text);
+  background: var(--surface);
+  padding: 10px 14px;
+  height: 280px;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+.terminal-output::-webkit-scrollbar { width: 8px; }
+.terminal-output::-webkit-scrollbar-track { background: var(--surface-2); }
+.terminal-output::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+}
+.terminal-output::-webkit-scrollbar-thumb:hover { background: var(--accent-dim); }
+
+.term-line{
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.term-line.cmd { color: var(--text-strong); }
+.term-line.err { color: var(--red); }
+.term-line.dim { color: var(--muted); }
+
+.term-line .term-user  { color: var(--accent); font-weight: 600; }
+.term-line .term-cwd   { color: var(--accent-bright); }
+.term-line .term-dir   { color: var(--accent); font-weight: 600; }
+.term-line .term-file  { color: var(--text); }
+.term-line .term-quote { color: var(--accent); }
+
+.term-game{
+  font-family: var(--mono);
+  font-size: 0.88rem;
+  line-height: 1.25;
+  color: var(--text-strong);
+  white-space: pre;
+  margin: 6px 0 4px;
+  letter-spacing: 0;
+}
+
+.terminal-input-line{
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 14px;
+  background: var(--surface-2);
+  border-top: 1px solid var(--border-strong);
+  font-family: var(--mono);
+  font-size: 0.86rem;
+}
+.terminal-prompt{
+  color: var(--accent);
+  white-space: nowrap;
+  user-select: none;
+}
+.terminal-prompt .term-user { color: var(--accent); }
+.terminal-prompt .term-cwd  { color: var(--accent-bright); }
+
+#terminal-input{
+  flex: 1;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  color: var(--text-strong);
+  font-family: var(--mono);
+  font-size: inherit;
+  padding: 0;
+  caret-color: var(--accent);
+}
+
+@media (max-width: 720px){
+  .terminal{ margin-top: 36px; }
+  .terminal-output{ height: 220px; font-size: 0.78rem; padding: 8px 10px; }
+  .terminal-input-line{ font-size: 0.78rem; padding: 7px 10px; }
+  .terminal-bar{ padding: 6px 10px; }
+}
+
+/* Lyrics section that now lives on the index page only */
+.home-lyrics{
+  margin: 36px 0 0;
+}
+.home-lyrics .footer-lyrics-text{ margin-bottom: 12px; }

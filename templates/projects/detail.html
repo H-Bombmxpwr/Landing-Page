@@ -102,92 +102,14 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-const galleryImages = [
-    "{{ image_url(project.iconImagePath) }}"
-    {% if project.galleryImages %}
-    {% for image in project.galleryImages %}
-    , "{{ image_url(image) }}"
-    {% endfor %}
-    {% endif %}
-];
-
-let currentImageIndex = 0;
-
-function openLightbox(index) {
-    currentImageIndex = index;
-    updateLightboxImage();
-    document.getElementById('lightbox').classList.add('active');
-    document.body.style.overflow = 'hidden';
+<script type="application/json" id="project-detail-data">
+{
+  "images": [
+    {{ image_url(project.iconImagePath) | tojson }}
+    {% if project.galleryImages %}{% for image in project.galleryImages %}, {{ image_url(image) | tojson }}{% endfor %}{% endif %}
+  ],
+  "lichessUser": {{ (project.lichessUser or '') | tojson }}
 }
-
-function closeLightbox() {
-    document.getElementById('lightbox').classList.remove('active');
-    document.body.style.overflow = '';
-}
-
-function navigateLightbox(direction, evt) {
-    if (evt) evt.stopPropagation();
-    currentImageIndex += direction;
-    if (currentImageIndex < 0) currentImageIndex = galleryImages.length - 1;
-    if (currentImageIndex >= galleryImages.length) currentImageIndex = 0;
-    updateLightboxImage();
-}
-
-function updateLightboxImage() {
-    const img = document.getElementById('lightbox-img');
-    const counter = document.getElementById('lightbox-counter');
-    img.src = galleryImages[currentImageIndex];
-    counter.textContent = `${currentImageIndex + 1} / ${galleryImages.length}`;
-
-    const prevBtn = document.querySelector('.lightbox-prev');
-    const nextBtn = document.querySelector('.lightbox-next');
-    if (galleryImages.length <= 1) {
-        prevBtn.style.display = 'none';
-        nextBtn.style.display = 'none';
-        counter.style.display = 'none';
-    } else {
-        prevBtn.style.display = 'flex';
-        nextBtn.style.display = 'flex';
-        counter.style.display = 'block';
-    }
-}
-
-{% if project.lichessUser %}
-(function() {
-    const container = document.getElementById('lichess-embed-container');
-    if (!container) return;
-
-    fetch('https://lichess.org/api/games/user/{{ project.lichessUser }}?max=1&pgnInJson=true', {
-        headers: { 'Accept': 'application/x-ndjson' }
-    })
-    .then(response => response.text())
-    .then(text => {
-        const line = text.trim().split('\n')[0];
-        if (!line) throw new Error('No games found');
-        const game = JSON.parse(line);
-        const gameId = game.id;
-        if (!gameId) throw new Error('No game ID');
-
-        container.innerHTML = '<iframe src="https://lichess.org/embed/game/' + gameId + '?theme=auto&bg=auto" ' +
-            'width="100%" height="400" frameborder="0" allowtransparency="true" ' +
-            'style="border-radius: 8px; max-width: 600px;"></iframe>';
-    })
-    .catch(err => {
-        console.error('Failed to load Lichess game:', err);
-        container.innerHTML = '<p>Could not load the most recent game. ' +
-            '<a href="https://lichess.org/@/{{ project.lichessUser }}" target="_blank" rel="noopener noreferrer">View on Lichess</a></p>';
-    });
-})();
-{% endif %}
-
-document.addEventListener('keydown', function(e) {
-    const lightbox = document.getElementById('lightbox');
-    if (!lightbox.classList.contains('active')) return;
-
-    if (e.key === 'Escape') closeLightbox();
-    if (e.key === 'ArrowLeft') navigateLightbox(-1);
-    if (e.key === 'ArrowRight') navigateLightbox(1);
-});
 </script>
+<script src="{{ url_for('static', filename='js/project-detail.js') }}"></script>
 {% endblock %}

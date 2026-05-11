@@ -25,6 +25,7 @@
      * Fetch lyrics from the static JSON file
      */
     async function fetchLyrics() {
+        if (!document.getElementById('footer-lyrics')) return;
         try {
             const response = await fetch('/static/data/lyrics.json');
             if (!response.ok) throw new Error('Failed to fetch lyrics');
