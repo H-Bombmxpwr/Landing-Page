@@ -315,20 +315,27 @@ _ensure_visitor_db()
 # and bots are filtered by user-agent.
 
 def get_terminal_projects():
-    """Compact project id/title lists for the in-page terminal filesystem."""
+    """Compact project id/title/link payload for the in-page terminal filesystem."""
     try:
         projects = load_projects()
     except Exception:
         return {'personal': [], 'academic': []}
+
+    def shape(p):
+        links = {}
+        if p.get('hasLive')     and p.get('liveLink'):     links['live']     = p['liveLink']
+        if p.get('hasGithub')   and p.get('githubLink'):   links['github']   = p['githubLink']
+        if p.get('hasVideo')    and p.get('videoLink'):    links['video']    = p['videoLink']
+        if p.get('hasDownload') and p.get('downloadLink'): links['download'] = p['downloadLink']
+        return {
+            'id': p.get('id', ''),
+            'title': p.get('title', ''),
+            'links': links,
+        }
+
     return {
-        'personal': [
-            {'id': p.get('id', ''), 'title': p.get('title', '')}
-            for p in projects.get('personal', []) if p.get('id')
-        ],
-        'academic': [
-            {'id': p.get('id', ''), 'title': p.get('title', '')}
-            for p in projects.get('academic', []) if p.get('id')
-        ],
+        'personal': [shape(p) for p in projects.get('personal', []) if p.get('id')],
+        'academic': [shape(p) for p in projects.get('academic', []) if p.get('id')],
     }
 
 

@@ -1745,11 +1745,6 @@ input:focus, .select:focus, .num:focus{
   border-top: 0;
   flex-wrap: wrap;
 }
-.footer-bottom::before{
-  content: "hunter@local:~$";
-  color: var(--accent);
-  margin-right: 4px;
-}
 .github-footer{
   color: var(--muted);
   display: inline-flex;

@@ -47,6 +47,7 @@
       display: display,
       routePath: opts.routePath || null,
       desc: opts.desc || '',
+      links: opts.links || null,
       parent: parent,
       children: {}
     };
@@ -83,11 +84,19 @@
     var data = window.TERMINAL_PROJECTS || { personal: [], academic: [] };
     (data.personal || []).forEach(function (p) {
       if (!p || !p.id) return;
-      makeDir(personal, p.id, { routePath: '/projects/' + p.id, desc: p.title || '' });
+      makeDir(personal, p.id, {
+        routePath: '/projects/' + p.id,
+        desc: p.title || '',
+        links: p.links || {}
+      });
     });
     (data.academic || []).forEach(function (p) {
       if (!p || !p.id) return;
-      makeDir(academic, p.id, { routePath: '/projects/' + p.id, desc: p.title || '' });
+      makeDir(academic, p.id, {
+        routePath: '/projects/' + p.id,
+        desc: p.title || '',
+        links: p.links || {}
+      });
     });
 
     return fsRoot;
@@ -225,7 +234,8 @@
       ['go',                  'alias for `open` (no args = current cwd)'],
       ['random',              'jump to a random page'],
       ['lyric',               'print a random song lyric'],
-      ['dino',                'play the ASCII dino runner'],
+      ['ssh [live|github|video|download]', 'open a project link (only inside a project dir)'],
+      ['snake',               'play the ASCII snake game'],
       ['theme <green|amber>', 'switch phosphor color'],
       ['whoami',              'short bio'],
       ['echo <text>',         'echo back'],
@@ -414,19 +424,62 @@
 
   COMMANDS.clear = function () { output.innerHTML = ''; };
 
-  COMMANDS.dino = function () {
-    if (!window.TerminalDino || typeof window.TerminalDino.start !== 'function') {
-      print('dino: game module not loaded', 'err');
+  COMMANDS.snake = function () {
+    if (!window.TerminalSnake || typeof window.TerminalSnake.start !== 'function') {
+      print('snake: game module not loaded', 'err');
       return;
     }
-    print('starting dino runner — [SPACE]/[↑] jump · [Q] quit · [R] restart', 'dim');
+    print('starting snake — [↑↓←→ / WASD] move · [Q] quit · [R] restart', 'dim');
     mode = 'game';
     input.blur();
-    window.TerminalDino.start(output, function () {
+    window.TerminalSnake.start(output, function () {
       mode = 'shell';
-      print('— exit dino —', 'dim');
+      print('— exit snake —', 'dim');
       input.focus();
     });
+  };
+
+  /* `ssh` opens an external project link in a new tab. It only works
+     inside a project directory (a node under personal/ or academic/
+     that has .links populated). */
+  function isProjectNode(node) {
+    if (!node || !node.links) return false;
+    var p = node.parent;
+    return !!(p && (p.name === 'personal' || p.name === 'academic'));
+  }
+
+  COMMANDS.ssh = function (args) {
+    if (!isProjectNode(cwd)) {
+      print('ssh: only available inside a project directory.', 'err');
+      print('     try `cd personal/<project>` or `cd academic/<project>` first.', 'dim');
+      return;
+    }
+    var links = cwd.links || {};
+    var available = Object.keys(links).filter(function (k) { return links[k]; });
+    if (!available.length) {
+      print('ssh: no external links for ' + cwd.name, 'err');
+      return;
+    }
+
+    var which = (args[0] || '').toLowerCase();
+    var target;
+    if (which) {
+      target = links[which];
+      if (!target) {
+        print('ssh: no `' + which + '` link for ' + cwd.name, 'err');
+        print('     available: ' + available.join(', '), 'dim');
+        return;
+      }
+    } else {
+      // priority: live > github > video > download
+      var order = ['live', 'github', 'video', 'download'];
+      for (var i = 0; i < order.length; i++) {
+        if (links[order[i]]) { which = order[i]; target = links[which]; break; }
+      }
+    }
+
+    print('ssh ' + which + ' → ' + target, 'dim');
+    window.open(target, '_blank', 'noopener,noreferrer');
   };
 
   /* ---- parse + run ------------------------------------------------- */
@@ -514,10 +567,21 @@
       };
     }
     if (cmd === 'theme') {
-      var pool = ['green', 'amber'];
+      var themePool = ['green', 'amber'];
       return {
         prefix: token,
-        matches: pool.filter(function (p) { return p.indexOf(token) === 0; }),
+        matches: themePool.filter(function (p) { return p.indexOf(token) === 0; }),
+        replaceFrom: argStart,
+        mode: 'arg'
+      };
+    }
+    if (cmd === 'ssh') {
+      var sshPool = (isProjectNode(cwd) && cwd.links)
+        ? Object.keys(cwd.links).filter(function (k) { return cwd.links[k]; })
+        : [];
+      return {
+        prefix: token,
+        matches: sshPool.filter(function (p) { return p.indexOf(token) === 0; }),
         replaceFrom: argStart,
         mode: 'arg'
       };
