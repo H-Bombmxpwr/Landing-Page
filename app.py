@@ -1,6 +1,5 @@
 from flask import Flask, render_template, jsonify, abort, url_for
 from dotenv import load_dotenv
-import requests
 import random
 import json
 import os
@@ -23,9 +22,7 @@ app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-change-in-production')
 
 # Feature flags
-SHOW_GAME = False    
-SHOW_RESUME = False  
-SHOW_BLOG = False    
+SHOW_RESUME = False
 
 # ============================================
 # VISITOR COUNTER (SQLite-backed)
@@ -343,9 +340,7 @@ def get_terminal_projects():
 def inject_feature_flags():
     """Make feature flags available to all templates"""
     return {
-        'show_game': SHOW_GAME,
         'show_resume': SHOW_RESUME,
-        'show_blog': SHOW_BLOG,
         'visit_count': get_authoritative_visit_count(),
         'image_url': static_image_url,
         'terminal_projects': get_terminal_projects(),
@@ -426,15 +421,6 @@ def load_projects():
     """Load projects from JSON file"""
     with open('static/data/projects.json', 'r') as f:
         return json.load(f)
-
-def load_blog_posts():
-    """Load blog posts from JSON file"""
-    try:
-        with open('static/data/blog.json', 'r') as f:
-            data = json.load(f)
-            return data.get('posts', [])
-    except FileNotFoundError:
-        return []
 
 def get_quick_stats():
     """Calculate quick stats for the home page"""
@@ -664,12 +650,6 @@ def about():
                          active_page='about',
                          page_id='about-page')
 
-@app.route('/game')
-def game():
-    return render_template('game.html',
-                         active_page='game',
-                         page_id='game-page')
-
 @app.route('/projects/personal')
 def personal_projects():
     projects = load_projects()
@@ -702,23 +682,6 @@ def project_detail(project_id):
                          project=project,
                          active_page=category,
                          page_id='project-detail-page')
-
-@app.route("/api/quote")
-def get_quote():
-    """Fetches a random quote from the ZenQuotes API and returns JSON"""
-    try:
-        response = requests.get("https://zenquotes.io/api/quotes")
-        response.raise_for_status()
-        quotes = response.json()
-
-        if isinstance(quotes, list) and len(quotes) > 0:
-            random_quote = random.choice(quotes)
-            return jsonify({"quote": random_quote["q"], "author": random_quote["a"]})
-        else:
-            return jsonify({"error": "Invalid response from API"}), 500
-
-    except requests.exceptions.RequestException as e:
-        return jsonify({"error": str(e)}), 500
 
 @app.route('/api/lyrics/random')
 def random_lyric():
@@ -797,25 +760,6 @@ def all_lyrics():
 @app.route('/all-lyrics')
 def all_lyrics_redirect():
     return all_lyrics()
-
-@app.route('/blog')
-def blog():
-    posts = load_blog_posts()
-    return render_template('blog/index.html',
-                         posts=posts,
-                         active_page='blog',
-                         page_id='blog-page')
-
-@app.route('/blog/<post_id>')
-def blog_post(post_id):
-    posts = load_blog_posts()
-    post = next((p for p in posts if p.get('id') == post_id), None)
-    if not post:
-        abort(404)
-    return render_template('blog/post.html',
-                         post=post,
-                         active_page='blog',
-                         page_id='blog-post-page')
 
 @app.errorhandler(404)
 def page_not_found(e):

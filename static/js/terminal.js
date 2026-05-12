@@ -235,7 +235,7 @@
       ['random',              'jump to a random page'],
       ['lyric',               'print a random song lyric'],
       ['ssh [live|github|video|download]', 'open a project link (only inside a project dir)'],
-      ['snake',               'play the ASCII snake game'],
+      ['doom',                'launch DOOM (jsdoom embed) in the terminal'],
       ['theme <green|amber>', 'switch phosphor color'],
       ['whoami',              'short bio'],
       ['echo <text>',         'echo back'],
@@ -424,17 +424,24 @@
 
   COMMANDS.clear = function () { output.innerHTML = ''; };
 
-  COMMANDS.snake = function () {
-    if (!window.TerminalSnake || typeof window.TerminalSnake.start !== 'function') {
-      print('snake: game module not loaded', 'err');
+  COMMANDS.doom = function () {
+    if (!window.TerminalDoom || typeof window.TerminalDoom.start !== 'function') {
+      print('doom: module not loaded', 'err');
       return;
     }
-    print('starting snake — [↑↓←→ / WASD] move · [Q] quit · [R] restart', 'dim');
+    print('launching DOOM — click the frame to capture input, ✕/Esc to quit', 'dim');
+    print('');
+    printHtml('<span class="term-dir">controls</span>');
+    printHtml('  <span class="term-dir">W</span> / <span class="term-dir">A</span> / <span class="term-dir">S</span> / <span class="term-dir">D</span>     <span class="dim">move</span>');
+    printHtml('  <span class="term-dir">mouse</span>             <span class="dim">aim</span>');
+    printHtml('  <span class="term-dir">click</span>             <span class="dim">shoot</span>');
+    printHtml('  <span class="term-dir">esc</span> / <span class="term-dir">✕</span>         <span class="dim">quit</span>');
+    print('');
     mode = 'game';
     input.blur();
-    window.TerminalSnake.start(output, function () {
+    window.TerminalDoom.start(output, function () {
       mode = 'shell';
-      print('— exit snake —', 'dim');
+      print('— exit doom —', 'dim');
       input.focus();
     });
   };
@@ -686,9 +693,26 @@
     input.focus();
   });
 
+  /* ---- global Tab keybind — focuses terminal input from anywhere -- */
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Tab') return;
+    if (mode !== 'shell') return;
+
+    var active = document.activeElement;
+    if (active === input) return; // already in the terminal — let tab-complete handle it
+    // Don't steal Tab from other text inputs / textareas / contenteditable
+    if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) {
+      return;
+    }
+    e.preventDefault();
+    input.focus();
+    root.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  });
+
   /* ---- boot -------------------------------------------------------- */
   setCwd(fs);
   print('hunter@local — pseudo-terminal v1.0', 'dim');
-  print('type `help` for commands · `dino` to play · `random` to wander', 'dim');
+  print('type `help` for commands · `doom` to play · `random` to wander', 'dim');
+  print('tip: press TAB anywhere on the page to jump back to this prompt', 'dim');
   print('');
 })();
