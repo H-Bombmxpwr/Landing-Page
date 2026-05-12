@@ -193,14 +193,15 @@
     {
       "id": "portfolio-website",
       "title": "This Website!",
-      "shortDescription": "My portfolio website built with Flask",
+      "shortDescription": "Flask portfolio with a brutalist-terminal look and a real in-page shell you can navigate the site with.",
       "description": [
-        "A website to show off all of my projects and introduce myself.",
-        "It is written with Flask and is hosted on Railway.",
-        "Features include city-themed backgrounds, dynamic project pages, and a lyrics footer."
+        "The site you're on right now. A Flask app rendered server-side with vanilla JavaScript on top — no framework, no build step. The aesthetic is brutalist-terminal: IBM Plex Mono throughout, hard one-pixel borders, no rounded corners, a subtle dot grid behind everything, and a phosphor accent that toggles between classic CRT green and IBM amber (persisted across visits).",
+        "The signature feature lives in the footer: a working pseudo-terminal that models the site as a virtual filesystem. `cd personal` then `ls` shows every personal project; `cd academic/fpv-drone` then `open` navigates to that detail page; `ssh github` opens its repo in a new tab; `cat README.md` prints a bio; `lyric` pulls a random song lyric live; `random` rolls a random page; `doom` boots a vendored copy of Nicholas Carlini's js13k Doom clone inside the terminal. Tab-completes commands and cwd-aware paths, history is on the arrow keys, and pressing Tab anywhere on the site jumps focus back to the prompt.",
+        "Other bits: a Leaflet-based visitor map with a SQLite-backed counter that geocodes to city-level only and never stores IPs; a home-page lyric rotator; per-project galleries with a keyboard-driven lightbox; an embedded most-recent Lichess game on the chess project pages.",
+        "Stack: Python / Flask, SQLite for the visitor counter, vanilla JS organized into small per-subsystem files (terminal.js, terminal-doom.js, visitors-map.js, effects.js, ...), and a tokenized CSS variable system that drives the green/amber theme swap. Source on GitHub."
       ],
       "iconImage": "images.jpg",
-      "tags": ["Python", "Flask", "Web", "CSS", "JavaScript"],
+      "tags": ["Python", "Flask", "Vanilla JS", "SQLite", "CSS", "Leaflet"],
       "hasGithub": true,
       "githubLink": "https://github.com/H-Bombmxpwr/Landing-Page",
       "hasLive": true,
