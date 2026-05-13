@@ -9,6 +9,8 @@ dependencies = [
     "gunicorn==20.1.0",
     "pillow==12.1.0",
     "python-dotenv==1.2.1",
+    # Gunicorn 20 imports pkg_resources; setuptools 81+ no longer ships it.
+    "setuptools==80.9.0",
     "werkzeug==2.2.2",
 ]
 
