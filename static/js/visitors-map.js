@@ -12,7 +12,7 @@
     zoomControl: true,
     attributionControl: true,
     worldCopyJump: true,
-    scrollWheelZoom: false
+    scrollWheelZoom: true
   });
   var markerLayer = L.layerGroup().addTo(map);
 
