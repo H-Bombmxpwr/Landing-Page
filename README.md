@@ -54,7 +54,8 @@ prompt. Once focused, `Tab` completes commands and paths (cwd-aware),
 ## Tech
 
 - **Backend:** Flask, SQLite (visitor counter), `ipinfo.io` for
-  city-level geocoding behind a token (optional).
+  city-level geocoding behind a token (optional). Python dependencies
+  are managed with `uv` and locked in `uv.lock`.
 - **Frontend:** vanilla JS, no bundler, no framework. Each subsystem
   has its own file under `static/js/` (`terminal.js`,
   `terminal-doom.js`, `visitors-map.js`, etc.). Styles split across
@@ -69,15 +70,18 @@ prompt. Once focused, `Tab` completes commands and paths (cwd-aware),
 
 ## Running locally
 
+Install `uv` first, then from the repo root:
+
 ```bash
-python -m venv .venv
-.venv/Scripts/activate     # or `source .venv/bin/activate`
-pip install -r requirements.txt
-python app.py
+uv sync
+uv run python app.py
 ```
 
 Then open <http://127.0.0.1:5000>. The Flask dev server runs with
 `debug=False`, so template changes require a restart.
+
+When dependencies change, use `uv add <package>` or edit
+`pyproject.toml`, then run `uv lock`.
 
 Optional environment variables (in `.env`):
 
@@ -92,13 +96,14 @@ Optional environment variables (in `.env`):
 ## Project layout
 
 ```
+pyproject.toml                 uv project metadata + dependencies
+uv.lock                        locked dependency graph
 app.py                        Flask routes + visitor counter
 templates/                    Jinja templates (base.html + per page)
 static/
   css/                        style.css, terminal.css
   js/                         site.js, effects.js, terminal.js, …
-  data/                       projects.json, lyrics.json,
-                              visits.json, visitors.sqlite3
+  data/                       projects.json, lyrics.json
   images/                     portrait + per-project galleries
   vendor/doom-clone/          GPL-3.0 vendored game (unmodified)
 scripts/
@@ -107,6 +112,10 @@ scripts/
 
 ## Deployment
 
-Procfile + `runtime.txt` + `requirements.txt` are wired for Railway.
-The visitor SQLite needs a persistent volume — point `DATA_DIR` at
-the mount path so the counter survives redeploys.
+The Dockerfile installs `uv`, syncs from `uv.lock`, and runs Gunicorn
+with `uv run --frozen`. The Procfile uses the same `uv run --frozen`
+Gunicorn command for hosts that use Procfile-based starts. `runtime.txt`
+keeps the Python 3.11 target explicit for non-Docker platforms.
+
+The visitor SQLite needs a persistent volume — point `DATA_DIR` at the
+mount path so the counter survives redeploys.
