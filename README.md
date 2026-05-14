@@ -114,8 +114,9 @@ scripts/
 
 The Dockerfile installs `uv`, syncs from `uv.lock`, and runs Gunicorn
 with `uv run --frozen`. The Procfile uses the same `uv run --frozen`
-Gunicorn command for hosts that use Procfile-based starts. `runtime.txt`
-keeps the Python 3.11 target explicit for non-Docker platforms.
+Gunicorn command for hosts that use Procfile-based starts. The Python
+version is pinned in `.python-version` (picked up by `uv` locally and
+by modern Heroku / Railway / Nixpacks builders).
 
 The visitor SQLite needs a persistent volume — point `DATA_DIR` at the
 mount path so the counter survives redeploys.
