@@ -105,8 +105,17 @@ def _ensure_visitor_db():
                 geocode_status TEXT NOT NULL DEFAULT 'pending'
             )
         """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS doom_scores (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                score INTEGER NOT NULL,
+                created_at TEXT NOT NULL
+            )
+        """)
         conn.execute("CREATE INDEX IF NOT EXISTS idx_visitor_events_created ON visitor_events(created_at)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_visitor_events_geo ON visitor_events(lat, lon)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_doom_scores_rank ON doom_scores(score DESC, created_at ASC)")
         row = conn.execute("SELECT count FROM visitor_counter WHERE id = 1").fetchone()
         if not row:
             now = _utc_iso()
@@ -736,6 +745,84 @@ def reset_visitors():
 def visitor_locations_api():
     """Return all visitor locations for the map"""
     return jsonify(get_visitor_snapshot())
+
+
+# ============================================
+# DOOM LEADERBOARD
+# Shared across all visitors via the same SQLite DB the visitor counter uses,
+# so it lives on the Railway volume (DATA_DIR). Top 10 are returned/displayed.
+# ============================================
+DOOM_NAME_RE = re.compile(r'^[A-Z]{3}$')
+DOOM_MAX_SCORE = 10000  # sanity cap; nobody legitimately kills this many
+DOOM_BLOCKLIST = {
+    'NGR', 'NIG', 'FAG', 'KKK', 'JAP', 'CHN', 'WOP', 'SPC', 'MIC', 'GOY',
+    'SLT', 'CUM', 'CUN', 'FUK', 'TWT', 'DIK', 'SHT', 'PSY',
+}
+
+
+def _doom_name_ok(name):
+    if not isinstance(name, str):
+        return False
+    name = name.upper()
+    if not DOOM_NAME_RE.match(name):
+        return False
+    if name in DOOM_BLOCKLIST:
+        return False
+    return True
+
+
+def _load_doom_scores(limit=10):
+    try:
+        _ensure_visitor_db()
+        with _visitor_db() as conn:
+            rows = conn.execute(
+                """
+                SELECT name, score, created_at
+                  FROM doom_scores
+                 ORDER BY score DESC, created_at ASC
+                 LIMIT ?
+                """,
+                (limit,),
+            ).fetchall()
+        return [dict(r) for r in rows]
+    except Exception:
+        return []
+
+
+def _record_doom_score(name, score):
+    with _visitor_db() as conn:
+        conn.execute(
+            "INSERT INTO doom_scores (name, score, created_at) VALUES (?, ?, ?)",
+            (name.upper(), int(score), _utc_iso()),
+        )
+        conn.commit()
+
+
+@app.route('/api/doom-scores')
+def doom_scores_get():
+    return jsonify({'scores': _load_doom_scores(limit=10)})
+
+
+@app.route('/api/doom-scores', methods=['POST'])
+def doom_scores_post():
+    from flask import request
+    data = request.get_json(silent=True) or {}
+    raw_name = str(data.get('name', '')).strip().upper()
+    try:
+        score = int(data.get('score', -1))
+    except (TypeError, ValueError):
+        return jsonify({'error': 'invalid score'}), 400
+
+    if not _doom_name_ok(raw_name):
+        return jsonify({'error': 'invalid name'}), 400
+    if score <= 0 or score > DOOM_MAX_SCORE:
+        return jsonify({'error': 'invalid score'}), 400
+
+    try:
+        _record_doom_score(raw_name, score)
+    except Exception:
+        return jsonify({'error': 'write failed'}), 500
+    return jsonify({'ok': True, 'scores': _load_doom_scores(limit=10)})
 
 @app.route('/visitors')
 def visitors():

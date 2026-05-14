@@ -67,11 +67,19 @@
     function teardown() {
       if (done) return;
       done = true;
+      // The game's kill count is a top-level `var killed_enemies` in its
+      // game.js. Same-origin iframe, so we can read it off the iframe's
+      // window. Null if anything goes wrong (cross-origin, not yet loaded).
+      var score = null;
+      try {
+        var w = iframe.contentWindow;
+        if (w && typeof w.killed_enemies === 'number') score = w.killed_enemies;
+      } catch (e) { /* leave null */ }
       outputEl.style.height = origHeight;
       if (container.parentNode) container.parentNode.removeChild(container);
       document.removeEventListener('keydown', keyHandler);
       document.dispatchEvent(new CustomEvent('doom:exit'));
-      if (typeof onExit === 'function') onExit();
+      if (typeof onExit === 'function') onExit(score);
     }
 
     function keyHandler(e) {
