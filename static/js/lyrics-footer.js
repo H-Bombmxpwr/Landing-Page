@@ -7,6 +7,7 @@
     let lyricsData = [];
     let currentIndex = 0;
     let autoChangeTimer = null;
+    let paused = false;
     const AUTO_CHANGE_INTERVAL = 45000; // 45 seconds
 
     /**
@@ -92,6 +93,7 @@
      * Start auto-change timer
      */
     function startAutoChange() {
+        if (paused) return;
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
         autoChangeTimer = setInterval(() => {
@@ -105,9 +107,24 @@
     function resetAutoChange() {
         if (autoChangeTimer) {
             clearInterval(autoChangeTimer);
+            autoChangeTimer = null;
         }
         startAutoChange();
     }
+
+    // Pause rotation while a game is running so layout shifts from a
+    // new lyric don't push the iframe around.
+    document.addEventListener('doom:start', () => {
+        paused = true;
+        if (autoChangeTimer) {
+            clearInterval(autoChangeTimer);
+            autoChangeTimer = null;
+        }
+    });
+    document.addEventListener('doom:exit', () => {
+        paused = false;
+        if (lyricsData.length) startAutoChange();
+    });
 
     // Expose the change function globally
     window.changeFooterLyric = nextLyric;

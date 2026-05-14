@@ -232,6 +232,7 @@
       ['cat <file>',          'print a file (README.md, bio.txt, lyrics.txt)'],
       ['open [path]',         'navigate to the current cwd or named route'],
       ['go',                  'alias for `open` (no args = current cwd)'],
+      ['home',                'navigate to the home page'],
       ['random',              'jump to a random page'],
       ['lyric',               'print a random song lyric'],
       ['ssh [live|github|video|download]', 'open a project link (only inside a project dir)'],
@@ -353,6 +354,15 @@
   };
 
   COMMANDS.go = function (args) { COMMANDS.open(args); };
+
+  COMMANDS.home = function () {
+    if (window.location.pathname === '/') {
+      print('already home', 'dim');
+      return;
+    }
+    print('opening / ...', 'dim');
+    setTimeout(function () { window.location.href = '/'; }, 220);
+  };
 
   COMMANDS.random = function () {
     // pool = every node in the tree that has a routePath, plus the home page

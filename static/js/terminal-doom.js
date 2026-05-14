@@ -59,6 +59,10 @@
     var origHeight = outputEl.style.height;
     outputEl.style.height = '520px';
 
+    // Tell the rest of the page (lyric rotator, etc.) to hold still so
+    // height changes elsewhere don't push the iframe around mid-play.
+    document.dispatchEvent(new CustomEvent('doom:start'));
+
     var done = false;
     function teardown() {
       if (done) return;
@@ -66,6 +70,7 @@
       outputEl.style.height = origHeight;
       if (container.parentNode) container.parentNode.removeChild(container);
       document.removeEventListener('keydown', keyHandler);
+      document.dispatchEvent(new CustomEvent('doom:exit'));
       if (typeof onExit === 'function') onExit();
     }
 
