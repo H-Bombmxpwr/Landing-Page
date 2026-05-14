@@ -145,9 +145,8 @@
   /* ---- shell state ------------------------------------------------- */
   var hist     = [];
   var histIdx  = 0;
-  var mode     = 'shell';     // 'shell' | 'game' | 'initials'
+  var mode     = 'shell';
   var bootTime = Date.now();
-  var pendingScore = 0;       // kill count waiting for initials
 
   /* ---- output primitives ------------------------------------------ */
   function escapeHtml(s) {
@@ -220,70 +219,6 @@
     return node;
   }
 
-  /* ---- doom leaderboard ------------------------------------------- */
-  /* Backed by the server (SQLite on DATA_DIR / Railway volume). The
-     server enforces the same 3-letter + blocklist rules; this is a
-     client-side mirror so feedback is instant. */
-  var DOOM_LB_MAX = 10;
-  var DOOM_BLOCKLIST = [
-    'NGR','NIG','FAG','KKK','JAP','CHN','WOP','SPC','MIC','GOY','SLT',
-    'CUM','CUN','FUK','TWT','DIK','SHT','PSY'
-  ];
-  var doomScoresCache = null; // last-fetched top 10
-
-  function fetchLeaderboard() {
-    return fetch('/api/doom-scores')
-      .then(function (r) { return r.ok ? r.json() : { scores: [] }; })
-      .then(function (d) {
-        doomScoresCache = Array.isArray(d && d.scores) ? d.scores : [];
-        return doomScoresCache;
-      })
-      .catch(function () { return doomScoresCache || []; });
-  }
-
-  function qualifiesForLeaderboard(score) {
-    if (!score || score <= 0) return false;
-    var board = doomScoresCache || [];
-    if (board.length < DOOM_LB_MAX) return true;
-    return score > board[board.length - 1].score;
-  }
-
-  function submitScore(name, score) {
-    return fetch('/api/doom-scores', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name, score: score })
-    }).then(function (r) {
-      return r.json().then(function (d) { return { ok: r.ok, body: d }; });
-    });
-  }
-
-  function isProfane(name) {
-    return DOOM_BLOCKLIST.indexOf(name.toUpperCase()) !== -1;
-  }
-
-  function renderLeaderboard(board) {
-    printHtml('<span class="term-dir">DOOM HIGH SCORES</span>');
-    if (!board.length) {
-      print('  (empty — play `doom` to set one)', 'dim');
-      return;
-    }
-    board.forEach(function (entry, i) {
-      var rank = String(i + 1).padStart(2, ' ');
-      var name = String(entry.name || '   ').padEnd(3, ' ');
-      var score = String(entry.score).padStart(4, ' ');
-      printHtml(
-        '  <span class="dim">' + escapeHtml(rank) + '.</span> ' +
-        '<span class="term-dir">' + escapeHtml(name) + '</span>  ' +
-        '<span class="term-file">' + escapeHtml(score) + '</span>'
-      );
-    });
-  }
-
-  // Warm the cache so `qualifiesForLeaderboard` has data ready when the
-  // user finishes a doom run; failures are silently ignored.
-  fetchLeaderboard();
-
   /* ---- commands ---------------------------------------------------- */
   var COMMANDS = {};
 
@@ -302,7 +237,6 @@
       ['lyric',               'print a random song lyric'],
       ['ssh [live|github|video|download]', 'open a project link (only inside a project dir)'],
       ['doom',                'launch DOOM (jsdoom embed) in the terminal'],
-      ['highscores',          'DOOM high scores (aliases: leaderboard, scores)'],
       ['theme <green|amber>', 'switch phosphor color'],
       ['whoami',              'short bio'],
       ['echo <text>',         'echo back'],
@@ -512,89 +446,15 @@
     printHtml('  <span class="term-dir">mouse</span>             <span class="dim">aim</span>');
     printHtml('  <span class="term-dir">click</span>             <span class="dim">shoot</span>');
     printHtml('  <span class="term-dir">esc</span> / <span class="term-dir">✕</span>         <span class="dim">quit</span>');
-    printHtml('  <span class="dim">score = enemies killed · top 10 recorded</span>');
     print('');
     mode = 'game';
     input.blur();
-    window.TerminalDoom.start(output, function (score) {
+    window.TerminalDoom.start(output, function () {
       mode = 'shell';
       print('— exit doom —', 'dim');
-      if (score == null) {
-        input.focus();
-        return;
-      }
-      printHtml('final score: <span class="term-dir">' + score + '</span> ' +
-                '<span class="dim">kill' + (score === 1 ? '' : 's') + '</span>');
-      // Refetch the live board so the qualifying threshold reflects what
-      // other visitors have posted, not a stale page-load snapshot.
-      fetchLeaderboard().then(function () {
-        if (qualifiesForLeaderboard(score)) {
-          beginInitialsEntry(score);
-        } else if (score > 0) {
-          print('not quite top 10. try again.', 'dim');
-          input.focus();
-        } else {
-          print('no kills, no glory.', 'dim');
-          input.focus();
-        }
-      });
+      input.focus();
     });
   };
-
-  COMMANDS.leaderboard = function () {
-    print('loading high scores ...', 'dim');
-    fetchLeaderboard().then(function (board) { renderLeaderboard(board); });
-  };
-  COMMANDS.scores     = function () { COMMANDS.leaderboard(); };
-  COMMANDS.highscores = function () { COMMANDS.leaderboard(); };
-
-  /* ---- initials entry mode ---------------------------------------- */
-  /* Prompt for 3 letters after a qualifying doom run, validate, save. */
-  function beginInitialsEntry(score) {
-    pendingScore = score;
-    mode = 'initials';
-    print('NEW HIGH SCORE — enter 3 letters (A-Z):', 'dim');
-    input.maxLength = 3;
-    input.style.textTransform = 'uppercase';
-    input.value = '';
-    input.focus();
-  }
-
-  function endInitialsEntry() {
-    mode = 'shell';
-    pendingScore = 0;
-    input.maxLength = 200;
-    input.style.textTransform = '';
-  }
-
-  function handleInitials(raw) {
-    var cleaned = String(raw || '').toUpperCase().replace(/[^A-Z]/g, '');
-    printHtml('<span class="dim">&gt;</span> ' + escapeHtml(cleaned || '(blank)'));
-    if (cleaned.length !== 3) {
-      print('must be exactly 3 letters. try again:', 'err');
-      return;
-    }
-    if (isProfane(cleaned)) {
-      print('nope. pick something else:', 'err');
-      return;
-    }
-    var score = pendingScore;
-    print('submitting ...', 'dim');
-    submitScore(cleaned, score).then(function (res) {
-      if (res.ok) {
-        if (Array.isArray(res.body && res.body.scores)) {
-          doomScoresCache = res.body.scores;
-        }
-        print('saved. type `highscores` to see standings.', 'dim');
-        endInitialsEntry();
-      } else {
-        var msg = (res.body && res.body.error) || 'submit failed';
-        print('server rejected: ' + msg + '. try again:', 'err');
-      }
-    }).catch(function () {
-      print('network error. try again:', 'err');
-    });
-  }
 
   /* `ssh` opens an external project link in a new tab. It only works
      inside a project directory (a node under personal/ or academic/
@@ -793,15 +653,6 @@
   input.addEventListener('keydown', function (e) {
     if (mode === 'game') return;
 
-    if (mode === 'initials') {
-      // Block tab-complete and history navigation while collecting initials.
-      // Letters auto-uppercase via CSS; everything else gets filtered on submit.
-      if (e.key === 'Tab' || e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-        e.preventDefault();
-      }
-      return;
-    }
-
     if (e.key === 'Tab') {
       e.preventDefault();
       input.value = applyCompletion(input.value);
@@ -836,10 +687,6 @@
     if (mode === 'game') return;
     var value = input.value;
     input.value = '';
-    if (mode === 'initials') {
-      handleInitials(value);
-      return;
-    }
     run(value);
   });
 
