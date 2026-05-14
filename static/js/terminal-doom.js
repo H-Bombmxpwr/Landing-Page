@@ -55,9 +55,26 @@
     outputEl.appendChild(container);
     outputEl.scrollTop = outputEl.scrollHeight;
 
-    // Make the terminal tall enough to fit the iframe comfortably
+    // Animate the terminal-output height grow instead of snapping it,
+    // so the page doesn't jolt the moment doom is summoned.
     var origHeight = outputEl.style.height;
+    var origTransition = outputEl.style.transition;
+    var startHeight = outputEl.getBoundingClientRect().height + 'px';
+    outputEl.style.height = startHeight;
+    outputEl.style.transition = 'height 0.32s var(--ease, ease)';
+    // force layout so the transition actually fires
+    void outputEl.offsetHeight;
     outputEl.style.height = '520px';
+
+    // Bring the iframe into view smoothly so the user lands on the game
+    // even while doom's many scripts are still parsing on the main thread.
+    setTimeout(function () {
+      try {
+        container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } catch (e) {
+        container.scrollIntoView();
+      }
+    }, 60);
 
     // Tell the rest of the page (lyric rotator, etc.) to hold still so
     // height changes elsewhere don't push the iframe around mid-play.
@@ -68,6 +85,7 @@
       if (done) return;
       done = true;
       outputEl.style.height = origHeight;
+      outputEl.style.transition = origTransition;
       if (container.parentNode) container.parentNode.removeChild(container);
       document.removeEventListener('keydown', keyHandler);
       document.dispatchEvent(new CustomEvent('doom:exit'));
