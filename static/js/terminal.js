@@ -712,7 +712,7 @@
   /* ---- boot -------------------------------------------------------- */
   setCwd(fs);
   print('hunter@local — pseudo-terminal v1.0', 'dim');
-  print('type `help` for commands · `doom` to play · `random` to wander', 'dim');
+  print('type `help` for commands · `doom` to play Doom `random` to wander', 'dim');
   print('tip: press TAB anywhere on the page to jump back to this prompt', 'dim');
   print('');
 })();
