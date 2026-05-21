@@ -18,7 +18,7 @@
  * `cd` updates a node reference; `ls` reads that node's children.
  * Project lists come from window.TERMINAL_PROJECTS, rendered server-side.
  *
- * The dino game lives in terminal-dino.js.
+ * The doom embed lives in terminal-doom.js.
  */
 (function () {
   var root   = document.getElementById('terminal');
@@ -108,13 +108,22 @@
     'electrical engineer & computer scientist · baltimore, MD',
     '',
     'site for personal projects, academic work, lyrics, and the occasional',
-    'useless thing. type `ls` to see what is around, `cd <name>` to move in,',
+    'useless thing. `ls` to see what is around, `cd <name>` to move in,',
     '`open` to actually navigate there.',
+    '',
+    'navigation:',
+    '  · `open` follows the cwd inside this site — e.g. `cd personal`',
+    '    then `open` jumps to /personal. `open <name>` is the shortcut.',
+    '  · `ssh` is the *external* version: only works inside a project',
+    '    directory, and opens that project\'s offsite links (live demo,',
+    '    github, video, download). e.g. `cd personal/<id>` then `ssh` or',
+    '    `ssh github` / `ssh live` / `ssh video` / `ssh download`.',
+    '  · `home` snaps back to /, `random` rolls the dice.',
     '',
     'tips:',
     '  · tab completes commands and the items in the current directory',
     '  · `cd personal` then `ls` to see every personal project',
-    '  · `random` jumps somewhere, `dino` is a game'
+    '  · `doom` launches a playable doom clone inside the terminal'
   ].join('\n');
 
   var BIO_TEXT = [
