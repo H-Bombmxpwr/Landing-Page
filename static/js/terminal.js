@@ -200,6 +200,25 @@
     if (cwdEl) cwdEl.textContent = cwd.display;
   }
 
+  /* Find the deepest fs node whose routePath matches a URL pathname.
+     Used at boot so the terminal opens in the directory for the page
+     you're on (home page -> root, /projects/personal -> personal/, a
+     project detail page -> that project's dir, etc). */
+  function nodeForPath(pathname) {
+    var path = (pathname || '/').replace(/\/+$/, '') || '/';
+    if (path === '/') return fs;
+    var found = null;
+    (function walk(node) {
+      Object.keys(node.children).forEach(function (k) {
+        var c = node.children[k];
+        if (c.kind !== 'dir') return;
+        if (c.routePath === path) found = c;
+        walk(c);
+      });
+    })(fs);
+    return found;
+  }
+
   /* ---- path resolution -------------------------------------------- */
   function resolve(arg) {
     if (!arg) return cwd;
@@ -729,9 +748,16 @@
   });
 
   /* ---- boot -------------------------------------------------------- */
-  setCwd(fs);
+  /* Start in the directory that matches the page you're on. The home
+     page (and anything without a matching route) gets the root prompt. */
+  var startNode = nodeForPath(window.location.pathname) || fs;
+  setCwd(startNode);
   print('hunter@local — pseudo-terminal v1.0', 'dim');
   print('type `help` for commands · `doom` to play Doom `random` to wander', 'dim');
   print('tip: press TAB anywhere on the page to jump back to this prompt', 'dim');
+  if (startNode !== fs) {
+    printHtml('cwd set to <span class="term-cwd">' + escapeHtml(startNode.display) +
+              '</span> to match this page · <span class="term-dir">cd /</span> for root', 'dim');
+  }
   print('');
 })();
