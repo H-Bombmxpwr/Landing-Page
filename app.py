@@ -508,38 +508,33 @@ def get_icon_image_path(category, project_id, icon_image):
 
     return prefer_webp_asset(project_rel_path)
 
-def get_featured_project():
-    """Get the project marked as homeFeatured, or fall back to random featured"""
+def get_featured_projects(limit=3):
+    """
+    Projects marked homeFeatured, ordered by homeFeaturedRank.
+    Falls back to a single random featured project when none are marked.
+    """
     projects = load_projects()
-    all_projects = projects.get('personal', []) + projects.get('academic', [])
+    all_projects = []
+    for category in ('personal', 'academic'):
+        for project in projects.get(category, []):
+            project['category'] = category
+            all_projects.append(project)
 
-    # First look for a project explicitly marked for home feature
-    home_featured = [p for p in all_projects if p.get('homeFeatured', False)]
-    if home_featured:
-        project = home_featured[0]  # Take the first one marked
+    chosen = [p for p in all_projects if p.get('homeFeatured', False)]
+    if chosen:
+        chosen.sort(key=lambda p: p.get('homeFeaturedRank', 999))
+        chosen = chosen[:limit]
     else:
-        # Fall back to random from featured projects
-        featured = [p for p in all_projects if p.get('featured', False)]
-        if featured:
-            project = random.choice(featured)
-        elif all_projects:
-            project = random.choice(all_projects)
-        else:
-            return None
+        pool = [p for p in all_projects if p.get('featured', False)] or all_projects
+        chosen = [random.choice(pool)] if pool else []
 
-    # Determine category
-    if project in projects.get('personal', []):
-        project['category'] = 'personal'
-    else:
-        project['category'] = 'academic'
-
-    # Get icon image path
-    project['iconImagePath'] = get_icon_image_path(
-        project['category'],
-        project['id'],
-        project.get('iconImage', '')
-    )
-    return project
+    for project in chosen:
+        project['iconImagePath'] = get_icon_image_path(
+            project['category'],
+            project['id'],
+            project.get('iconImage', '')
+        )
+    return chosen
 
 def get_project_by_id(project_id):
     """Get a single project by ID with all images"""
@@ -636,10 +631,10 @@ def group_academic_projects(projects):
 
 @app.route('/')
 def index():
-    featured = get_featured_project()
+    featured = get_featured_projects()
     stats = get_quick_stats()
     return render_template('index.html',
-                         featured_project=featured,
+                         featured_projects=featured,
                          stats=stats,
                          active_page='home',
                          page_id='home-page')

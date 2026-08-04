@@ -66,33 +66,37 @@
 </section>
 {% endif %}
 
-{% if featured_project %}
+{% if featured_projects %}
 <section class="featured-section animate-on-scroll">
     <h2 class="section-title">
         <span class="title-accent"><i class="fas fa-star"></i></span>
-        Featured Project
+        Featured {% if featured_projects|length > 1 %}Projects{% else %}Project{% endif %}
     </h2>
-    <a href="{{ url_for('project_detail', project_id=featured_project.id) }}" class="featured-card">
-        <div class="featured-image">
-            <img
-                src="{{ image_url(featured_project.iconImagePath) }}"
-                alt="{{ featured_project.title }}"
-                loading="lazy"
-                decoding="async">
-            <div class="featured-overlay">
-                <span class="view-project">View Project <i class="fas fa-arrow-right"></i></span>
+    <div class="featured-list">
+        {% for featured_project in featured_projects %}
+        <a href="{{ url_for('project_detail', project_id=featured_project.id) }}" class="featured-card">
+            <div class="featured-image">
+                <img
+                    src="{{ image_url(featured_project.iconImagePath) }}"
+                    alt="{{ featured_project.title }}"
+                    loading="lazy"
+                    decoding="async">
+                <div class="featured-overlay">
+                    <span class="view-project">View Project <i class="fas fa-arrow-right"></i></span>
+                </div>
             </div>
-        </div>
-        <div class="featured-info">
-            <h3 class="featured-title">{{ featured_project.title }}</h3>
-            <p class="featured-description">{{ featured_project.shortDescription }}</p>
-            <div class="featured-tags">
-                {% for tag in featured_project.tags[:4] %}
-                <span class="tag">{{ tag }}</span>
-                {% endfor %}
+            <div class="featured-info">
+                <h3 class="featured-title">{{ featured_project.title }}</h3>
+                <p class="featured-description">{{ featured_project.shortDescription }}</p>
+                <div class="featured-tags">
+                    {% for tag in featured_project.tags[:4] %}
+                    <span class="tag">{{ tag }}</span>
+                    {% endfor %}
+                </div>
             </div>
-        </div>
-    </a>
+        </a>
+        {% endfor %}
+    </div>
 </section>
 {% endif %}
 

@@ -688,6 +688,9 @@ input:focus, .select:focus, .num:focus{
 /* ---------- 11. featured + quick links ----------------------------------- */
 .featured-section { margin: 36px 0; }
 
+/* Stacked featured cards — one row each, so the top pick reads first. */
+.featured-list { display: grid; gap: 14px; }
+
 .section-title{
   font-family: var(--mono);
   font-weight: 600;

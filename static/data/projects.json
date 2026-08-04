@@ -1,6 +1,34 @@
 {
   "personal": [
     {
+      "id": "steady",
+      "title": "Steady",
+      "shortDescription": "iPhone app for weight loss with an adaptive calorie budget and AI food logging",
+      "description": [
+        "An iOS app for weight loss and fitness that learns your actual metabolism rather than trusting a textbook formula. After about two weeks of logging it compares what you really ate against how your weight trend moved, works out what you are genuinely burning, and corrects your daily calorie budget from your own results.",
+        "Food logging runs through Google Gemini: describe a meal in a sentence, dictate it, photograph the plate, or paste a recipe link, and every component comes back as its own line item with a full nutrition panel. It also scans barcodes and searches a three-million-product database, and every number stays editable.",
+        "It builds real workouts from an 873-exercise database with set-by-set logging, syncs two ways with Apple Health so Garmin and Apple Watch data flows in automatically, and computes what to eat around training — carbs per hour during long sessions, fluids, and recovery protein — with training days raising that day's calorie and water targets to match.",
+        "Everything is local-first: no account, no server, and no analytics. Progress photos sit behind Face ID and never touch the photo library, and the only thing that ever leaves the phone is a meal description you explicitly send for an estimate. Written in SwiftUI with SwiftData, WidgetKit, and HealthKit.",
+        "iPhone only, requires iOS 18 or later. Currently in TestFlight beta — the link below goes to the documentation site until there is a public download."
+      ],
+      "iconImage": "steady.png",
+      "tags": ["Swift", "SwiftUI", "iOS", "SwiftData", "HealthKit", "WidgetKit", "Gemini API"],
+      "hasGithub": true,
+      "githubLink": "https://github.com/H-Bombmxpwr/steady",
+      "hasLive": true,
+      "liveLink": "https://h-bombmxpwr.github.io/steady/",
+      "hasVideo": false,
+      "videoLink": "",
+      "hasDownload": true,
+      "downloadLink": "https://h-bombmxpwr.github.io/steady/",
+      "featured": true,
+      "homeFeatured": true,
+      "date": "2026-08",
+      "rank": 1,
+      "subcategory": "Mobile Applications",
+      "homeFeaturedRank": 1
+    },
+    {
       "id": "album-poster",
       "title": "Album Poster Generator",
       "shortDescription": "Generate cool album posters using the Spotify API",
@@ -21,18 +49,21 @@
       "featured": true,
       "date": "2024-01",
       "rank": 1,
-      "subcategory": "Websites"
+      "subcategory": "Websites",
+      "homeFeatured": true,
+      "homeFeaturedRank": 2
     },
     {
       "id": "lidar-lense",
       "title": "LiDAR Lense",
       "shortDescription": "iPhone app using LiDAR to map obstacles in real-time",
       "description": [
-        "My iPhone app that uses the LiDAR on some iPhone Pro models to help map the room around you.",
-        "It identifies potential obstacles and displays them on the screen for the user as they walk around in real time.",
-        "Written in Swift and Python, the repository is currently private."
+        "My iPhone app that uses the LiDAR sensor on iPhone Pro models to help map the room around you.",
+        "It identifies potential obstacles and displays them on the screen with a live distance readout as you walk around in real time.",
+        "Written in Swift and Python, the repository is currently private.",
+        "iPhone only, and requires a Pro model with a LiDAR sensor."
       ],
-      "iconImage": "lidar.png",
+      "iconImage": "lense.png",
       "tags": ["Swift", "Python", "iOS", "LiDAR", "Computer Vision"],
       "hasGithub": false,
       "githubLink": "",
@@ -44,7 +75,7 @@
       "downloadLink": "",
       "featured": false,
       "date": "2023-06",
-      "rank": 1,
+      "rank": 2,
       "subcategory": "Mobile Applications"
     },
     {
@@ -71,7 +102,7 @@
       "rank": 2,
       "subcategory": "Websites"
     },
-     {
+    {
       "id": "taylor-series",
       "title": "Taylor Series Visualizer",
       "shortDescription": "Browser Based Tool for visualizing Taylor Series",
@@ -233,10 +264,12 @@
       "videoLink": "",
       "hasDownload": false,
       "downloadLink": "",
-      "featured": false,
+      "featured": true,
       "date": "2025-12",
       "rank": 3,
-      "subcategory": "Websites"
+      "subcategory": "Websites",
+      "homeFeatured": true,
+      "homeFeaturedRank": 3
     },
     {
       "id": "mario-kart-tracker",
@@ -286,8 +319,6 @@
       "subcategory": "Bots",
       "lichessUser": "claricethebot"
     }
-
-
   ],
   "academic": [
     {
@@ -386,7 +417,7 @@
       "rank": 4,
       "university": "University of Illinois"
     },
-        {
+    {
       "id": "lc3-computer",
       "title": "LC3 Computer",
       "shortDescription": "A simple computer implemented in LC3 assembly language",
@@ -410,7 +441,6 @@
       "rank": 5,
       "university": "University of Illinois"
     },
-  
     {
       "id": "seam-carving-manim",
       "title": "Demonstration of Seam Carving using Manim",
@@ -445,7 +475,7 @@
         "The entire class was designing this converter from the groundup "
       ],
       "iconImage": "3D.png",
-      "tags": ["Power Electronics", "MATLAB", "Hardware", "Circuit Design","Analog Control"],
+      "tags": ["Power Electronics", "MATLAB", "Hardware", "Circuit Design", "Analog Control"],
       "hasGithub": false,
       "githubLink": "",
       "hasLive": false,
