@@ -12,7 +12,7 @@
         "iPhone only, requires iOS 18 or later. Currently in TestFlight beta — the link below goes to the documentation site until there is a public download."
       ],
       "iconImage": "steady.png",
-      "tags": ["Swift", "SwiftUI", "iOS", "SwiftData", "HealthKit", "WidgetKit", "Gemini API"],
+      "tags": ["Swift", "SwiftUI", "iOS", "SwiftData", "HealthKit", "WidgetKit"],
       "hasGithub": true,
       "githubLink": "https://github.com/H-Bombmxpwr/steady",
       "hasLive": true,
@@ -246,7 +246,7 @@
       "subcategory": "Websites"
     },
     {
-      "id": "peyton-baisden",
+      "id": "peyton",
       "title": "www.peytonbaisden.com",
       "shortDescription": "A complete portfolio website for my brother",
       "description": [
