@@ -486,7 +486,32 @@
       "downloadLink": "",
       "featured": false,
       "date": "2026-05",
-      "rank": 5,
+      "rank": 4,
+      "university": "Johns Hopkins University"
+    },
+    {
+      "id": "language-death",
+      "title": "Simulating Language Death",
+      "shortDescription": "Reproducing Abrams & Strogatz's language death model, then extending it to a 22,500-variable cellular automaton where minority languages survive",
+      "description": [
+        "Final project for Modeling and Simulation of Complex Systems, reproducing and extending Abrams & Strogatz, \"Modelling the dynamics of language death,\" Nature 424, 900 (2003).",
+        "Two languages compete for speakers. The original paper models the fraction of speakers with a single ODE driven by status (s) and volatility (a), and reaches a bleak conclusion: one language always dies. I reproduced that baseline, then extended it into a stochastic cellular automaton on a 150x150 lattice — 22,500 coupled variables, one speaker per site — where the same conversion rule acts on each speaker's local Moore neighborhood instead of the global population.",
+        "That single substitution changes the ending. Space lets domains coarsen into dialect-like borders, minority languages hold out in strongholds where their status is locally high, and below a volatility of a = 1 the two languages genuinely coexist rather than one going extinct. A parameter sweep over both s and a maps out the full phase diagram of extinction versus coexistence.",
+        "Written in Python with NumPy for the simulations and Manim Community for the animated presentation, with every scene rendered directly from the saved simulation data. The repository is currently private."
+      ],
+      "iconImage": "stronghold.png",
+      "tags": ["Python", "NumPy", "Manim", "Cellular Automata", "ODEs", "Complex Systems", "Simulation"],
+      "hasGithub": false,
+      "githubLink": "",
+      "hasLive": false,
+      "liveLink": "",
+      "hasVideo": true,
+      "videoLink": "https://www.youtube.com/watch?v=2KDE8OeC-Jw",
+      "hasDownload": false,
+      "downloadLink": "",
+      "featured": false,
+      "date": "2026-07",
+      "rank": 6,
       "university": "Johns Hopkins University"
     },
     {
@@ -511,7 +536,7 @@
       "downloadLink": "",
       "featured": false,
       "date": "2026-04",
-      "rank": 6,
+      "rank": 5,
       "university": "Johns Hopkins University"
     }
   ]
