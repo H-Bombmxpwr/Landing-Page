@@ -95,6 +95,7 @@ ready_</aside>
     </div>
 
     <script>window.TERMINAL_PROJECTS = {{ terminal_projects | tojson }};</script>
+    <script>window.SITE_LOCATION = {{ {'city': location_city, 'hometown': hometown_city} | tojson }};</script>
     <script src="{{ url_for('static', filename='js/site.js') }}"></script>
     <script src="{{ url_for('static', filename='js/effects.js') }}"></script>
     <script src="{{ url_for('static', filename='js/lyrics-footer.js') }}"></script>

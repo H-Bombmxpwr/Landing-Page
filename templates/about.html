@@ -10,7 +10,7 @@
             <h1 class="about-title slide-in-left">About Me</h1>
             <h2 class="about-role slide-in-left">Electrical Engineer & Computer Scientist</h2>
             <p class="about-bio slide-in-left">
-                I'm Hunter - an Electrical Engineer and Computer Scientist based in Baltimore, MD.
+                I'm Hunter - an Electrical Engineer and Computer Scientist based in {{ location_city }}.
                 I mostly build things I find interesting or funny and maybe you will too.
             </p>
             <p class="about-bio slide-in-left">
@@ -37,8 +37,34 @@
         </div>
         <div class="detail-section">
             <h3><i class="fas fa-map-marker-alt"></i> Location</h3>
-            <p>Baltimore, MD</p>
-            <p class="detail-sub">Originally from Chicago</p>
+            <p class="location-line">
+                {{ location_city }}
+                {% if location_flag %}
+                <img
+                    src="{{ image_url(location_flag) }}"
+                    alt="Flag of {{ location_city }}"
+                    class="location-flag"
+                    width="21"
+                    height="14"
+                    decoding="async"
+                    loading="lazy"
+                >
+                {% endif %}
+            </p>
+            <p class="detail-sub location-line">
+                Originally from {{ hometown_city }}
+                {% if hometown_flag %}
+                <img
+                    src="{{ image_url(hometown_flag) }}"
+                    alt="Flag of {{ hometown_city }}"
+                    class="location-flag"
+                    width="21"
+                    height="14"
+                    decoding="async"
+                    loading="lazy"
+                >
+                {% endif %}
+            </p>
         </div>
         <div class="detail-section">
             <h3><i class="fas fa-heart"></i> Interests</h3>

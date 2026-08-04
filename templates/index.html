@@ -16,7 +16,20 @@
                 <p class="hero-summary">
                     Projects here range from software tools and data work to experiments and useless junk.
                 </p>
-                <p class="hero-location"><i class="fas fa-map-marker-alt"></i> Baltimore, MD</p>
+                <p class="hero-location">
+                    <i class="fas fa-map-marker-alt"></i> {{ location_city }}
+                    {% if location_flag %}
+                    <img
+                        src="{{ image_url(location_flag) }}"
+                        alt="Flag of {{ location_city }}"
+                        class="location-flag"
+                        width="21"
+                        height="14"
+                        decoding="async"
+                        loading="lazy"
+                    >
+                    {% endif %}
+                </p>
                 <div class="hero-cta">
                     <a href="{{ url_for('personal_projects') }}" class="btn primary hero-btn">
                         <i class="fas fa-code"></i> View Projects

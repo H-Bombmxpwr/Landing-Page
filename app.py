@@ -24,6 +24,14 @@ app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-change-in-production')
 # Feature flags
 SHOW_RESUME = False
 
+# Where I live and where I'm from. Change these if I move; the home page, the
+# about page, and the terminal's `whoami` all read from here.
+# Set either flag to '' for no flag.
+LOCATION_CITY = 'Baltimore, MD'
+LOCATION_FLAG = 'images/flags/baltimore_flag.png'
+HOMETOWN_CITY = 'Chicago'
+HOMETOWN_FLAG = 'images/flags/chicago_flag.png'
+
 # ============================================
 # VISITOR COUNTER (SQLite-backed)
 # DATA_DIR can be set to a Railway Volume mount path (e.g. /data) for persistence.
@@ -341,6 +349,10 @@ def inject_feature_flags():
     """Make feature flags available to all templates"""
     return {
         'show_resume': SHOW_RESUME,
+        'location_city': LOCATION_CITY,
+        'location_flag': LOCATION_FLAG,
+        'hometown_city': HOMETOWN_CITY,
+        'hometown_flag': HOMETOWN_FLAG,
         'visit_count': get_authoritative_visit_count(),
         'image_url': static_image_url,
         'terminal_projects': get_terminal_projects(),

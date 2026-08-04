@@ -17,6 +17,7 @@
  *
  * `cd` updates a node reference; `ls` reads that node's children.
  * Project lists come from window.TERMINAL_PROJECTS, rendered server-side.
+ * `whoami` reads the city from window.SITE_LOCATION (app.py owns both).
  *
  * The doom embed lives in terminal-doom.js.
  */
@@ -126,11 +127,14 @@
     '  · `doom` launches a playable doom clone inside the terminal'
   ].join('\n');
 
+  var SITE_LOCATION = window.SITE_LOCATION || {};
+
   var BIO_TEXT = [
     'Hunter Baisden — electrical engineer & computer scientist.',
     '',
     'Education: BS EE at UIUC, MS ECE at Johns Hopkins.',
-    'Living in Baltimore, MD. Originally from Chicago.',
+    'Living in ' + (SITE_LOCATION.city || 'Baltimore, MD') +
+      '. Originally from ' + (SITE_LOCATION.hometown || 'Chicago') + '.',
     'Off-hours: DJ, chess, hockey, softball, disc golf, movies, restaurants.'
   ].join('\n');
 

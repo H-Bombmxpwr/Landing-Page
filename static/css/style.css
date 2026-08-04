@@ -581,6 +581,19 @@ input:focus, .select:focus, .num:focus{
 .hero-location i {
   color: var(--accent);
 }
+.location-flag {
+  width: 21px;
+  height: 14px;
+  object-fit: cover;
+  display: block;
+  flex: none;
+  border: 1px solid var(--border-strong);
+}
+.location-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
 
 .hero-cta {
   display: flex;
