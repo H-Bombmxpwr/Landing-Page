@@ -11,6 +11,7 @@
      7. nav
      8. buttons / inputs
      9. hero
+     9b. interactive portrait
     10. quick stats
     11. featured + quick links
     12. page shell (header, eyebrow, title, section title)
@@ -606,51 +607,139 @@ input:focus, .select:focus, .num:focus{
 }
 
 .hero-visual { position: relative; }
-.hero-image-card{
+.hero-visual .portrait { max-width: 420px; margin: 0 auto; }
+
+/* ---------- 9b. interactive portrait -------------------------------------- */
+/* The 52x23 character stage the four portrait modes render into. Sizing of the
+   <pre> layers is done in static/js/portrait.js so the grid lands exactly. */
+.portrait{
   position: relative;
-  padding: 0;
+  margin: 0;
   background: var(--surface-2);
   border: 1px solid var(--border);
-  max-width: 420px;
-  margin: 0 auto;
 }
-.hero-image-card::before{
-  content: "● ● ●";
-  display: block;
+.portrait-bar{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
   padding: 6px 10px;
-  font-size: 0.7rem;
-  letter-spacing: 0.6em;
-  color: var(--dim);
   background: var(--surface-3);
   border-bottom: 1px solid var(--border);
-}
-.hero-image-card::after{
-  content: "img/portrait.png";
-  position: absolute;
-  top: 6px;
-  right: 12px;
-  font-family: var(--mono);
   font-size: 0.7rem;
+}
+.portrait-dots { color: var(--dim); letter-spacing: 0.6em; }
+.portrait-file{
   color: var(--muted);
-}
-.hero-orb { display: none; }
-.hero-image-frame{
-  padding: 0;
-  background: transparent;
-}
-.hero-image{
-  position: relative;
+  white-space: nowrap;
   overflow: hidden;
-  aspect-ratio: 4 / 3;
-  background: var(--surface-3);
-  filter: contrast(1.02) saturate(0.92);
+  text-overflow: ellipsis;
 }
-.hero-image img{
+.portrait-stage{
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--surface-3);
+  cursor: crosshair;
+  touch-action: pan-y;
+}
+.portrait-stage::after{
+  /* a soft CRT vignette over whichever mode is running */
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 45%, transparent 48%, rgba(0, 0, 0, 0.42) 100%);
+}
+.portrait-layer{
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 1;
+  white-space: pre;
+  overflow: hidden;
+  user-select: none;
+  text-rendering: optimizeSpeed;
+}
+.portrait-dim { color: var(--accent); opacity: 0.34; }
+.portrait-lit{
+  color: var(--accent-bright);
+  text-shadow: 0 0 6px var(--accent-glow);
+}
+.portrait-canvas{
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  transform: scale(1.0);
 }
+/* mode switching toggles [hidden]; author styles here would otherwise beat the
+   UA display:none, so make it explicit */
+.portrait [hidden] { display: none !important; }
+.portrait-hotspots { position: absolute; inset: 0; }
+.portrait-hotspot{
+  position: absolute;
+  padding: 0;
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: help;
+}
+.portrait-hotspot:hover,
+.portrait-hotspot:focus-visible{
+  border-color: var(--accent);
+  background: var(--accent-glow);
+  outline: none;
+}
+.portrait-status{
+  margin: 0;
+  padding: 7px 10px;
+  min-height: 2.2em;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+.portrait-tabs{
+  position: relative;
+  display: flex;
+  gap: 0;
+  border-top: 1px solid var(--border);
+}
+.portrait-tab{
+  flex: 1;
+  padding: 7px 4px;
+  background: transparent;
+  border: 0;
+  border-right: 1px solid var(--border);
+  color: var(--dim);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: color 0.15s var(--ease), background 0.15s var(--ease);
+}
+.portrait-tab:last-of-type { border-right: 0; }
+.portrait-tab:hover { color: var(--accent); background: var(--bg-tint); }
+.portrait-tab[aria-selected="true"]{
+  color: var(--accent-bright);
+  background: var(--bg-tint);
+}
+.portrait-tab[aria-selected="true"]::before { content: "> "; }
+.portrait-progress{
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 100%;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+}
+
+/* the about page reuses the same widget, just a touch larger */
+.about-portrait-panel .portrait { border-color: var(--border-strong); }
 
 /* ---------- 10. quick stats ---------------------------------------------- */
 .quick-stats {
@@ -961,19 +1050,6 @@ input:focus, .select:focus, .num:focus{
   margin: 0 0 14px;
 }
 .about-portrait-panel { padding: 16px; }
-.about-image-large{
-  position: relative;
-  overflow: hidden;
-  border: 1px solid var(--border-strong);
-  aspect-ratio: 1 / 1;
-  background: var(--surface-3);
-}
-.about-image-large img{
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: saturate(0.85) contrast(1.05);
-}
 
 .about-details{
   display: grid;
@@ -1938,4 +2014,5 @@ input:focus, .select:focus, .num:focus{
   }
   .brand-caret, .hero-name::after { animation: none; opacity: 1; }
   .scanlines { display: none; }
+  .portrait-progress { display: none; }
 }

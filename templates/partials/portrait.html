@@ -1,0 +1,50 @@
+{# Interactive terminal portrait. Four modes (ascii bust / oscilloscope /
+   schematic / id card) that auto-cycle; static/js/portrait.js takes over the
+   stage on load. The <pre> below is the no-JS fallback and the first paint. #}
+<figure class="portrait" data-portrait>
+    <figcaption class="portrait-bar">
+        <span class="portrait-dots" aria-hidden="true">&#9679; &#9679; &#9679;</span>
+        <span class="portrait-file" data-portrait-file>dev/scope0</span>
+    </figcaption>
+
+    <div class="portrait-stage" data-portrait-stage>
+        <pre class="portrait-layer portrait-dim" data-portrait-dim aria-hidden="true"></pre>
+        <pre class="portrait-layer portrait-lit" data-portrait-lit role="img"
+             aria-label="ASCII art portrait of Hunter wearing headphones">
+                        %%%%
+                   %%%%%%  %%%%%%
+                 %%% #########  %%%
+                %%############### %%
+               %%##############-== %%
+              %%#=----#-----#----=# %%
+            %%%==#####-------#####==%%%
+            %%%==.....-------.....==%%%
+            %%%==...@.-------...@.==%%%
+            %%%==--------+--------==%%%
+            %%%==-------=:=-------==%%%
+                ==----@-----@----==
+                 ===---@@@@@---===
+                   ====-----====
+                      =======
+                      =======
+                  ==::=======::==
+             ==:::::::::: ::::::::::==
+         ==:::::::::::::   :::::::::::::==
+      =::::::::::::::::     ::::::::::::::::=
+      =::::::::::::::::     ::::::::::::::::=
+      =:::::::::::::::       :::::::::::::::=</pre>
+        <canvas class="portrait-canvas" data-portrait-canvas hidden role="img"
+                aria-label="Oscilloscope trace of a SINE waveform"></canvas>
+        <div class="portrait-hotspots" data-portrait-hotspots hidden></div>
+    </div>
+
+    <p class="portrait-status" data-portrait-status>&gt; drag across to bend the trace, click for next channel</p>
+
+    <div class="portrait-tabs" role="tablist" aria-label="Portrait mode">
+        <button type="button" class="portrait-tab" role="tab" data-portrait-tab="0" aria-selected="true">scope</button>
+        <button type="button" class="portrait-tab" role="tab" data-portrait-tab="1" aria-selected="false">ascii</button>
+        <button type="button" class="portrait-tab" role="tab" data-portrait-tab="2" aria-selected="false">sch</button>
+        <button type="button" class="portrait-tab" role="tab" data-portrait-tab="3" aria-selected="false">id</button>
+        <span class="portrait-progress" data-portrait-progress aria-hidden="true"></span>
+    </div>
+</figure>

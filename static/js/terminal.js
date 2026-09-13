@@ -106,7 +106,7 @@
   var README_TEXT = [
     '# hunter.baisden',
     '',
-    'electrical engineer & computer scientist · baltimore, MD',
+    'electrical engineer & computer scientist · washington, d.c.',
     '',
     'site for personal projects, academic work, lyrics, and the occasional',
     'useless thing. `ls` to see what is around, `cd <name>` to move in,',
@@ -133,7 +133,7 @@
     'Hunter Baisden — electrical engineer & computer scientist.',
     '',
     'Education: BS EE at UIUC, MS ECE at Johns Hopkins.',
-    'Living in ' + (SITE_LOCATION.city || 'Baltimore, MD') +
+    'Living in ' + (SITE_LOCATION.city || 'Washington, D.C.') +
       '. Originally from ' + (SITE_LOCATION.hometown || 'Chicago') + '.',
     'Off-hours: DJ, chess, hockey, softball, disc golf, movies, restaurants.'
   ].join('\n');
@@ -444,7 +444,8 @@
   };
 
   COMMANDS.whoami = function () {
-    print('hunter — electrical engineer & computer scientist (baltimore, MD)');
+    print('hunter — electrical engineer & computer scientist (' +
+      (SITE_LOCATION.city || 'Washington, D.C.') + ')');
   };
 
   COMMANDS.echo = function (args) { print(args.join(' ')); };

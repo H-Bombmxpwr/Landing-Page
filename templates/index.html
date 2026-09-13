@@ -40,21 +40,7 @@
                 </div>
             </div>
             <div class="hero-visual">
-                <div class="hero-image-card">
-                    <div class="hero-orb hero-orb-one"></div>
-                    <div class="hero-orb hero-orb-two"></div>
-                    <div class="hero-image-frame">
-                        <div class="hero-image">
-                            <img
-                                src="{{ image_url('images/icon2.png') }}"
-                                alt="Hunter"
-                                width="225"
-                                height="169"
-                                decoding="async"
-                                fetchpriority="high">
-                        </div>
-                    </div>
-                </div>
+                {% include "partials/portrait.html" %}
             </div>
         </div>
     </div>

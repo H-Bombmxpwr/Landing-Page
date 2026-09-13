@@ -27,8 +27,8 @@ SHOW_RESUME = False
 # Where I live and where I'm from. Change these if I move; the home page, the
 # about page, and the terminal's `whoami` all read from here.
 # Set either flag to '' for no flag.
-LOCATION_CITY = 'Baltimore, MD'
-LOCATION_FLAG = 'images/flags/baltimore_flag.png'
+LOCATION_CITY = 'Washington, D.C.'
+LOCATION_FLAG = 'images/flags/dc_flag.png'
 HOMETOWN_CITY = 'Chicago'
 HOMETOWN_FLAG = 'images/flags/chicago_flag.png'
 
