@@ -69,7 +69,7 @@ def _visitor_db():
 
 def _legacy_visit_count():
     try:
-        with open(_visits_file, 'r') as f:
+        with open(_visits_file, 'r', encoding='utf-8') as f:
             return int(json.load(f).get('count', 0))
     except (FileNotFoundError, json.JSONDecodeError, TypeError, ValueError):
         return 0
@@ -79,7 +79,7 @@ def _write_visit_count_mirror(count):
     try:
         os.makedirs(_data_dir, exist_ok=True)
         tmp_path = _visits_file + '.tmp'
-        with open(tmp_path, 'w') as f:
+        with open(tmp_path, 'w', encoding='utf-8') as f:
             json.dump({'count': int(count)}, f)
         os.replace(tmp_path, _visits_file)
     except Exception:
@@ -431,7 +431,7 @@ def get_visitor_snapshot():
 
 def load_projects():
     """Load projects from JSON file"""
-    with open('static/data/projects.json', 'r') as f:
+    with open('static/data/projects.json', 'r', encoding='utf-8') as f:
         return json.load(f)
 
 def get_quick_stats():
@@ -694,7 +694,7 @@ def project_detail(project_id):
 def random_lyric():
     """Get a random lyric for the footer"""
     try:
-        with open('static/data/lyrics.json', 'r') as f:
+        with open('static/data/lyrics.json', 'r', encoding='utf-8') as f:
             lyrics_data = json.load(f)
         if lyrics_data:
             lyric = random.choice(lyrics_data)
@@ -756,7 +756,7 @@ def visitors():
 
 @app.route('/lyrics')
 def all_lyrics():
-    with open('static/data/lyrics.json', 'r') as f:
+    with open('static/data/lyrics.json', 'r', encoding='utf-8') as f:
         lyrics_data = json.load(f)
     return render_template('lyrics/all.html',
                          lyrics=lyrics_data,

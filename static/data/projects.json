@@ -1,6 +1,41 @@
 {
   "personal": [
     {
+      "id": "caissa",
+      "title": "Caissa",
+      "shortDescription": "A desktop chess workbench — a lighter ChessBase, with your games kept as plain PGN",
+      "description": [
+        "A desktop chess database and analysis workbench, built as a lighter alternative to ChessBase. Games are kept as ordinary PGN files in folders you can read, copy and back up; the SQLite database is only an index over that text, so losing it costs you search rather than chess. Everything runs on your own machine — no account, no cloud library, no telemetry.",
+        "A bundled Stockfish analyses positions live, with up to five variations each drawn in its own colour on the board, and a telemetry panel reporting search depth, nodes per second, hash pressure, thread count against the machine's cores, and CPU temperature and wattage where the hardware publishes them. One click annotates an entire game, writing evaluations and blunder glyphs straight into the PGN.",
+        "The opening explorer walks a collection's tree move by move and scores every line from the named player's side rather than White's — your own games, or a database of one strong player's. It shows win/draw/loss splits, average opposition, a score-by-year trend for lines that stopped working, and a scan that ranks the openings which actually cost the most points. Aggregation happens in SQL, so a twenty-thousand-game collection answers in about forty milliseconds.",
+        "Imports handle almost anything: PGN files, ZIP/GZ/BZ2/ZST archives, folders and URLs, whole lichess accounts streamed without a size cap, chess.com, and ChessBase exports — including their Windows-1252 encoding, which most readers mangle, and their richer tag set of teams, titles, FIDE IDs and tournament dates. A linked lichess account can pull in private studies and keep importing new games as they are played.",
+        "Lichess studies become spaced-repetition repertoire drills you play blindfold, a seven-level visualisation trainer sits alongside, PDFs can be read next to the board, and positions link out to tablebase results and Wikipedia background. Written in Python and vanilla JavaScript with no build step, with two independent chess engines — one per language — both verified against the standard perft positions."
+      ],
+      "iconImage": "caissa.png",
+      "tags": [
+        "Python",
+        "JavaScript",
+        "SQLite",
+        "Stockfish",
+        "PyInstaller",
+        "Desktop"
+      ],
+      "hasGithub": true,
+      "githubLink": "https://github.com/H-Bombmxpwr/caissa",
+      "hasLive": true,
+      "liveLink": "https://h-bombmxpwr.github.io/caissa/",
+      "hasVideo": false,
+      "videoLink": "",
+      "hasDownload": true,
+      "downloadLink": "https://web-production-fe9a74.up.railway.app/",
+      "featured": true,
+      "homeFeatured": true,
+      "date": "2026-09",
+      "rank": 1,
+      "subcategory": "Other Software",
+      "homeFeaturedRank": 1
+    },
+    {
       "id": "steady",
       "title": "Steady",
       "shortDescription": "iPhone app for weight loss with an adaptive calorie budget and AI food logging",
@@ -12,7 +47,14 @@
         "iPhone only, requires iOS 18 or later. Currently in TestFlight beta — the link below goes to the documentation site until there is a public download."
       ],
       "iconImage": "steady.png",
-      "tags": ["Swift", "SwiftUI", "iOS", "SwiftData", "HealthKit", "WidgetKit"],
+      "tags": [
+        "Swift",
+        "SwiftUI",
+        "iOS",
+        "SwiftData",
+        "HealthKit",
+        "WidgetKit"
+      ],
       "hasGithub": true,
       "githubLink": "https://github.com/H-Bombmxpwr/steady",
       "hasLive": true,
@@ -26,7 +68,7 @@
       "date": "2026-08",
       "rank": 1,
       "subcategory": "Mobile Applications",
-      "homeFeaturedRank": 1
+      "homeFeaturedRank": 2
     },
     {
       "id": "album-poster",
@@ -37,7 +79,12 @@
         "It will take an album and generate a poster with the album artwork, tracklist, and other metadata beautifully arranged."
       ],
       "iconImage": "The_Queen_Is_Dead.png",
-      "tags": ["Python", "Flask", "Spotify API", "Web"],
+      "tags": [
+        "Python",
+        "Flask",
+        "Spotify API",
+        "Web"
+      ],
       "hasGithub": true,
       "githubLink": "https://github.com/H-Bombmxpwr/MusicPoster",
       "hasLive": true,
@@ -51,7 +98,7 @@
       "rank": 1,
       "subcategory": "Websites",
       "homeFeatured": true,
-      "homeFeaturedRank": 2
+      "homeFeaturedRank": 3
     },
     {
       "id": "lidar-lense",
@@ -64,7 +111,13 @@
         "iPhone only, and requires a Pro model with a LiDAR sensor."
       ],
       "iconImage": "lense.png",
-      "tags": ["Swift", "Python", "iOS", "LiDAR", "Computer Vision"],
+      "tags": [
+        "Swift",
+        "Python",
+        "iOS",
+        "LiDAR",
+        "Computer Vision"
+      ],
       "hasGithub": false,
       "githubLink": "",
       "hasLive": false,
@@ -88,7 +141,12 @@
         "The seam carving feature allows for intelligent resizing that preserves important content in images. See my academic project on seam carving for more info."
       ],
       "iconImage": "icon.svg",
-      "tags": ["Python", "Flask", "Image Processing", "Web"],
+      "tags": [
+        "Python",
+        "Flask",
+        "Image Processing",
+        "Web"
+      ],
       "hasGithub": true,
       "githubLink": "https://github.com/H-Bombmxpwr/image",
       "hasLive": true,
@@ -112,7 +170,12 @@
         "The interface also generates the corresponding LaTeX for both the general Taylor form and the expanded polynomial, with quick copy support for notes or reports."
       ],
       "iconImage": "taylor.jpg",
-      "tags": ["Python", "Flask", "CSS", "JavaScript"],
+      "tags": [
+        "Python",
+        "Flask",
+        "CSS",
+        "JavaScript"
+      ],
       "hasGithub": true,
       "githubLink": "https://github.com/H-Bombmxpwr/taylor-series",
       "hasLive": true,
@@ -136,7 +199,11 @@
         "The original website may still be at: https://trevorg73.web.illinois.edu/songswears"
       ],
       "iconImage": "new.png",
-      "tags": ["Web", "API", "Spotify"],
+      "tags": [
+        "Web",
+        "API",
+        "Spotify"
+      ],
       "hasGithub": true,
       "githubLink": "https://github.com/H-Bombmxpwr/song-swears",
       "hasLive": true,
@@ -160,7 +227,12 @@
         "It is highly parallelized, being able to support downloading 6 playlists at a time."
       ],
       "iconImage": "GUI_Ex.png",
-      "tags": ["Python", "GUI", "Spotify API", "Parallelization"],
+      "tags": [
+        "Python",
+        "GUI",
+        "Spotify API",
+        "Parallelization"
+      ],
       "hasGithub": true,
       "githubLink": "https://github.com/H-Bombmxpwr/Music_DJ_Downloader",
       "hasLive": false,
@@ -184,7 +256,11 @@
         "He is named Clarence, and is Clarice's brother"
       ],
       "iconImage": "clarence.jpg",
-      "tags": ["Python", "discord.py", "Bot"],
+      "tags": [
+        "Python",
+        "discord.py",
+        "Bot"
+      ],
       "hasGithub": true,
       "githubLink": "https://github.com/H-Bombmxpwr/Clarence",
       "hasLive": true,
@@ -207,7 +283,11 @@
         "These are all of the programs that have some amount of value that I wrote on my TI-84+ over the years."
       ],
       "iconImage": "ti.png",
-      "tags": ["TI-BASIC", "Calculator", "Education"],
+      "tags": [
+        "TI-BASIC",
+        "Calculator",
+        "Education"
+      ],
       "hasGithub": true,
       "githubLink": "https://github.com/H-Bombmxpwr/TI-Programs",
       "hasLive": false,
@@ -231,7 +311,14 @@
         "Also includes a SQLite-backed visitor map, a lyric rotator, and per-project galleries with a lightbox."
       ],
       "iconImage": "images.jpg",
-      "tags": ["Python", "Flask", "Vanilla JS", "SQLite", "CSS", "Leaflet"],
+      "tags": [
+        "Python",
+        "Flask",
+        "Vanilla JS",
+        "SQLite",
+        "CSS",
+        "Leaflet"
+      ],
       "hasGithub": true,
       "githubLink": "https://github.com/H-Bombmxpwr/Landing-Page",
       "hasLive": true,
@@ -255,7 +342,13 @@
         "Features some intense css and javascript with dyanmically generated html."
       ],
       "iconImage": "peyton.png",
-      "tags": ["Python", "Flask", "Web", "CSS", "JavaScript"],
+      "tags": [
+        "Python",
+        "Flask",
+        "Web",
+        "CSS",
+        "JavaScript"
+      ],
       "hasGithub": false,
       "githubLink": "",
       "hasLive": true,
@@ -264,12 +357,11 @@
       "videoLink": "",
       "hasDownload": false,
       "downloadLink": "",
-      "featured": true,
+      "featured": false,
       "date": "2025-12",
       "rank": 3,
       "subcategory": "Websites",
-      "homeFeatured": true,
-      "homeFeaturedRank": 3
+      "homeFeatured": false
     },
     {
       "id": "mario-kart-tracker",
@@ -280,7 +372,11 @@
         "They are saved under your username for easy access later."
       ],
       "iconImage": "kart.png",
-      "tags": ["Web", "Database", "Gaming"],
+      "tags": [
+        "Web",
+        "Database",
+        "Gaming"
+      ],
       "hasGithub": false,
       "githubLink": "",
       "hasLive": true,
@@ -304,7 +400,12 @@
         "Named Clarice as she is Clarence's sister"
       ],
       "iconImage": "clarice.webp",
-      "tags": ["Python", "Lichess API", "Stockfish", "Chess"],
+      "tags": [
+        "Python",
+        "Lichess API",
+        "Stockfish",
+        "Chess"
+      ],
       "hasGithub": true,
       "githubLink": "https://github.com/H-Bombmxpwr/clarice",
       "hasLive": true,
@@ -331,7 +432,12 @@
         "The project involved designing camera, transmitter, and receiver boards, as well as integrating them with the existing Crazyflie platform."
       ],
       "iconImage": "Drone.png",
-      "tags": ["PCB Design", "Embedded Systems", "Wireless", "Senior Design"],
+      "tags": [
+        "PCB Design",
+        "Embedded Systems",
+        "Wireless",
+        "Senior Design"
+      ],
       "hasGithub": true,
       "githubLink": "https://github.com/H-Bombmxpwr/FPV_Drone",
       "hasLive": false,
@@ -355,7 +461,12 @@
         "It also goes into the betweenness centrality of thousands of articles, analyzing which articles serve as important connectors in the Wikipedia link graph."
       ],
       "iconImage": "graph.png",
-      "tags": ["C++", "Graph Theory", "Algorithms", "Data Structures"],
+      "tags": [
+        "C++",
+        "Graph Theory",
+        "Algorithms",
+        "Data Structures"
+      ],
       "hasGithub": true,
       "githubLink": "https://github.com/JuanDiegoSanz7/225-Final-Project",
       "hasLive": false,
@@ -379,7 +490,12 @@
         "The repository is currently private."
       ],
       "iconImage": "fpga.png",
-      "tags": ["SystemVerilog", "FPGA", "Digital Logic", "Game Development"],
+      "tags": [
+        "SystemVerilog",
+        "FPGA",
+        "Digital Logic",
+        "Game Development"
+      ],
       "hasGithub": false,
       "githubLink": "",
       "hasLive": false,
@@ -403,7 +519,12 @@
         "Arduino control was also built in for more precise control."
       ],
       "iconImage": "boost.jpg",
-      "tags": ["Power Electronics", "Arduino", "Hardware", "Circuit Design"],
+      "tags": [
+        "Power Electronics",
+        "Arduino",
+        "Hardware",
+        "Circuit Design"
+      ],
       "hasGithub": false,
       "githubLink": "",
       "hasLive": false,
@@ -427,7 +548,11 @@
         "All built on a breadboard with hand wired connections."
       ],
       "iconImage": "computer.jpg",
-      "tags": ["Assembly Language", "Computer Architecture", "Breadboard"],
+      "tags": [
+        "Assembly Language",
+        "Computer Architecture",
+        "Breadboard"
+      ],
       "hasGithub": false,
       "githubLink": "",
       "hasLive": false,
@@ -451,7 +576,13 @@
         "I didn't have a good microphone so the audio is not great."
       ],
       "iconImage": "seam.png",
-      "tags": ["Python", "Manim", "Image Processing", "Education", "Video"],
+      "tags": [
+        "Python",
+        "Manim",
+        "Image Processing",
+        "Education",
+        "Video"
+      ],
       "hasGithub": false,
       "githubLink": "",
       "hasLive": false,
@@ -475,7 +606,13 @@
         "The entire class was designing this converter from the groundup "
       ],
       "iconImage": "3D.png",
-      "tags": ["Power Electronics", "MATLAB", "Hardware", "Circuit Design", "Analog Control"],
+      "tags": [
+        "Power Electronics",
+        "MATLAB",
+        "Hardware",
+        "Circuit Design",
+        "Analog Control"
+      ],
       "hasGithub": false,
       "githubLink": "",
       "hasLive": false,
@@ -500,7 +637,15 @@
         "Written in Python with NumPy for the simulations and Manim Community for the animated presentation, with every scene rendered directly from the saved simulation data. The repository is currently private."
       ],
       "iconImage": "stronghold.png",
-      "tags": ["Python", "NumPy", "Manim", "Cellular Automata", "ODEs", "Complex Systems", "Simulation"],
+      "tags": [
+        "Python",
+        "NumPy",
+        "Manim",
+        "Cellular Automata",
+        "ODEs",
+        "Complex Systems",
+        "Simulation"
+      ],
       "hasGithub": false,
       "githubLink": "",
       "hasLive": false,
@@ -525,7 +670,15 @@
         "Made in my \"Geospatial Intelligence: the art and science for better understanding our world\" Class"
       ],
       "iconImage": "map.png",
-      "tags": ["Python", "Flask", "Data Analysis", "Pandas", "Plotly", "EPA API", "Environmental"],
+      "tags": [
+        "Python",
+        "Flask",
+        "Data Analysis",
+        "Pandas",
+        "Plotly",
+        "EPA API",
+        "Environmental"
+      ],
       "hasGithub": true,
       "githubLink": "https://github.com/H-Bombmxpwr/baltimore-wheelabrator-",
       "hasLive": true,
