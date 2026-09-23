@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, abort, url_for
+from flask import Flask, render_template, jsonify, abort, url_for, redirect
 from dotenv import load_dotenv
 import random
 import json
@@ -6,12 +6,10 @@ import os
 import hashlib
 import time
 import threading
-import ipaddress
 import re
 import sqlite3
 import secrets
 import urllib.parse
-import urllib.request
 from contextlib import contextmanager
 from datetime import datetime
 
@@ -86,7 +84,15 @@ def _write_visit_count_mirror(count):
         pass
 
 
+_visitor_db_ready = False
+
+
 def _ensure_visitor_db():
+    # Runs on every page render via the context processor, so only touch
+    # the schema once per process instead of committing on each request.
+    global _visitor_db_ready
+    if _visitor_db_ready:
+        return
     with _visitor_db() as conn:
         conn.execute("""
             CREATE TABLE IF NOT EXISTS visitor_counter (
@@ -123,6 +129,7 @@ def _ensure_visitor_db():
                 (_legacy_visit_count(), now, now),
             )
         conn.commit()
+    _visitor_db_ready = True
 
 
 def _read_visit_count():
@@ -133,22 +140,6 @@ def _read_visit_count():
             return int(row['count']) if row else _legacy_visit_count()
     except Exception:
         return _legacy_visit_count()
-
-
-def get_real_ip():
-    from flask import request
-    forwarded = request.headers.get('X-Forwarded-For', '')
-    if forwarded:
-        return forwarded.split(',')[0].strip()
-    return request.headers.get('X-Real-IP') or request.remote_addr or ''
-
-
-def is_private_ip(ip):
-    try:
-        parsed = ipaddress.ip_address(ip)
-        return parsed.is_private or parsed.is_loopback or parsed.is_reserved or parsed.is_link_local
-    except ValueError:
-        return True
 
 
 def _is_likely_bot():
@@ -199,86 +190,15 @@ def _referrer_host():
     return host[:120] if host else ''
 
 
-def _geocode_ip(ip):
-    if not ip or is_private_ip(ip):
-        return {'geocode_status': 'local_or_private'}
-    token = os.getenv('IPINFO_TOKEN', '').strip()
-    quoted_ip = urllib.parse.quote(ip, safe='')
-    url = f'https://ipinfo.io/{quoted_ip}/json'
-    if token:
-        url += f'?token={urllib.parse.quote(token)}'
-    req = urllib.request.Request(url, headers={'User-Agent': 'hunter-visitor-map/1.0'})
-    try:
-        with urllib.request.urlopen(req, timeout=4) as resp:
-            if getattr(resp, 'status', 200) != 200:
-                return {'geocode_status': f'http_{getattr(resp, "status", "error")}'}
-            data = json.loads(resp.read().decode('utf-8'))
-    except Exception:
-        return {'geocode_status': 'lookup_failed'}
-
-    loc = data.get('loc', '')
-    if not loc or ',' not in loc:
-        return {'geocode_status': 'no_location'}
-    try:
-        lat_str, lon_str = loc.split(',', 1)
-        lat = round(float(lat_str), 1)
-        lon = round(float(lon_str), 1)
-    except (TypeError, ValueError):
-        return {'geocode_status': 'bad_location'}
-
-    return {
-        'geocode_status': 'mapped',
-        'lat': lat,
-        'lon': lon,
-        'city': str(data.get('city') or '')[:120],
-        'region': str(data.get('region') or '')[:120],
-        'country': str(data.get('country') or '')[:12],
-    }
-
-
-def _update_visitor_event_location(event_id, ip):
-    geo = _geocode_ip(ip)
-    try:
-        with _visitor_db() as conn:
-            conn.execute(
-                """
-                UPDATE visitor_events
-                   SET updated_at = ?,
-                       country = ?,
-                       region = ?,
-                       city = ?,
-                       lat = ?,
-                       lon = ?,
-                       geocode_status = ?
-                 WHERE id = ?
-                """,
-                (
-                    _utc_iso(),
-                    geo.get('country', ''),
-                    geo.get('region', ''),
-                    geo.get('city', ''),
-                    geo.get('lat'),
-                    geo.get('lon'),
-                    geo.get('geocode_status', 'lookup_failed'),
-                    event_id,
-                ),
-            )
-            conn.commit()
-    except Exception:
-        pass
-
-
 def _record_visit_event():
     """Increment the public counter and insert one visitor event.
 
-    Raw IPs and full user agents are intentionally not stored. The event is
-    inserted before geolocation so the footer count and event count stay
-    aligned even if the third-party lookup fails.
+    Raw IPs and full user agents are intentionally not stored, and visits
+    are no longer geolocated now that the visitor map is gone.
     """
     _ensure_visitor_db()
     now = _utc_iso()
     event_id = secrets.token_urlsafe(12)
-    ip = get_real_ip()
     with _visit_lock:
         with _visitor_db() as conn:
             conn.execute("BEGIN IMMEDIATE")
@@ -303,13 +223,11 @@ def _record_visit_event():
                     _visit_path_from_request(),
                     _referrer_host(),
                     _ua_family(),
-                    'pending' if not is_private_ip(ip) else 'local_or_private',
+                    'not_geocoded',
                 ),
             )
             conn.commit()
         _write_visit_count_mirror(count)
-    if not is_private_ip(ip):
-        threading.Thread(target=_update_visitor_event_location, args=(event_id, ip), daemon=True).start()
     return count
 
 # Initialize visitor DB on startup
@@ -401,33 +319,6 @@ def static_image_url(path):
 def get_authoritative_visit_count():
     return _read_visit_count()
 
-
-def get_authoritative_visitor_locations():
-    try:
-        _ensure_visitor_db()
-        with _visitor_db() as conn:
-            rows = conn.execute(
-                """
-                SELECT lat, lon, city, country
-                  FROM visitor_events
-                 WHERE lat IS NOT NULL AND lon IS NOT NULL
-                """
-            ).fetchall()
-        return [dict(r) for r in rows]
-    except Exception:
-        return []
-
-
-def get_visitor_snapshot():
-    locations = get_authoritative_visitor_locations()
-    total_visits = _read_visit_count()
-    unique_countries = len({loc.get('country') for loc in locations if loc.get('country')})
-    return {
-        'locations': locations,
-        'total_visits': total_visits,
-        'unique_countries': unique_countries,
-        'location_count': len(locations),
-    }
 
 def load_projects():
     """Load projects from JSON file"""
@@ -739,20 +630,16 @@ def reset_visitors():
     return jsonify({'status': 'reset', 'visits': 0, 'locations': 0})
 
 
-@app.route('/api/visitor-locations')
-def visitor_locations_api():
-    """Return all visitor locations for the map"""
-    return jsonify(get_visitor_snapshot())
+@app.route('/lab')
+def lab():
+    return render_template('lab.html',
+                         active_page='lab',
+                         page_id='lab-page')
 
 @app.route('/visitors')
 def visitors():
-    visitor_snapshot = get_visitor_snapshot()
-    return render_template('visitors.html',
-                         active_page='visitors',
-                         page_id='visitors-page',
-                         total_visits=visitor_snapshot['total_visits'],
-                         unique_countries=visitor_snapshot['unique_countries'],
-                         location_count=visitor_snapshot['location_count'])
+    # The visitor map page was retired; its nav slot is now the lab.
+    return redirect(url_for('lab'), code=301)
 
 @app.route('/lyrics')
 def all_lyrics():

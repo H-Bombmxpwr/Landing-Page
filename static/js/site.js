@@ -10,11 +10,11 @@
   }
 
   function visitCounter() {
+    // The counter only renders in the home portrait, but every page records.
     var el = document.getElementById('visit-count-text');
-    if (!el) return;
 
     function display(n) {
-      if (typeof n === 'number') el.textContent = n.toLocaleString();
+      if (el && typeof n === 'number') el.textContent = n.toLocaleString();
     }
 
     try {
@@ -32,7 +32,7 @@
             display(d.count);
           })
           .catch(function () {});
-      } else {
+      } else if (el) {
         fetch('/api/visit-count')
           .then(function (r) { return r.ok ? r.json() : null; })
           .then(function (d) { if (d) display(d.count); })

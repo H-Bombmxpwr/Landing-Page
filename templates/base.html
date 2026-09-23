@@ -60,7 +60,7 @@ ready_</aside>
                 <li><a href="{{ url_for('personal_projects') }}" class="{% if active_page == 'personal' %}nav-active{% endif %}">Personal</a></li>
                 <li><a href="{{ url_for('academic_projects') }}" class="{% if active_page == 'academic' %}nav-active{% endif %}">Academic</a></li>
                 <li><a href="{{ url_for('about') }}" class="{% if active_page == 'about' %}nav-active{% endif %}">About</a></li>
-                <li><a href="{{ url_for('visitors') }}" class="{% if active_page == 'visitors' %}nav-active{% endif %}">Visitors</a></li>
+                <li><a href="{{ url_for('lab') }}" class="{% if active_page == 'lab' %}nav-active{% endif %}">Lab</a></li>
             </ul>
         </nav>
 
@@ -87,9 +87,6 @@ ready_</aside>
             <div class="phosphor-toggle" role="group" aria-label="Phosphor color theme">
                 <button type="button" class="theme-opt" data-theme="green" aria-pressed="false">green</button>
                 <button type="button" class="theme-opt" data-theme="amber" aria-pressed="false">amber</button>
-            </div>
-            <div class="visit-counter">
-                <i class="fas fa-eye"></i> <span id="visit-count-text">{{ "{:,}".format(visit_count) }}</span> visits
             </div>
         </footer>
     </div>

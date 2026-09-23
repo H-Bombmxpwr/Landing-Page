@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block title %}Hunter - Lab{% endblock %}
+
+{% block content %}
+<section class="page-shell lab-page">
+    <div class="page-panel page-header">
+        <p class="page-eyebrow">lab / toys / trinkets</p>
+        <h1 class="page-title"><i class="fas fa-flask"></i> Lab</h1>
+    </div>
+
+    {# Each [data-trinket] card is wired up by static/js/lab.js. #}
+    <div class="lab-grid">
+        <article class="lab-card" data-trinket="life">
+            <header class="lab-bar">
+                <span class="lab-name">life.c</span>
+                <span class="lab-hint">click + drag to draw cells</span>
+            </header>
+            <div class="lab-stage"><canvas aria-label="Conway's Game of Life"></canvas></div>
+            <div class="lab-controls">
+                <button type="button" class="lab-btn" data-action="run">pause</button>
+                <button type="button" class="lab-btn" data-action="step">step</button>
+                <button type="button" class="lab-btn" data-action="random">random</button>
+                <button type="button" class="lab-btn" data-action="gun">glider gun</button>
+                <button type="button" class="lab-btn" data-action="clear">clear</button>
+            </div>
+            <p class="lab-readout" data-readout></p>
+        </article>
+
+        <article class="lab-card" data-trinket="fourier">
+            <header class="lab-bar">
+                <span class="lab-name">epicycles.py</span>
+                <span class="lab-hint">draw anything, even in several strokes</span>
+            </header>
+            <div class="lab-stage"><canvas aria-label="Fourier epicycles writing HUNTER"></canvas></div>
+            <div class="lab-controls">
+                <label class="lab-range">circles
+                    <input type="range" min="1" max="512" value="120" data-terms>
+                    <output data-terms-out>120</output>
+                </label>
+                <button type="button" class="lab-btn" data-action="reset">hunter</button>
+            </div>
+            <p class="lab-readout" data-readout></p>
+        </article>
+
+        <article class="lab-card" data-trinket="sierpinski">
+            <header class="lab-bar">
+                <span class="lab-name">chaos_game.c</span>
+                <span class="lab-hint">drag the corners</span>
+            </header>
+            <div class="lab-stage"><canvas aria-label="Sierpinski triangle built by the chaos game"></canvas></div>
+            <div class="lab-controls">
+                <button type="button" class="lab-btn" data-action="corners">3 corners</button>
+                <button type="button" class="lab-btn" data-action="restart">restart</button>
+            </div>
+            <p class="lab-readout" data-readout></p>
+        </article>
+
+        <article class="lab-card" data-trinket="pendulum">
+            <header class="lab-bar">
+                <span class="lab-name">double_pendulum.ode</span>
+                <span class="lab-hint">drag a bob, let go</span>
+            </header>
+            <div class="lab-stage"><canvas aria-label="Chaotic double pendulum"></canvas></div>
+            <div class="lab-controls">
+                <button type="button" class="lab-btn" data-action="run">pause</button>
+                <button type="button" class="lab-btn" data-action="kick">random swing</button>
+                <button type="button" class="lab-btn" data-action="ghost">hide ghost</button>
+            </div>
+            <p class="lab-readout" data-readout></p>
+        </article>
+
+        <article class="lab-card" data-trinket="lissajous">
+            <header class="lab-bar">
+                <span class="lab-name">dev/scope1 &mdash; x/y</span>
+                <span class="lab-hint">drag across to scrub phase</span>
+            </header>
+            <div class="lab-stage"><canvas aria-label="Lissajous figure on an XY oscilloscope"></canvas></div>
+            <div class="lab-controls">
+                <label class="lab-range">x
+                    <input type="range" min="1" max="9" value="3" data-a>
+                    <output data-a-out>3</output>
+                </label>
+                <label class="lab-range">y
+                    <input type="range" min="1" max="9" value="2" data-b>
+                    <output data-b-out>2</output>
+                </label>
+                <button type="button" class="lab-btn" data-action="drift">freeze</button>
+            </div>
+            <p class="lab-readout" data-readout></p>
+        </article>
+
+        <article class="lab-card" data-trinket="filter">
+            <header class="lab-bar">
+                <span class="lab-name">rc_filter.sim</span>
+                <span class="lab-hint">slide the cutoff</span>
+            </header>
+            <div class="lab-stage"><canvas aria-label="RC filter input and output waveforms"></canvas></div>
+            <div class="lab-controls">
+                <label class="lab-range">f<sub>c</sub>
+                    <input type="range" min="0" max="1000" value="420" data-fc>
+                </label>
+                <button type="button" class="lab-btn" data-action="wave">square</button>
+                <button type="button" class="lab-btn" data-action="mode">low-pass</button>
+            </div>
+            <p class="lab-readout" data-readout></p>
+        </article>
+
+        <article class="lab-card" data-trinket="mandelbrot">
+            <header class="lab-bar">
+                <span class="lab-name">mandelbrot.glsl</span>
+                <span class="lab-hint">hold to zoom, move to steer, right-hold out</span>
+            </header>
+            <div class="lab-stage"><canvas aria-label="Mandelbrot set"></canvas></div>
+            <div class="lab-controls">
+                <button type="button" class="lab-btn" data-action="auto">pause</button>
+                <button type="button" class="lab-btn" data-action="home">zoom out</button>
+            </div>
+            <p class="lab-readout" data-readout></p>
+        </article>
+
+        <article class="lab-card" data-trinket="sort">
+            <header class="lab-bar">
+                <span class="lab-name">sort.cpp</span>
+                <span class="lab-hint">pick an algorithm, hit sort</span>
+            </header>
+            <div class="lab-stage"><canvas aria-label="Sorting algorithm visualization"></canvas></div>
+            <div class="lab-controls">
+                <button type="button" class="lab-btn" data-action="algo">quicksort</button>
+                <button type="button" class="lab-btn" data-action="go">sort</button>
+                <button type="button" class="lab-btn" data-action="shuffle">shuffle</button>
+                <label class="lab-range">speed
+                    <input type="range" min="0" max="8" value="2" data-speed>
+                </label>
+            </div>
+            <p class="lab-readout" data-readout></p>
+        </article>
+
+        <article class="lab-card" data-trinket="resistor">
+            <header class="lab-bar">
+                <span class="lab-name">resistor.bom</span>
+                <span class="lab-hint">click a band (right-click goes back)</span>
+            </header>
+            <div class="lab-stage lab-stage--light">
+                <svg viewBox="0 0 320 180" role="img" aria-label="Four-band resistor"></svg>
+            </div>
+            <div class="lab-controls">
+                <form class="lab-lookup" data-lookup>
+                    <input type="text" data-lookup-input placeholder="4.7k, 4k7, 330..." aria-label="Resistance to look up" autocomplete="off" spellcheck="false">
+                    <button type="submit" class="lab-btn">find</button>
+                </form>
+                <button type="button" class="lab-btn" data-action="random">random part</button>
+                <button type="button" class="lab-btn" data-action="quiz">quiz me</button>
+            </div>
+            <p class="lab-readout" data-readout></p>
+        </article>
+
+        <article class="lab-card" data-trinket="adder">
+            <header class="lab-bar">
+                <span class="lab-name">ripple_adder.v</span>
+                <span class="lab-hint">flip bits, then peek at the gates</span>
+            </header>
+            <div class="lab-stage">
+                <div class="adder">
+                    <div class="adder-row"><span class="adder-label">a</span><div class="bits" data-bits="a"></div><span class="adder-dec" data-dec="a">0</span></div>
+                    <div class="adder-row"><span class="adder-label">b</span><div class="bits" data-bits="b"></div><span class="adder-dec" data-dec="b">0</span></div>
+                    <div class="adder-row adder-carry"><span class="adder-label">c</span><div class="bits" data-bits="c"></div><span></span></div>
+                    <div class="adder-rule"></div>
+                    <div class="adder-row"><span class="adder-label">&Sigma;</span><div class="bits" data-bits="s"></div><span class="adder-dec" data-dec="s">0</span></div>
+                </div>
+                <svg class="adder-gates" viewBox="0 0 400 290" role="img" aria-label="Gate-level ripple-carry adder" hidden></svg>
+                <pre class="adder-code" hidden></pre>
+            </div>
+            <div class="lab-controls">
+                <button type="button" class="lab-btn" data-action="view">view: bits</button>
+                <button type="button" class="lab-btn" data-action="random">random</button>
+                <button type="button" class="lab-btn" data-action="max">15 + 1</button>
+                <button type="button" class="lab-btn" data-action="clear">clear</button>
+            </div>
+            <p class="lab-readout" data-readout></p>
+        </article>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/lab.js') }}"></script>
+{% endblock %}

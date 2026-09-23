@@ -10,7 +10,9 @@
  *   ├── academic           -> /projects/academic
  *   │   ├── fpv-drone      -> /projects/fpv-drone
  *   │   └── ...
- *   ├── visitors           -> /visitors
+ *   ├── lab                -> /lab
+ *   │   ├── mandelbrot     (game: `ssh mandelbrot` opens it fullscreen)
+ *   │   └── ...
  *   ├── lyrics             -> /lyrics
  *   ├── README.md          (file)
  *   └── lyrics.txt         (file, fetched live)
@@ -75,12 +77,16 @@
     var about    = makeDir(fsRoot, 'about',    { routePath: '/about',             desc: 'about me + links' });
     var personal = makeDir(fsRoot, 'personal', { routePath: '/projects/personal', desc: 'personal projects' });
     var academic = makeDir(fsRoot, 'academic', { routePath: '/projects/academic', desc: 'academic projects' });
-    makeDir(fsRoot, 'visitors', { routePath: '/visitors', desc: 'visitor map' });
+    var lab      = makeDir(fsRoot, 'lab', { routePath: '/lab', desc: 'interactive trinkets' });
     makeDir(fsRoot, 'lyrics',   { routePath: '/lyrics',   desc: 'favorite lyrics' });
 
     makeFile(fsRoot, 'README.md',  { desc: 'site readme', content: README_TEXT });
     makeFile(fsRoot, 'lyrics.txt', { desc: 'random lyric (live)', dynamic: fetchLyric });
     makeFile(about,  'bio.txt',    { desc: 'extended bio', content: BIO_TEXT });
+    LAB_GAMES.forEach(function (g) {
+      var node = makeFile(lab, g[0], { desc: g[2], content: 'a lab game. `ssh ' + g[0] + '` to play it fullscreen.' });
+      node.game = g[1];
+    });
 
     var data = window.TERMINAL_PROJECTS || { personal: [], academic: [] };
     (data.personal || []).forEach(function (p) {
@@ -102,6 +108,20 @@
 
     return fsRoot;
   }
+
+  /* Lab games: [name in the terminal, data-trinket id on /lab, blurb]. */
+  var LAB_GAMES = [
+    ['life',       'life',       "conway's game of life"],
+    ['epicycles',  'fourier',    'fourier transform writes HUNTER'],
+    ['chaos-game', 'sierpinski', 'sierpinski triangle from random dots'],
+    ['pendulum',   'pendulum',   'chaotic double pendulum'],
+    ['scope',      'lissajous',  'xy oscilloscope lissajous'],
+    ['rc-filter',  'filter',     'rc low/high-pass simulator'],
+    ['mandelbrot', 'mandelbrot', 'endless fractal zoom'],
+    ['sort',       'sort',       'sorting algorithms, op by op'],
+    ['resistor',   'resistor',   'color code decoder + lookup'],
+    ['adder',      'adder',      '4-bit ripple-carry adder + verilog']
+  ];
 
   var README_TEXT = [
     '# hunter.baisden',
@@ -267,6 +287,7 @@
       ['home',                'navigate to the home page'],
       ['random',              'jump to a random page'],
       ['lyric',               'print a random song lyric'],
+      ['ssh <game>',          'play a lab game fullscreen (ls in lab/ to list)'],
       ['ssh [live|github|video|download]', 'open a project link (only inside a project dir)'],
       ['doom',                'launch DOOM (jsdoom embed) in the terminal'],
       ['theme <green|amber>', 'switch phosphor color'],
@@ -328,6 +349,7 @@
         '<span class="dim">' + escapeHtml(n.desc || '') + '</span>'
       );
     });
+    if (node.name === 'lab' && node.parent === fs) print('ssh <game> to play one fullscreen', 'dim');
   };
 
   COMMANDS.cd = function (args) {
@@ -498,10 +520,35 @@
     return !!(p && (p.name === 'personal' || p.name === 'academic'));
   }
 
+  /* A lab game by terminal name, from lab/ or as a path like lab/sort. */
+  function findGame(arg) {
+    if (!arg) return null;
+    var node = resolve(arg) || resolve('/lab/' + arg.replace(/^\/?(lab\/)?/, ''));
+    return node && node.game ? node : null;
+  }
+
+  function launchGame(node) {
+    if (window.location.pathname === '/lab' && typeof window.labOpen === 'function') {
+      print('ssh ' + node.name + ' → fullscreen (esc to exit)', 'dim');
+      window.labOpen(node.game);
+      return;
+    }
+    print('ssh ' + node.name + ' → /lab ...', 'dim');
+    setTimeout(function () { window.location.href = '/lab#play=' + node.game; }, 220);
+  }
+
   COMMANDS.ssh = function (args) {
+    var game = findGame(args[0]);
+    if (game) { launchGame(game); return; }
+    if (cwd.name === 'lab' && cwd.parent === fs) {
+      print(args[0] ? 'ssh: no game called `' + args[0] + '`' : 'ssh: which game? try `ls`', 'err');
+      print('     games: ' + LAB_GAMES.map(function (g) { return g[0]; }).join(', '), 'dim');
+      return;
+    }
     if (!isProjectNode(cwd)) {
       print('ssh: only available inside a project directory.', 'err');
-      print('     try `cd personal/<project>` or `cd academic/<project>` first.', 'dim');
+      print('     try `cd personal/<project>` or `cd academic/<project>` first,', 'dim');
+      print('     or `ssh <game>` for a lab game (`ls lab` to list them).', 'dim');
       return;
     }
     var links = cwd.links || {};
@@ -628,7 +675,7 @@
     if (cmd === 'ssh') {
       var sshPool = (isProjectNode(cwd) && cwd.links)
         ? Object.keys(cwd.links).filter(function (k) { return cwd.links[k]; })
-        : [];
+        : LAB_GAMES.map(function (g) { return g[0]; });
       return {
         prefix: token,
         matches: sshPool.filter(function (p) { return p.indexOf(token) === 0; }),

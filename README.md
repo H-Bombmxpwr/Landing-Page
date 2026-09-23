@@ -17,9 +17,18 @@ persists in `localStorage`.
 - **Project detail pages** — gallery + lightbox, external links,
   optional embedded most-recent Lichess game for chess-related entries.
 - **About** — bio, education, social links with original brand colors.
-- **Visitors** — Leaflet map of approximate visitor locations
-  (city-level only; no IPs stored). Counter is SQLite-backed and
-  POST'd once per session from the client.
+- **Lab** — `/lab`, a grid of small canvas/SVG toys: Game of Life,
+  Fourier-transform epicycles that write HUNTER in one stroke (or
+  anything you draw), a chaos-game Sierpinski triangle, a chaotic double
+  pendulum, XY-scope Lissajous, RC filter sim, an endless Mandelbrot zoom
+  (auto-dives when idle, hold to steer), a sorting-algorithm visualizer, a
+  resistor color code (with value-to-bands lookup and a quiz) and a
+  ripple-carry adder with live gate-level and Verilog views. Any card can
+  go fullscreen; in the footer terminal, `ls` in `lab/` lists them and
+  `ssh <game>` opens one fullscreen. All client-side in `static/js/lab.js`.
+- **Visit counter** — shown as "N logged in" in the home portrait's
+  title bar. SQLite-backed and POST'd once per session from the
+  client; no IPs or locations are stored.
 - **Lyrics** — `/lyrics` lists the full collection;
   `/api/lyrics/random` powers the home-page rotator and the
   terminal's `lyric` command.
@@ -53,12 +62,11 @@ prompt. Once focused, `Tab` completes commands and paths (cwd-aware),
 
 ## Tech
 
-- **Backend:** Flask, SQLite (visitor counter), `ipinfo.io` for
-  city-level geocoding behind a token (optional). Python dependencies
+- **Backend:** Flask, SQLite (visitor counter). Python dependencies
   are managed with `uv` and locked in `uv.lock`.
 - **Frontend:** vanilla JS, no bundler, no framework. Each subsystem
   has its own file under `static/js/` (`terminal.js`,
-  `terminal-doom.js`, `visitors-map.js`, etc.). Styles split across
+  `terminal-doom.js`, `portrait.js`, etc.). Styles split across
   `static/css/style.css` (site-wide) and `static/css/terminal.css`
   (terminal panel).
 - **Type:** IBM Plex Mono via Google Fonts.
@@ -89,7 +97,6 @@ Optional environment variables (in `.env`):
 | --- | --- |
 | `SECRET_KEY` | Flask session secret |
 | `DATA_DIR` | Override where `visits.json` + `visitors.sqlite3` live (set to a persistent volume mount in production) |
-| `IPINFO_TOKEN` | Geocoding token for visitor map (works without one, just rate-limited) |
 | `ADMIN_KEY` | Header value required by `POST /api/reset-visitors` |
 | `PORT` | Override the dev-server port (default 5000) |
 
@@ -113,7 +120,7 @@ scripts/
 ## Deployment
 
 The Dockerfile installs `uv`, syncs from `uv.lock`, and runs Gunicorn
-with `uv run --frozen`. The Procfile uses the same `uv run --frozen`
+directly from the venv. The Procfile uses the same `uv run --frozen`
 Gunicorn command for hosts that use Procfile-based starts. The Python
 version is pinned in `.python-version` (picked up by `uv` locally and
 by modern Heroku / Railway / Nixpacks builders).
